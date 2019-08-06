@@ -1,0 +1,147 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+def isCiServer = System.getenv().containsKey("IS_CI_ENV")
+
+project.ext {
+    my_group = 'net.parget.konfigurations'
+    my_artifact = 'konfigurations'
+    my_version = '5.0.0'
+    my_name = 'Konfigurations'
+    my_real_name = 'Koosha Hosseiny'
+    my_email = 'koosha.hosseiny@gmail.com'
+    my_description = 'Simple, small and extendable configuration management library with live updates.'
+    my_url = 'https://github.com/hkoosha/konfigurations'
+    my_url_issues = 'https://github.com/hkoosha/konfigurations/issues'
+    my_git = 'scm:git:git://github.com/hkoosha/konfigurations.git'
+    my_git_conn = 'scm:git:git@github.com:hkoosha/konfigurations.git'
+    my_org = 'net.pargar'
+    my_org_url = 'https://pargar.net'
+}
+
+group ext.my_group
+version ext.my_version
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+test {
+    useTestNG()
+}
+
+idea {
+    module {
+        outputDir = file('build')
+        inheritOutputDirs = true
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+dependencies {
+    compileOnly 'com.fasterxml.jackson.core:jackson-core:2.9.9'
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
+    compileOnly 'com.google.inject:guice:4.0'
+
+    testCompile 'com.fasterxml.jackson.core:jackson-core:2.9.9'
+    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
+    testCompile 'org.testng:testng:6.14.3'
+    testCompile 'org.slf4j:slf4j-api:1.7.26'
+    testCompile 'org.slf4j:slf4j-simple:1.7.26'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task allJar(type: Jar, dependsOn: [sourcesJar, javadocJar, jar]) {
+    classifier = 'everything'
+    from sourceSets.main.allSource
+    from javadoc.destinationDir
+    baseName = 'allJar'
+    from configurations.archives.artifacts.files.collect {
+        zipTree(it)
+    }
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+    // archives allJar
+}
+
+signing {
+    sign configurations.archives
+}
+
+publishing {
+    publications {
+        sonata(MavenPublication) {
+            pom {
+                description = project.ext.my_description
+                name = project.ext.my_name
+                url = project.ext.my_url
+                organization {
+                    name = project.ext.my_org
+                    url = project.ext.my_org_url
+                }
+                issueManagement {
+                    system = 'GitHub'
+                    url = project.ext.my_url_issues
+                }
+                licenses {
+                    license {
+                        name = 'GNU General Public License'
+                        url = 'https://www.gnu.org/licenses/gpl-3.0.txt'
+                    }
+                }
+                scm {
+                    connection = project.ext.my_git
+                    developerConnection = project.ext.my_git_conn
+                    url = project.ext.my_url
+                }
+                developers {
+                    developer {
+                        url = project.ext.my_org_url
+                        name = project.ext.my_real_name
+                        email = project.ext.my_email
+                    }
+                }
+            }
+            groupId project.ext.my_group
+            artifactId project.ext.my_artifact
+            version project.ext.my_version
+            from components.java
+            artifact sourcesJar {
+                classifier 'sources'
+            }
+            artifact javadocJar {
+                classifier 'javadoc'
+            }
+            repositories {
+                maven {
+                    url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+                    if(!isCiServer) {
+                      credentials {
+                          username sonatypeUsername
+                          password sonatypePassword
+                      }
+                    }
+                }
+            }
+        }
+    }
+}
