@@ -6,9 +6,9 @@ apply plugin: 'signing'
 def isCiServer = System.getenv().containsKey("IS_CI_ENV")
 
 project.ext {
-    my_group = 'net.parget.konfigurations'
+    my_group = 'io.koosha.konfigurations'
     my_artifact = 'konfigurations'
-    my_version = '5.0.0'
+    my_version = '6.0.0'
     my_name = 'Konfigurations'
     my_real_name = 'Koosha Hosseiny'
     my_email = 'koosha.hosseiny@gmail.com'
@@ -17,8 +17,12 @@ project.ext {
     my_url_issues = 'https://github.com/hkoosha/konfigurations/issues'
     my_git = 'scm:git:git://github.com/hkoosha/konfigurations.git'
     my_git_conn = 'scm:git:git@github.com:hkoosha/konfigurations.git'
-    my_org = 'net.pargar'
-    my_org_url = 'https://pargar.net'
+    my_org = 'io.koosha'
+    my_org_url = 'https://koosha.io'
+}
+
+tasks.withType(JavaCompile) {
+    options.fork = true
 }
 
 group ext.my_group
@@ -35,6 +39,10 @@ repositories {
 test {
     useTestNG()
 }
+compileTestJava {
+  sourceCompatibility = "11"
+  targetCompatibility = "11"
+}
 
 idea {
     module {
@@ -46,15 +54,23 @@ idea {
 }
 
 dependencies {
-    compileOnly 'com.fasterxml.jackson.core:jackson-core:2.9.9'
-    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
-    compileOnly 'com.google.inject:guice:4.0'
+    compileOnly 'com.fasterxml.jackson.core:jackson-core:2.10.1'
+    compileOnly 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
+    compileOnly 'org.yaml:snakeyaml:1.25'
 
-    testCompile 'com.fasterxml.jackson.core:jackson-core:2.9.9'
-    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.9.9'
-    testCompile 'org.testng:testng:6.14.3'
-    testCompile 'org.slf4j:slf4j-api:1.7.26'
-    testCompile 'org.slf4j:slf4j-simple:1.7.26'
+    compileOnly 'org.jetbrains:annotations:18.0.0'
+    compileOnly 'net.jcip:jcip-annotations:1.0'
+
+
+    compileOnly "org.projectlombok:lombok:1.18.10"
+    annotationProcessor "org.projectlombok:lombok:1.18.10"
+
+    testImplementation 'com.fasterxml.jackson.core:jackson-core:2.10.1'
+    testImplementation 'com.fasterxml.jackson.core:jackson-databind:2.10.1'
+    testImplementation 'org.yaml:snakeyaml:1.25'
+    testImplementation 'org.testng:testng:7.0.3'
+    testImplementation 'org.slf4j:slf4j-api:2.0.0-alpha1'
+    testImplementation 'org.slf4j:slf4j-simple:2.0.0-alpha1'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
@@ -71,7 +87,7 @@ task allJar(type: Jar, dependsOn: [sourcesJar, javadocJar, jar]) {
     classifier = 'everything'
     from sourceSets.main.allSource
     from javadoc.destinationDir
-    baseName = 'allJar'
+    archiveBaseName = 'allJar'
     from configurations.archives.artifacts.files.collect {
         zipTree(it)
     }
@@ -84,7 +100,14 @@ artifacts {
 }
 
 signing {
+    required {
+      !version.toString().endsWith('-SNAPSHOT') && 
+        tasks.withType(PublishToMavenRepository).find {
+         gradle.taskGraph.hasTask it
+      }
+    }
     sign configurations.archives
+    sign publishing.publications
 }
 
 publishing {

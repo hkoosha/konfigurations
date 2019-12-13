@@ -1,0 +1,9 @@
+bang:
+  str: hello
+  i: 99
+  olf:
+    manga: panga
+    foo: bar
+    baz: quo
+  again: 'no'
+

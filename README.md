@@ -1,4 +1,3 @@
-
 ## Java Configuration Library [![Build Status](https://travis-ci.org/hkoosha/konfigurations.svg?branch=master)](https://travis-ci.org/hkoosha/konfigurations)
 
 Simple, small and extendable configuration management library with live updates.
@@ -7,25 +6,27 @@ Simple, small and extendable configuration management library with live updates.
 
 ```xml
 <dependency>
-    <groupId>net.pargar.konfigurations</groupId>
+    <groupId>io.koosha.konfigurations</groupId>
     <artifactId>konfigurations</artifactId>
     <version>5.0.0</version>
 </dependency>
 ```
 
 ```groovy
-compile group: 'net.pargar.konfigurations', name: 'konfigurations', version: '5.0.0'
+compile group: 'io.koosha.konfigurations', name: 'konfigurations', version: '5.0.0'
 ```
+
+Development happens on master branch. Releases (versions) are tagged. 
 
 
 ## Project goals:
 
+- Lightweight, small, easy.
 - Supporting multiple configuration sources.
-- Extendible in every aspect.
 - Live updates, with possibility of removing old keys or adding new ones.
 - Possibility of registering to configuration changes, per key or generally.
 - Configuration namespace management.
-- Support Android.
+- Hopefully support Android.
 
 ## Usage:
 
@@ -35,17 +36,14 @@ which contains the requested key is selected and takes precendece.
 **Default values**: For non-existing keys, default values can be passed to 
 `v(DEFAULT_VALUE)`
 
-**Multi-Line String**s in JsonKonfigSource: as it uses Jackson, it's possible
-to span strings to multiple lines by declaring each part as an array element.
-
 **List, Map, Custom Type**: As long as the underlying source can parse it from 
 the actual configuration source, it's possible. The JsonKonfigSource uses 
-Jackson for parsing json, so if the Jackson parser can parse the 
-map / list / object, so can the configuration.
+Jackson for parsing json, so if the Jackson parser can parse the map / list /
+object, so can the configuration.
 
 **Observing changes**: Observers can register to changes of a specific key 
-(register(KeyObserver) on the `V` interface) or to any configuration change 
-(register(EverythingObserver) onthe Konfiguration interface). 
+(`register(KeyObserver` on the `V` interface) or to any configuration change 
+(`register(EverythingObserver)` on the `Konfiguration` interface). 
 
 **Observing multiple keys** from a single listener is possible, and the 
 observer will be notified once for each updated key in each update. 
@@ -55,28 +53,36 @@ reference is kept to listeners (GC works as expected).
 
 ```java
 // Create as many sources as necessary
-JsonKonfigSource js = new JsonKonfigSource(this::readJsonString);
-InMemoryKonfigSource ms = new InMemoryKonfigSource(this::readMapOfConfigs);
-InMemoryKonfigSource fix = new InMemoryKonfigSource(new HashMap(...));
+JsonKonfigSource     json = new JsonKonfigSource    (() -> Files.read("/etc/my_app.cfg"));
+InMemoryKonfigSource map0 = new InMemoryKonfigSource(() -> Map.of(foo, bar, baz, quo));
+InMemoryKonfigSource map1 = new InMemoryKonfigSource(() -> NetworkUtil.decodeAsMap("http://example.com/endpoint/config?token=hahaha"));
 
-// Kombine them (ms takes priority over js and js over fix).
-Konfiguration konfig = new KonfigurationKombiner(ms, js, fix);
+// Kombine them (map0 takes priority over json and json over map1).
+Konfiguration konfig = new KonfigurationKombiner(map0, json, map1);
 
 // Get the value, notice the .v()
 boolean b = konfig.bool   ("some.konfig.key.deeply.nested").v()
 int     i = konfig.int_   ("some.int").v()
 long    l = konfig.long_  ("some.long").v()
 String  s = konfig.string ("aString").v()
-Double  d = konfig.double ("double").v()
+double  d = konfig.double_("double").v()
 
-List<String>         list = konfig.list("a.nice.string.list", String.class).v()
-Map<String, Integer> map  = konfig.map ("my.map", int.class).v()
+List<Invoice>       list = konfig.list("a.nice.string.list", Invoice.class).v()
+Map<String, Integer> map = konfig.map ("my.map", int.class).v()
 
 // --------------
 
-K<Integer> defValue = konfig.int_("non.existing.key");
-Integer value = defValue.v(42);
+K<Integer> maybe = konfig.int_("might.be.unavailable");
+int value = maybe.v(42);
 assert value == 42;
+
+// Sometime later, "non.existing.key" is actually written into config source,
+// and konfig.update() is called in the worker thread.
+
+K<Integer> defValue = konfig.int_("non.existing.key");
+int value = defValue.v(42);
+assert value == 42;
+
 
 ```
 
