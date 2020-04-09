@@ -1,13 +1,11 @@
 package io.koosha.konfiguration;
 
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Objects;
 
 import static java.util.Collections.emptyMap;
 
@@ -18,8 +16,6 @@ import static java.util.Collections.emptyMap;
 public class KfgAssertionException extends KfgException {
 
     @NotNull
-    @Getter
-    @Accessors(fluent = true)
     private final Map<String, ?> context;
 
     public KfgAssertionException(@Nullable String message) {
@@ -28,8 +24,9 @@ public class KfgAssertionException extends KfgException {
     }
 
     public KfgAssertionException(@Nullable String message,
-                                 @NotNull @NonNull final Map<String, ?> context) {
+                                 @NotNull final Map<String, ?> context) {
         super(null, null, null, null, message);
+        Objects.requireNonNull(context, "context");
         this.context = context;
     }
 
@@ -74,6 +71,11 @@ public class KfgAssertionException extends KfgException {
                                  @Nullable Object actualValue) {
         super(source, key, neededType, actualValue);
         this.context = emptyMap();
+    }
+
+    @NotNull
+    public Map<String, ?> context() {
+        return this.context;
     }
 
 }

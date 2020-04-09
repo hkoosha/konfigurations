@@ -1,7 +1,6 @@
 package io.koosha.konfiguration;
 
 
-import lombok.NonNull;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
@@ -35,7 +34,7 @@ public interface K<U> {
      */
     @NotNull
     @Contract(mutates = "this")
-    Handle registerSoft(@NonNull @NotNull KeyObserver observer);
+    Handle registerSoft(@NotNull KeyObserver observer);
 
     /**
      * Register to receive update notifications for changes in value of this
@@ -51,7 +50,7 @@ public interface K<U> {
      */
     @NotNull
     @Contract(mutates = "this")
-    Handle register(@NonNull @NotNull KeyObserver observer);
+    Handle register(@NotNull KeyObserver observer);
 
     /**
      * De-register a listener previously registered via
@@ -72,7 +71,7 @@ public interface K<U> {
      */
     @NotNull
     @Contract(mutates = "this")
-    K<U> deregister(@NonNull @NotNull Handle observer);
+    K<U> deregister(@NotNull Handle observer);
 
 
     /**
@@ -125,6 +124,7 @@ public interface K<U> {
      * Same as {@link #v()} but in case of null throws {@link KfgMissingKeyException}.
      *
      * @see #v(Object)
+     * @return value this konfig holds, but throws {@link KfgMissingKeyException} if that value is going to be null.
      */
     @NotNull
     @Contract(mutates = "this")

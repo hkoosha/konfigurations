@@ -1,10 +1,6 @@
 package io.koosha.konfiguration;
 
 
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -20,24 +16,20 @@ import java.util.*;
 @SuppressWarnings("unused")
 @ThreadSafe
 @Immutable
-@Accessors(fluent = true)
-@EqualsAndHashCode
 @ApiStatus.AvailableSince(Factory.VERSION_8)
 public abstract class Q<TYPE> {
 
     @Nullable
-    @Getter
     private final String key;
 
     @Nullable
-    @Getter
     private final ParameterizedType pt;
 
     @NotNull
-    @Getter
     private final Class<TYPE> klass;
 
-    private Q(@NotNull @NonNull final Class<TYPE> type) {
+    private Q(@NotNull final Class<TYPE> type) {
+        Objects.requireNonNull(type, "type");
         this.key = null;
         this.pt = null;
         this.klass = type;
@@ -45,7 +37,8 @@ public abstract class Q<TYPE> {
 
     private Q(@Nullable final String key,
               @Nullable final ParameterizedType pt,
-              @NotNull @NonNull final Class<TYPE> klass) {
+              @NotNull final Class<TYPE> klass) {
+        Objects.requireNonNull(klass, "klass");
         this.key = key;
         this.pt = pt;
         this.klass = klass;
@@ -80,10 +73,48 @@ public abstract class Q<TYPE> {
         );
     }
 
+    @Override
+    public boolean equals(final Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Q))
+            return false;
+        final Q<?> other = (Q<?>) o;
+        return Objects.equals(this.key, other.key)
+                && Objects.equals(this.pt, other.pt)
+                && Objects.equals(this.klass, other.klass);
+    }
+
+    @Override
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = 1;
+        result = result * PRIME + (this.key == null ? 43 : ((Object) this.key).hashCode());
+        result = result * PRIME + (this.pt == null ? 43 : this.pt.hashCode());
+        result = result * PRIME + this.klass.hashCode();
+        return result;
+    }
+
+    @Nullable
+    public String key() {
+        return this.key;
+    }
+
+    @Nullable
+    public ParameterizedType pt() {
+        return this.pt;
+    }
+
+    @NotNull
+    public Class<TYPE> klass() {
+        return this.klass;
+    }
+
+
     public Q<TYPE> withKey(final String key) {
         return Objects.equals(this.key, key)
-               ? new Q<TYPE>(key, this.pt, this.klass) {}
-               : this;
+                ? new Q<TYPE>(key, this.pt, this.klass) {}
+                : this;
     }
 
     public final boolean isParametrized() {
@@ -244,7 +275,8 @@ public abstract class Q<TYPE> {
     @NotNull
     @Contract(value = "_ -> new",
             pure = true)
-    public static <U> Q<U> of(@NotNull @NonNull final Class<U> klass) {
+    public static <U> Q<U> of(@NotNull final Class<U> klass) {
+        Objects.requireNonNull(klass, "klass");
         return new Q<U>(klass) {};
     }
 
@@ -277,7 +309,8 @@ public abstract class Q<TYPE> {
     @NotNull
     @Contract(value = "_ -> new",
             pure = true)
-    private static <U> Q<U> of_(@NotNull @NonNull final Class<?> klass) {
+    private static <U> Q<U> of_(@NotNull final Class<?> klass) {
+        Objects.requireNonNull(klass, "klass");
         return (Q<U>) of(klass);
     }
 
@@ -305,7 +338,8 @@ public abstract class Q<TYPE> {
 
     @Contract(pure = true)
     public static Q<?> withKey0(@Nullable final Q<?> type,
-                                @NotNull @NonNull final String key) {
+                                @NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return type == null ? Q._VOID.withKey(key) : type.withKey(key);
     }
 

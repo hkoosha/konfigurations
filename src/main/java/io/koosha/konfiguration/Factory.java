@@ -31,7 +31,8 @@ public interface Factory {
      * @return implementation version.
      */
     @Contract(pure = true)
-    @NotNull String getVersion();
+    @NotNull
+    String getVersion();
 
     // =========================================================================
 
@@ -42,6 +43,7 @@ public interface Factory {
     /**
      * Create a new konfiguration object from given sources.
      *
+     * @param name name of created konfiguration.
      * @param k0 first source
      * @return kombined sources.
      */
@@ -53,6 +55,7 @@ public interface Factory {
     /**
      * Create a new konfiguration object from given sources.
      *
+     * @param name name of created konfiguration.
      * @param k0      first source
      * @param sources rest of sources
      * @return kombined sources.
@@ -66,6 +69,7 @@ public interface Factory {
     /**
      * Create a new konfiguration object from given sources.
      *
+     * @param name name of created konfiguration.
      * @param sources sources to combine.
      * @return kombined sources.
      * @throws NullPointerException     if sources is null.
@@ -260,6 +264,7 @@ public interface Factory {
      * Creates a {@link Konfiguration} with the given backing store.
      *
      * @param storage konfig source.
+     * @param deser deserializer in case {@link Konfiguration#custom(String, Q)} is used.
      * @return a konfig source.
      * @throws NullPointerException if provided storage provider is null
      * @throws KfgSourceException   if the provided storage by provider is null
@@ -269,6 +274,16 @@ public interface Factory {
     Konfiguration preferences_(@NotNull Preferences storage,
                                @NotNull Deserializer deser);
 
+    /**
+     * Creates a {@link Konfiguration} with the given backing store.
+     *
+     * @param name name of created configuration.
+     * @param storage konfig source.
+     * @param deser deserializer in case {@link Konfiguration#custom(String, Q)} is used.
+     * @return a konfig source.
+     * @throws NullPointerException if provided storage provider is null
+     * @throws KfgSourceException   if the provided storage by provider is null
+     */
     @NotNull
     @Contract("_, _, _ -> new")
     Konfiguration preferences(@NotNull String name,
@@ -283,6 +298,7 @@ public interface Factory {
      * type (instance of {@link Q}) the source will act as if it does not
      * contain that key.
      *
+     * @param name name of created konfiguration.
      * @param json backing store provider. Must always return a
      *             non-null valid json string.
      * @return a konfig source.
@@ -405,6 +421,7 @@ public interface Factory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
+     * @param name name of created konfiguration.
      * @param json backing store.
      * @return a konfig source.
      * @throws NullPointerException if any of its arguments are null.
@@ -429,6 +446,7 @@ public interface Factory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
+     * @param name name of created konfiguration.
      * @param json         backing store.
      * @param objectMapper A {@link ObjectMapper} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
@@ -456,6 +474,7 @@ public interface Factory {
      * type (instance of {@link Q}) the source will act as if it does not
      * contain that key.
      *
+     * @param name name of created konfiguration.
      * @param json         backing store provider. Must always return a
      *                     non-null valid json string.
      * @param objectMapper A {@link ObjectMapper} provider. Must always return
@@ -588,6 +607,7 @@ public interface Factory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
+     * @param name name of created konfiguration.
      * @param yaml backing store.
      * @return a konfig source.
      * @throws NullPointerException if any of its arguments are null.
@@ -612,6 +632,7 @@ public interface Factory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
+     * @param name name of created konfiguration.
      * @param yaml         backing store.
      * @param objectMapper A {@link Yaml} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
@@ -641,6 +662,7 @@ public interface Factory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
+     * @param name name of created konfiguration.
      * @param yaml backing store provider. Must always return a
      *             non-null valid json string.
      * @return a konfig source.
@@ -666,6 +688,7 @@ public interface Factory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
+     * @param name name of created konfiguration.
      * @param yaml         backing store provider. Must always return a
      *                     non-null valid json string.
      * @param objectMapper A {@link Yaml} provider. Must always return
@@ -696,6 +719,7 @@ public interface Factory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
+     * @param name name of created konfiguration.
      * @param yaml backing store provider. Must always return a
      *             non-null valid json string.
      * @return a konfig source.
@@ -721,6 +745,7 @@ public interface Factory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
+     * @param name name of created konfiguration.
      * @param yaml         backing store provider. Must always return a
      *                     non-null valid json string.
      * @param objectMapper A {@link Yaml} provider. Must always return

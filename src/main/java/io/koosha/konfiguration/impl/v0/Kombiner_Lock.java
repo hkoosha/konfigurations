@@ -2,12 +2,12 @@ package io.koosha.konfiguration.impl.v0;
 
 import io.koosha.konfiguration.KfgConcurrencyException;
 import io.koosha.konfiguration.KfgIllegalStateException;
-import lombok.NonNull;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -20,7 +20,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 final class Kombiner_Lock {
 
     @NotNull
-    @NonNull
     private final String name;
 
     @Nullable
@@ -29,9 +28,11 @@ final class Kombiner_Lock {
     @NotNull
     private final ReadWriteLock LOCK;
 
-    public Kombiner_Lock(@NotNull @NonNull final String name,
+    public Kombiner_Lock(@NotNull final String name,
                          @Nullable final Long lockWaitTimeMillis,
                          final boolean fair) {
+        Objects.requireNonNull(name, "name");
+
         if (lockWaitTimeMillis != null && lockWaitTimeMillis < 0)
             throw new KfgIllegalStateException(name, "wait time must be gte 0: " + lockWaitTimeMillis);
         this.name = name;
@@ -39,7 +40,9 @@ final class Kombiner_Lock {
         LOCK = new ReentrantReadWriteLock(fair);
     }
 
-    private void acquire(@NonNull @NotNull final Lock lock) {
+    private void acquire(@NotNull final Lock lock) {
+        Objects.requireNonNull(lock, "lock");
+
         if (this.lockWaitTimeMillis == null)
             lock.lock();
         else
@@ -57,7 +60,9 @@ final class Kombiner_Lock {
             lock.unlock();
     }
 
-    <T> T doReadLocked(@NonNull @NotNull final Supplier<T> func) {
+    <T> T doReadLocked(@NotNull final Supplier<T> func) {
+        Objects.requireNonNull(func, "func");
+
         Lock lock = null;
         try {
             lock = LOCK.readLock();
@@ -69,7 +74,9 @@ final class Kombiner_Lock {
         }
     }
 
-    <T> T doWriteLocked(@NonNull @NotNull final Supplier<T> func) {
+    <T> T doWriteLocked(@NotNull final Supplier<T> func) {
+        Objects.requireNonNull(func, "func");
+
         Lock lock = null;
         try {
             lock = LOCK.readLock();

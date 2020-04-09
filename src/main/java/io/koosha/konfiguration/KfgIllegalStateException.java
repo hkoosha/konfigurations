@@ -1,13 +1,11 @@
 package io.koosha.konfiguration;
 
-import lombok.Getter;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static io.koosha.konfiguration.KfgException.toStringOf;
 
-@Getter
 @ThreadSafe
 public class KfgIllegalStateException extends IllegalStateException {
 
@@ -68,6 +66,26 @@ public class KfgIllegalStateException extends IllegalStateException {
         this.key = key;
         this.neededType = neededType;
         this.actualValue = toStringOf(actualValue);
+    }
+
+    @Nullable
+    public String getSource() {
+        return this.source;
+    }
+
+    @Nullable
+    public String getKey() {
+        return this.key;
+    }
+
+    @Nullable
+    public Q<?> getNeededType() {
+        return this.neededType;
+    }
+
+    @Nullable
+    public String getActualValue() {
+        return this.actualValue;
     }
 
 }

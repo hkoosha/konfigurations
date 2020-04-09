@@ -1,9 +1,6 @@
 package io.koosha.konfiguration.impl.v0;
 
 import io.koosha.konfiguration.*;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -28,17 +25,18 @@ import java.util.Set;
 @ApiStatus.Internal
 final class JSubsetView implements Konfiguration {
 
-    @Accessors(fluent = true)
-    @Getter
     private final String name;
     private final Konfiguration wrapped;
     private final String baseKey;
 
-    JSubsetView(@NonNull @NotNull final String name,
-                @NotNull @NonNull final Konfiguration wrapped,
-                @NotNull @NonNull final String baseKey) {
+    JSubsetView(@NotNull final String name,
+                @NotNull final Konfiguration wrappedKonfiguration,
+                @NotNull final String baseKey) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(wrappedKonfiguration, "wrappedKonfiguration");
+        Objects.requireNonNull(baseKey, "baseKey");
         this.name = name;
-        this.wrapped = wrapped;
+        this.wrapped = wrappedKonfiguration;
 
         if (baseKey.startsWith(".")) // covers baseKey == "." too.
             throw new KfgIllegalArgumentException(this.name(), "key must not start with a dot: " + baseKey);
@@ -53,13 +51,25 @@ final class JSubsetView implements Konfiguration {
             this.baseKey = baseKey + ".";
     }
 
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    public String name() {
+        return this.name;
+    }
+
+
     /**
      * {@inheritDoc}
      */
     @Contract(pure = true)
     @Override
     @NotNull
-    public K<Boolean> bool(@NotNull @NonNull final String key) {
+    public K<Boolean> bool(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.bool(key(key));
     }
 
@@ -69,7 +79,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public K<Byte> byte_(@NotNull @NonNull final String key) {
+    public K<Byte> byte_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.byte_(key(key));
     }
 
@@ -79,7 +90,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public K<Character> char_(@NotNull @NonNull String key) {
+    public K<Character> char_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.char_(key(key));
     }
 
@@ -89,7 +101,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public K<Short> short_(@NotNull @NonNull String key) {
+    public K<Short> short_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.short_(key(key));
     }
 
@@ -99,7 +112,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public K<Integer> int_(@NotNull @NonNull final String key) {
+    public K<Integer> int_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.int_(key(key));
     }
 
@@ -109,7 +123,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public K<Long> long_(@NotNull @NonNull final String key) {
+    public K<Long> long_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.long_(key(key));
     }
 
@@ -119,7 +134,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public K<Float> float_(@NotNull @NonNull final String key) {
+    public K<Float> float_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.float_(key(key));
     }
 
@@ -129,7 +145,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public K<Double> double_(@NotNull @NonNull final String key) {
+    public K<Double> double_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.double_(key(key));
     }
 
@@ -139,7 +156,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public K<String> string(@NotNull @NonNull final String key) {
+    public K<String> string(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return wrapped.string(key(key));
     }
 
@@ -149,8 +167,9 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public <U> K<List<U>> list(@NonNull @NotNull final String key,
+    public <U> K<List<U>> list(@NotNull final String key,
                                @Nullable final Q<List<U>> type) {
+        Objects.requireNonNull(key, "key");
         return wrapped.list(key(key), type);
     }
 
@@ -160,8 +179,9 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public <U, V> K<Map<U, V>> map(@NonNull @NotNull final String key,
+    public <U, V> K<Map<U, V>> map(@NotNull final String key,
                                    @Nullable final Q<Map<U, V>> type) {
+        Objects.requireNonNull(key, "key");
         return wrapped.map(key(key), type);
     }
 
@@ -171,8 +191,9 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public <U> K<Set<U>> set(@NotNull @NonNull final String key,
+    public <U> K<Set<U>> set(@NotNull final String key,
                              @Nullable final Q<Set<U>> type) {
+        Objects.requireNonNull(key, "key");
         return wrapped.set(key(key), type);
     }
 
@@ -182,8 +203,9 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public <U> K<U> custom(@NotNull @NonNull final String key,
+    public <U> K<U> custom(@NotNull final String key,
                            @Nullable final Q<U> type) {
+        Objects.requireNonNull(key, "key");
         return wrapped.custom(key(key), type);
     }
 
@@ -192,8 +214,9 @@ final class JSubsetView implements Konfiguration {
      */
     @Contract(pure = true)
     @Override
-    public boolean has(@NonNull @NotNull final String key,
+    public boolean has(@NotNull final String key,
                        @Nullable final Q<?> type) {
+        Objects.requireNonNull(key, "key");
         return wrapped.has(key(key), type);
     }
 
@@ -203,8 +226,10 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public Handle registerSoft(@NotNull @NonNull final KeyObserver observer,
-                               @NotNull @NonNull final String key) {
+    public Handle registerSoft(@NotNull final KeyObserver observer,
+                               @NotNull final String key) {
+        Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
         return this.wrapped.registerSoft(observer, key(key));
     }
 
@@ -214,8 +239,10 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true)
     @NotNull
     @Override
-    public Konfiguration deregister(@NotNull @NonNull final Handle observer,
-                                    @NotNull @NonNull final String key) {
+    public Konfiguration deregister(@NotNull final Handle observer,
+                                    @NotNull final String key) {
+        Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
         return this.wrapped.deregister(observer, key(key));
     }
 
@@ -224,8 +251,10 @@ final class JSubsetView implements Konfiguration {
      */
     @Contract(pure = true)
     @Override
-    public @NonNull @NotNull Handle register(@NotNull @NonNull final KeyObserver observer,
-                                             @NotNull @NonNull final String key) {
+    public @NotNull Handle register(@NotNull final KeyObserver observer,
+                                    @NotNull final String key) {
+        Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
         return this.wrapped.register(observer, key(key));
     }
 
@@ -236,7 +265,8 @@ final class JSubsetView implements Konfiguration {
             value = "_ -> _")
     @NotNull
     @Override
-    public Konfiguration subset(@NonNull @NotNull final String key) {
+    public Konfiguration subset(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return key.isEmpty()
                ? this
                : new JSubsetView(
@@ -265,7 +295,8 @@ final class JSubsetView implements Konfiguration {
     @Contract(pure = true,
             value = "_ -> _")
     @NotNull
-    private String key(@NonNull @NotNull final String key) {
+    private String key(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         if (Objects.equals(key, KeyObserver.LISTEN_TO_ALL))
             return key;
 

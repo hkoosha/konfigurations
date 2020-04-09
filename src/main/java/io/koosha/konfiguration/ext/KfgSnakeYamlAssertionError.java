@@ -1,8 +1,6 @@
 package io.koosha.konfiguration.ext;
 
 import io.koosha.konfiguration.Q;
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -11,9 +9,7 @@ import static java.util.Collections.emptyMap;
 
 public class KfgSnakeYamlAssertionError extends KfgSnakeYamlError {
 
-    @Getter
     @Nullable
-    @Accessors(fluent = true)
     private final Map<String, ?> context;
 
     public KfgSnakeYamlAssertionError(@Nullable String source,
@@ -71,6 +67,11 @@ public class KfgSnakeYamlAssertionError extends KfgSnakeYamlError {
                                       @Nullable Object actualValue) {
         super(source, key, neededType, actualValue);
         this.context = emptyMap();
+    }
+
+    @Nullable
+    public Map<String, ?> context() {
+        return this.context;
     }
 
 }

@@ -1,10 +1,8 @@
 package io.koosha.konfiguration;
 
-import lombok.Getter;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Nullable;
 
-@Getter
 @ThreadSafe
 public class KfgIllegalArgumentException extends IllegalArgumentException {
 
@@ -15,6 +13,11 @@ public class KfgIllegalArgumentException extends IllegalArgumentException {
                                        final String message) {
         super(message);
         this.source = source;
+    }
+
+    @Nullable
+    public String getSource() {
+        return this.source;
     }
 
 }

@@ -4,11 +4,7 @@ import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.Q;
-import lombok.AllArgsConstructor;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
 import net.jcip.annotations.NotThreadSafe;
-import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -17,13 +13,10 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Consumer;
 
-@AllArgsConstructor
-@Accessors(fluent = true)
 @NotThreadSafe
 @ApiStatus.Internal
 final class Kombiner_Values {
 
-    @NonNull
     @NotNull
     private final Kombiner origin;
 
@@ -33,9 +26,15 @@ final class Kombiner_Values {
     @NotNull
     final Map<Q<?>, ? super Object> cache = new HashMap<>();
 
+    Kombiner_Values(@NotNull final Kombiner origin) {
+        Objects.requireNonNull(origin, "origin");
+        this.origin = origin;
+    }
+
     @SuppressWarnings({"unchecked", "rawtypes", "RedundantCast"})
-    <U> K<U> k(@NotNull @NonNull final String key,
+    <U> K<U> k(@NotNull final String key,
                @Nullable final Q<U> type) {
+        Objects.requireNonNull(key, "key");
         this.issue(key, type);
         return new Kombiner_K<>(this.origin, key, type == null ? (Q) Q._VOID : type);
     }
@@ -43,10 +42,11 @@ final class Kombiner_Values {
     @Contract(mutates = "this")
     @Nullable
     @SuppressWarnings("unchecked")
-    <U> U v(@NonNull @NotNull final String key,
+    <U> U v(@NotNull final String key,
             @Nullable final Q<?> type,
             @Nullable final U def,
             final boolean mustExist) {
+        Objects.requireNonNull(key, "key");
         final Q<?> t = Q.withKey0(type, key);
 
         return this.origin.r(() -> {
@@ -59,6 +59,7 @@ final class Kombiner_Values {
     Object v_(@NotNull final Q<?> key,
               final Object def,
               final boolean mustExist) {
+        Objects.requireNonNull(key, "key");
         final String keyStr = key.key();
         Objects.requireNonNull(keyStr, "key passed through kombiner is null");
         final Optional<Konfiguration> first = this
@@ -77,12 +78,12 @@ final class Kombiner_Values {
         return value;
     }
 
-    boolean has(@NonNull @NotNull final Q<?> t) {
+    boolean has(@NotNull final Q<?> t) {
         Objects.requireNonNull(t.key());
         return this.cache.containsKey(t);
     }
 
-    private void issue(@NotNull @NonNull final String key,
+    private void issue(@NotNull final String key,
                        @Nullable final Q<?> q) {
         this.issuedKeys.add(Q.withKey0(q, key));
     }
@@ -93,10 +94,10 @@ final class Kombiner_Values {
         return new HashMap<>(this.cache);
     }
 
-    Kombiner_Values replace(@NotNull @NonNull final Map<Q<?>, Object> copy) {
+    void replace(@NotNull final Map<Q<?>, Object> copy) {
+        Objects.requireNonNull(copy, "copy");
         this.cache.clear();
         this.cache.putAll(copy);
-        return this;
     }
 
     void origForEach(Consumer<Q<?>> action) {

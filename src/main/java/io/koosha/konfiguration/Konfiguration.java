@@ -206,9 +206,9 @@ public interface Konfiguration {
      * {@link #set(String, Q)}.
      *
      * @param key unique key of the konfiguration being requested.
+     * @param <U> generic type of the returned konfig value.
      * @return konfiguration value wrapper for the requested key.
      */
-
     @NotNull
     @Contract(mutates = "this")
     @ApiStatus.AvailableSince(Factory.VERSION_8)
@@ -242,6 +242,7 @@ public interface Konfiguration {
      * Check if {@code key} exists in the configuration.
      *
      * @param key the config key to check it's existence
+     * @param type type of konfiguration value.
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
@@ -257,7 +258,7 @@ public interface Konfiguration {
      */
     @Contract(pure = true)
     @ApiStatus.AvailableSince(Factory.VERSION_8)
-    default boolean hasBool(@NotNull String key, @NotNull Q<?> type) {
+    default boolean hasBool(@NotNull final String key) {
         return this.has(key, Q.BOOL);
     }
 
@@ -441,6 +442,7 @@ public interface Konfiguration {
     /**
      * Deregister a previously registered listener of a key.
      *
+     * @param key  the key to deregister from.
      * @param observer handle returned by one of register methods.
      * @return this.
      */

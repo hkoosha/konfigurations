@@ -20,8 +20,7 @@ public class KonfigurationKombinerCustomValueTest {
 
     @Test
     public void testCustomValue() {
-
-        K<DummyCustom> custom = k.custom(key, DummyCustom.class);
+        K<DummyCustom> custom = k.custom(key, Q.of(DummyCustom.class));
         Assert.assertSame(custom.v(), value);
     }
 

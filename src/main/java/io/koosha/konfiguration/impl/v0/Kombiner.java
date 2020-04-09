@@ -1,9 +1,6 @@
 package io.koosha.konfiguration.impl.v0;
 
 import io.koosha.konfiguration.*;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -21,8 +18,6 @@ import java.util.stream.Stream;
 final class Kombiner implements Konfiguration {
 
     @NotNull
-    @Getter
-    @Accessors(fluent = true)
     private final String name;
 
     @NotNull
@@ -40,10 +35,13 @@ final class Kombiner implements Konfiguration {
     @Nullable
     private volatile KonfigurationManager man;
 
-    Kombiner(@NotNull @NonNull final String name,
-             @NotNull @NonNull final Collection<Konfiguration> sources,
+    Kombiner(@NotNull final String name,
+             @NotNull final Collection<Konfiguration> sources,
              @Nullable final Long lockWaitTimeMillis,
              final boolean fairLock) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(sources, "sources");
+
         this.name = name;
 
         final Map<Handle, Konfiguration> s = new HashMap<>();
@@ -77,15 +75,26 @@ final class Kombiner implements Konfiguration {
         return this._lock;
     }
 
-    <T> T r(@NonNull @NotNull final Supplier<T> func) {
+    <T> T r(@NotNull final Supplier<T> func) {
+        Objects.requireNonNull(func, "func");
         return lock().doReadLocked(func);
     }
 
-    <T> T w(@NonNull @NotNull final Supplier<T> func) {
+    <T> T w(@NotNull final Supplier<T> func) {
+        Objects.requireNonNull(func, "func");
         return lock().doWriteLocked(func);
     }
 
     // =========================================================================
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @NotNull
+    public String name() {
+        return this.name;
+    }
 
     /**
      * {@inheritDoc}
@@ -109,7 +118,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<Boolean> bool(@NotNull @NonNull final String key) {
+    public K<Boolean> bool(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.BOOL);
     }
 
@@ -118,7 +128,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<Byte> byte_(@NotNull @NonNull final String key) {
+    public K<Byte> byte_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.BYTE);
     }
 
@@ -127,7 +138,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<Character> char_(@NotNull @NonNull final String key) {
+    public K<Character> char_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.CHAR);
     }
 
@@ -136,7 +148,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<Short> short_(@NotNull @NonNull final String key) {
+    public K<Short> short_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.SHORT);
     }
 
@@ -145,7 +158,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<Integer> int_(@NotNull @NonNull final String key) {
+    public K<Integer> int_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.INT);
     }
 
@@ -154,7 +168,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<Long> long_(@NotNull @NonNull final String key) {
+    public K<Long> long_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.LONG);
     }
 
@@ -163,7 +178,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<Float> float_(@NotNull @NonNull final String key) {
+    public K<Float> float_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.FLOAT);
     }
 
@@ -172,7 +188,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<Double> double_(@NotNull @NonNull final String key) {
+    public K<Double> double_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.DOUBLE);
     }
 
@@ -181,7 +198,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public K<String> string(@NotNull @NonNull final String key) {
+    public K<String> string(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, Q.STRING);
     }
 
@@ -190,8 +208,9 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public <U> K<List<U>> list(@NotNull @NonNull final String key,
+    public <U> K<List<U>> list(@NotNull final String key,
                                @Nullable final Q<List<U>> type) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
 
@@ -200,8 +219,9 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public <U, V> K<Map<U, V>> map(@NotNull @NonNull final String key,
+    public <U, V> K<Map<U, V>> map(@NotNull final String key,
                                    @Nullable final Q<Map<U, V>> type) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
 
@@ -210,8 +230,9 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public <U> K<Set<U>> set(@NotNull @NonNull final String key,
+    public <U> K<Set<U>> set(@NotNull final String key,
                              @Nullable final Q<Set<U>> type) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
 
@@ -220,8 +241,9 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public <U> K<U> custom(@NonNull final String key,
+    public <U> K<U> custom(final String key,
                            @Nullable final Q<U> type) {
+        Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
 
@@ -229,8 +251,9 @@ final class Kombiner implements Konfiguration {
      * {@inheritDoc}
      */
     @Override
-    public boolean has(@NotNull @NonNull final String key,
+    public boolean has(@NotNull final String key,
                        @Nullable final Q<?> type) {
+        Objects.requireNonNull(key, "key");
         final Q<?> t = Q.withKey0(type, key);
         return r(() -> this.values.has(t) || this.sources.has(key, type));
     }
@@ -242,8 +265,9 @@ final class Kombiner implements Konfiguration {
      */
     @NotNull
     @Override
-    public Handle registerSoft(@NonNull @NotNull final KeyObserver observer,
+    public Handle registerSoft(@NotNull final KeyObserver observer,
                                @Nullable final String key) {
+        Objects.requireNonNull(observer, "observer");
         return w(() -> observers.registerSoft(observer, key));
     }
 
@@ -252,8 +276,10 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public Handle register(@NotNull @NonNull final KeyObserver observer,
-                           @NotNull @NonNull final String key) {
+    public Handle register(@NotNull final KeyObserver observer,
+                           @NotNull final String key) {
+        Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
         return w(() -> observers.registerHard(observer, key));
     }
 
@@ -262,8 +288,10 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public Konfiguration deregister(@NotNull @NonNull final Handle observer,
-                                    @NotNull @NonNull final String key) {
+    public Konfiguration deregister(@NotNull final Handle observer,
+                                    @NotNull final String key) {
+        Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
         return w(() -> {
             if (Objects.equals(KeyObserver.LISTEN_TO_ALL, key))
                 this.observers.remove(observer);
@@ -278,7 +306,8 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public final Konfiguration subset(@NonNull @NotNull final String key) {
+    public final Konfiguration subset(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         this.lock();
         return new JSubsetView(this.name() + "::" + key, this, key);
     }

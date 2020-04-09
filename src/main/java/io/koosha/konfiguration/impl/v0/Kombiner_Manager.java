@@ -4,7 +4,6 @@ import io.koosha.konfiguration.Handle;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.Q;
-import lombok.NonNull;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -22,12 +21,12 @@ import static java.util.stream.Collectors.toList;
 final class Kombiner_Manager implements KonfigurationManager {
 
     @NotNull
-    @NonNull
     private final Kombiner origin;
 
     private final AtomicReference<Kombiner> kombiner;
 
-    public Kombiner_Manager(@NotNull @NonNull Kombiner kombiner) {
+    public Kombiner_Manager(@NotNull Kombiner kombiner) {
+        Objects.requireNonNull(kombiner, "kombiner");
         this.origin = kombiner;
         this.kombiner = new AtomicReference<>(kombiner);
     }
@@ -141,13 +140,16 @@ final class Kombiner_Manager implements KonfigurationManager {
         });
     }
 
-    private static <T> Predicate<T> not(@NotNull @NonNull final Predicate<? super T> target) {
-        //noinspection unchecked
+    @SuppressWarnings("unchecked")
+    private static <T> Predicate<T> not(@NotNull final Predicate<? super T> target) {
+        Objects.requireNonNull(target, "target");
         return (Predicate<T>) target.negate();
     }
 
     @SuppressWarnings({"Convert2Lambda", "Anonymous2MethodRef"})
-    private static Runnable wrap(@NonNull @NotNull final Runnable r) {
+    private static Runnable wrap(@NotNull final Runnable r) {
+        Objects.requireNonNull(r, "runnable");
+
         // We can not be sure if given runnable is safe to be put in a map
         // So we create a plain object wrapping it.
         return new Runnable() {

@@ -1,9 +1,6 @@
 package io.koosha.konfiguration.impl.v0;
 
 import io.koosha.konfiguration.*;
-import lombok.AccessLevel;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -11,10 +8,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Reads konfig from a plain java map.
@@ -26,7 +20,6 @@ import java.util.Set;
  * <p>Thread safe and immutable.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
-@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @ThreadSafe
 @Immutable
 @ApiStatus.Internal
@@ -38,7 +31,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<Boolean> bool(@NonNull @NotNull final String key) {
+    public final K<Boolean> bool(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<Boolean> q = Q.BOOL;
 
         if (this.has(key, q))
@@ -59,7 +54,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<Character> char_(@NonNull @NotNull final String key) {
+    public final K<Character> char_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<Character> q = Q.CHAR;
 
         if (this.has(key, q))
@@ -93,7 +90,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<String> string(@NonNull @NotNull final String key) {
+    public final K<String> string(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<String> q = Q.STRING;
 
         if (this.has(key, q))
@@ -120,7 +119,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<Byte> byte_(@NonNull @NotNull final String key) {
+    public final K<Byte> byte_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<Byte> q = Q.BYTE;
 
         if (this.has(key, q))
@@ -143,7 +144,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<Short> short_(@NonNull @NotNull final String key) {
+    public final K<Short> short_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<Short> q = Q.SHORT;
 
         if (this.has(key, q))
@@ -166,7 +169,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<Integer> int_(@NonNull @NotNull final String key) {
+    public final K<Integer> int_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<Integer> q = Q.INT;
 
         if (this.has(key, q))
@@ -189,7 +194,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<Long> long_(@NonNull @NotNull final String key) {
+    public final K<Long> long_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<Long> q = Q.LONG;
 
         if (this.has(key, q))
@@ -212,7 +219,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<Float> float_(@NonNull @NotNull final String key) {
+    public final K<Float> float_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<Float> q = Q.FLOAT;
 
         if (this.has(key, q))
@@ -235,7 +244,9 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final K<Double> double_(@NonNull @NotNull final String key) {
+    public final K<Double> double_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
         final Q<Double> q = Q.DOUBLE;
 
         if (this.has(key, q))
@@ -258,8 +269,10 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final <U> K<List<U>> list(@NonNull @NotNull final String key,
+    public final <U> K<List<U>> list(@NotNull final String key,
                                      @Nullable Q<List<U>> type) {
+        Objects.requireNonNull(key, "key");
+
         if (this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
@@ -292,8 +305,10 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final <U> K<Set<U>> set(@NonNull @NotNull final String key,
+    public final <U> K<Set<U>> set(@NotNull final String key,
                                    @Nullable Q<Set<U>> type) {
+        Objects.requireNonNull(key, "key");
+
         if (this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
@@ -326,8 +341,10 @@ abstract class Source implements Konfiguration0 {
      */
     @Override
     @NotNull
-    public final <U, V> K<Map<U, V>> map(@NonNull @NotNull final String key,
+    public final <U, V> K<Map<U, V>> map(@NotNull final String key,
                                          @Nullable Q<Map<U, V>> type) {
+        Objects.requireNonNull(key, "key");
+
         if (this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
@@ -361,8 +378,10 @@ abstract class Source implements Konfiguration0 {
     @SuppressWarnings("unchecked")
     @Override
     @NotNull
-    public final <U> K<U> custom(@NonNull @NotNull final String key,
+    public final <U> K<U> custom(@NotNull final String key,
                                  @Nullable final Q<U> type) {
+        Objects.requireNonNull(key, "key");
+
         if (this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
@@ -413,6 +432,7 @@ abstract class Source implements Konfiguration0 {
         return this.k(key, type, v);
     }
 
+
     @NotNull
     abstract Object bool0(@NotNull final String key);
 
@@ -452,16 +472,24 @@ abstract class Source implements Konfiguration0 {
 
     // =========================================================================
 
-    private void checkType0(@NonNull @NotNull final Q<?> neededType,
-                            @NonNull @NotNull final String key,
-                            @NonNull @NotNull final Object value) {
+    private void checkType0(@NotNull final Q<?> neededType,
+                            @NotNull final String key,
+                            @NotNull final Object value) {
+        Objects.requireNonNull(neededType, "neededType");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(value, "value");
+
         if (!Q.matchesValue(neededType, value))
             throw new KfgTypeException(this.name(), key, neededType, value);
     }
 
-    private void checkCollectionType0(@NonNull @NotNull final String key,
-                                      @NonNull @NotNull final Q<?> neededType,
-                                      @NonNull @NotNull final Object value) {
+    private void checkCollectionType0(@NotNull final String key,
+                                      @NotNull final Q<?> neededType,
+                                      @NotNull final Object value) {
+        Objects.requireNonNull(neededType, "neededType");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(value, "value");
+
         if (neededType.isMap()) {
             if (!(value instanceof Map))
                 throw new KfgIllegalStateException(this.name(), key, neededType, value, "expecting a map");
@@ -605,8 +633,7 @@ abstract class Source implements Konfiguration0 {
         return false;
     }
 
-    abstract boolean isNull(@NonNull @NotNull String key);
-
+    abstract boolean isNull(@NotNull String key);
 
     /**
      * Handle the case where value of a key is null.
@@ -615,8 +642,9 @@ abstract class Source implements Konfiguration0 {
      * @param type type of requested konfig.
      * @return true if it's ok to have null values.
      */
-    @NotNull <U> K<U> null_(@NonNull @NotNull final String key,
+    @NotNull <U> K<U> null_(@NotNull final String key,
                             @Nullable final Q<U> type) {
+        Objects.requireNonNull(key, "key");
         return k(key, type, null);
     }
 
@@ -628,9 +656,10 @@ abstract class Source implements Konfiguration0 {
      * @param type       type of requested konfig.
      * @return true if it's ok to have null values.
      */
-    boolean allowNullInCollection_(@NonNull @NotNull final String key,
+    boolean allowNullInCollection_(@NotNull final String key,
                                    @Nullable final Q<?> type,
                                    @NotNull final Object collection) {
+        Objects.requireNonNull(key, "key");
         return true;
     }
 
@@ -643,9 +672,12 @@ abstract class Source implements Konfiguration0 {
      * @throws KfgTypeException if the requested type does not match the type
      *                          of value in the given in.
      */
-    void checkType(@NonNull @NotNull final String key,
-                   @NotNull @NonNull final Q<?> neededType,
-                   @NotNull @NonNull final Object value) {
+    void checkType(@NotNull final String key,
+                   @NotNull final Q<?> neededType,
+                   @NotNull final Object value) {
+        Objects.requireNonNull(neededType, "neededType");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(value, "value");
         checkType0(neededType, key, value);
     }
 
@@ -658,9 +690,12 @@ abstract class Source implements Konfiguration0 {
      * @throws KfgTypeException if the requested type does not match the type
      *                          of value in the given in.
      */
-    void checkCollectionType(@NotNull @NonNull final String key,
-                             @NotNull @NonNull final Q<?> neededType,
-                             @NotNull @NonNull final Object value) {
+    void checkCollectionType(@NotNull final String key,
+                             @NotNull final Q<?> neededType,
+                             @NotNull final Object value) {
+        Objects.requireNonNull(neededType, "neededType");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(value, "value");
         checkCollectionType0(key, neededType, value);
     }
 
@@ -675,9 +710,10 @@ abstract class Source implements Konfiguration0 {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    final <U> K<U> k(@NotNull @NonNull final String key,
+    final <U> K<U> k(@NotNull final String key,
                      @Nullable final Q<U> type,
                      @Nullable final Object value) {
+        Objects.requireNonNull(key, "key");
         return DummyV.of((U) value, type, key);
     }
 
@@ -690,7 +726,7 @@ abstract class Source implements Konfiguration0 {
     @NotNull
     @Contract("_ -> fail")
     @Override
-    public Konfiguration subset(@NotNull String key) {
+    public Konfiguration subset(@NotNull final String key) {
         throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
     }
 
@@ -700,7 +736,8 @@ abstract class Source implements Konfiguration0 {
     @Override
     @NotNull
     @Contract("_ -> fail")
-    public Handle registerSoft(@NotNull @NonNull KeyObserver observer) {
+    public Handle registerSoft(@NotNull final KeyObserver observer) {
+        Objects.requireNonNull(observer, "observer");
         throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
     }
 
@@ -710,7 +747,8 @@ abstract class Source implements Konfiguration0 {
     @Override
     @Contract("_ -> fail")
     @NotNull
-    public Handle register(@NotNull @NonNull KeyObserver observer) {
+    public Handle register(@NotNull final KeyObserver observer) {
+        Objects.requireNonNull(observer, "observer");
         throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
     }
 
@@ -720,7 +758,10 @@ abstract class Source implements Konfiguration0 {
     @Contract("_, _ -> fail")
     @Override
     @NotNull
-    public Handle registerSoft(@NotNull KeyObserver observer, @NotNull String key) {
+    public Handle registerSoft(@NotNull final KeyObserver observer,
+                               @NotNull final String key) {
+        Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
         throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
     }
 
@@ -730,7 +771,10 @@ abstract class Source implements Konfiguration0 {
     @Override
     @Contract("_, _ -> fail")
     @NotNull
-    public Handle register(@NotNull KeyObserver observer, @NotNull String key) {
+    public Handle register(@NotNull final KeyObserver observer,
+                           @NotNull final String key) {
+        Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
         throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
     }
 
@@ -740,7 +784,10 @@ abstract class Source implements Konfiguration0 {
     @Contract("_, _ -> fail")
     @Override
     @NotNull
-    public Konfiguration deregister(@NotNull Handle observer, @NotNull String key) {
+    public Konfiguration deregister(@NotNull final Handle observer,
+                                    @NotNull final String key) {
+        Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
         throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
     }
 
@@ -750,7 +797,8 @@ abstract class Source implements Konfiguration0 {
     @Contract("_ -> fail")
     @Override
     @NotNull
-    public Konfiguration deregister(@NotNull Handle observer) {
+    public Konfiguration deregister(@NotNull final Handle observer) {
+        Objects.requireNonNull(observer, "observer");
         throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
     }
 

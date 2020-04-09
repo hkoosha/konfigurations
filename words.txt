@@ -1,5 +1,14 @@
 kombine
 konfiguration
+konfigurations
 kval
 paranamer
 deser
+konfig
+optimizable
+deregistered
+updatable
+prefs
+konstruct
+snakeyaml
+kombined

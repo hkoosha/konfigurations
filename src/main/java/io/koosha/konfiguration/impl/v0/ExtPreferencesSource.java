@@ -1,11 +1,8 @@
 package io.koosha.konfiguration.impl.v0;
 
+
 import io.koosha.konfiguration.*;
 import io.koosha.konfiguration.ext.KfgPreferencesError;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import lombok.experimental.Accessors;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -14,13 +11,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.NodeChangeListener;
 import java.util.prefs.Preferences;
+
 
 /**
  * Reads konfig from a {@link Preferences} source.
@@ -44,14 +39,10 @@ final class ExtPreferencesSource extends Source {
     private final Preferences source;
     private final int lastHash;
 
-    @NonNull
     @NotNull
-    @Getter
-    @Accessors(fluent = true)
     private final String name;
 
-    @Accessors(fluent = true)
-    @Getter
+    @NotNull
     private final KonfigurationManager0 manager = new KonfigurationManager0() {
 
         /**
@@ -75,9 +66,12 @@ final class ExtPreferencesSource extends Source {
 
     };
 
-    ExtPreferencesSource(@NotNull @NonNull final String name,
-                         @NonNull @NotNull final Preferences preferences,
+    ExtPreferencesSource(@NotNull final String name,
+                         @NotNull final Preferences preferences,
                          @Nullable final Deserializer deserializer) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(preferences, "preferences");
+
         this.name = name;
         this.source = preferences;
         this.deser = deserializer;
@@ -89,7 +83,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Object bool0(@NotNull @NonNull final String key) {
+    Object bool0(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.source.getBoolean(sane(key), false);
     }
 
@@ -98,7 +93,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Object char0(@NotNull @NonNull final String key) {
+    Object char0(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         final String s = ((String) this.string0(sane(key)));
         if (s.length() != 1)
             throw new KfgTypeException(this.name(), key, Q.CHAR, s);
@@ -110,7 +106,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Object string0(@NotNull @NonNull final String key) {
+    Object string0(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.source.get(sane(key), null);
     }
 
@@ -119,7 +116,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Number number0(@NotNull @NonNull final String key) {
+    Number number0(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.source.getLong(sane(key), 0);
     }
 
@@ -128,7 +126,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Number numberDouble0(@NotNull @NonNull final String key) {
+    Number numberDouble0(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.source.getDouble(sane(key), 0);
     }
 
@@ -137,8 +136,11 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    List<?> list0(@NotNull @NonNull final String key,
-                  @NotNull @NonNull final Q<? extends List<?>> type) {
+    List<?> list0(@NotNull final String key,
+                  @NotNull final Q<? extends List<?>> type) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
         if (this.deser == null)
             throw new KfgPreferencesError(this.name(), "deserializer not set");
         return this.deser.deserialize(this.source.getByteArray(sane(key), new byte[0]), type);
@@ -149,8 +151,11 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Set<?> set0(@NotNull @NonNull final String key,
-                @NotNull @NonNull final Q<? extends Set<?>> type) {
+    Set<?> set0(@NotNull final String key,
+                @NotNull final Q<? extends Set<?>> type) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
         if (this.deser == null)
             throw new KfgPreferencesError(this.name(), "deserializer not set");
         return this.deser.deserialize(this.source.getByteArray(sane(key), new byte[0]), type);
@@ -161,8 +166,11 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Map<?, ?> map0(@NotNull @NonNull final String key,
-                   @NotNull @NonNull final Q<? extends Map<?, ?>> type) {
+    Map<?, ?> map0(@NotNull final String key,
+                   @NotNull final Q<? extends Map<?, ?>> type) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
         if (this.deser == null)
             throw new KfgPreferencesError(this.name(), "deserializer not set");
         return this.deser.deserialize(this.source.getByteArray(sane(key), new byte[0]), type);
@@ -173,8 +181,11 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Object custom0(@NotNull @NonNull final String key,
-                   @NotNull @NonNull final Q<?> type) {
+    Object custom0(@NotNull final String key,
+                   @NotNull final Q<?> type) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
         if (this.deser == null)
             throw new KfgPreferencesError(this.name(), "deserializer not set");
         return this.deser.deserialize(this.source.getByteArray(sane(key), new byte[0]), type);
@@ -184,7 +195,8 @@ final class ExtPreferencesSource extends Source {
      * {@inheritDoc}
      */
     @Override
-    boolean isNull(@NonNull @NotNull final String key) {
+    boolean isNull(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
         return this.source.get(sane(key), null) == null;
     }
 
@@ -192,8 +204,9 @@ final class ExtPreferencesSource extends Source {
      * {@inheritDoc}
      */
     @Override
-    public boolean has(@NotNull @NonNull final String key,
+    public boolean has(@NotNull final String key,
                        @Nullable final Q<?> type) {
+        Objects.requireNonNull(key, "key");
         try {
             return source.nodeExists(sane(key));
         }
@@ -202,10 +215,17 @@ final class ExtPreferencesSource extends Source {
         }
     }
 
-    @SneakyThrows
-    private String sane(@NotNull @NonNull final String key) {
-        if (!this.source.nodeExists(key))
-            throw new KfgIllegalStateException(this.name(), "missing key; " + key);
+    private String sane(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
+        try {
+            if (!this.source.nodeExists(key))
+                throw new KfgIllegalStateException(this.name(), "missing key=" + key);
+        }
+        catch (final BackingStoreException e) {
+            throw new KfgIllegalStateException(this.name(), "backing store error for key=" + key, e);
+        }
+
         return key.replace('.', '/');
     }
 
@@ -218,6 +238,25 @@ final class ExtPreferencesSource extends Source {
             throw new KfgSourceException(this.name(), "could not calculate hash of the java.util.prefs.Preferences source", e);
         }
         return Arrays.hashCode(buffer.toByteArray());
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    public String name() {
+        return this.name;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @NotNull
+    @Override
+    public KonfigurationManager0 manager() {
+        return this.manager;
     }
 
 }

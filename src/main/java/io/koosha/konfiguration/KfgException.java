@@ -1,7 +1,5 @@
 package io.koosha.konfiguration;
 
-import lombok.Getter;
-import lombok.experimental.Accessors;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Nullable;
 
@@ -9,8 +7,6 @@ import java.util.Objects;
 
 import static java.lang.String.format;
 
-@Accessors(fluent = true)
-@Getter
 @SuppressWarnings("unused")
 @ThreadSafe
 public class KfgException extends RuntimeException {
@@ -133,10 +129,31 @@ public class KfgException extends RuntimeException {
     }
 
 
+    @Nullable
+    public String source() {
+        return this.source;
+    }
+
+    @Nullable
+    public String key() {
+        return this.key;
+    }
+
+    @Nullable
+    public Q<?> neededType() {
+        return this.neededType;
+    }
+
+    @Nullable
+    public String actualValue() {
+        return this.actualValue;
+    }
+
+
     static String msgOf(final Throwable t) {
         return t == null
-               ? "[null exception]->[null exception]"
-               : format("[throwable::%s]->[%s]", t.getClass().getName(), t.getMessage());
+                ? "[null exception]->[null exception]"
+                : format("[throwable::%s]->[%s]", t.getClass().getName(), t.getMessage());
     }
 
     static String toStringOf(final Object value) {

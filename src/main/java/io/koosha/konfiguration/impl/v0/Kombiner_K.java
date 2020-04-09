@@ -1,39 +1,59 @@
 package io.koosha.konfiguration.impl.v0;
 
 import io.koosha.konfiguration.*;
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.experimental.Accessors;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 import static java.lang.String.format;
 
-@AllArgsConstructor
-@Accessors(fluent = true)
-@EqualsAndHashCode
 @ThreadSafe
 @ApiStatus.Internal
 final class Kombiner_K<U> implements K<U> {
 
-    @NonNull
     @NotNull
     private final Kombiner origin;
 
-    @NonNull
     @NotNull
-    @Getter
     private final String key;
 
-    @NonNull
     @NotNull
-    @Getter
     private final Q<U> type;
+
+    public Kombiner_K(@NotNull final Kombiner origin,
+                      @NotNull final String key,
+                      @NotNull final Q<U> type) {
+        Objects.requireNonNull(origin, "origin");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
+        this.origin = origin;
+        this.key = key;
+        this.type = type;
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @NotNull
+    public String key() {
+        return this.key;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @NotNull
+    public Q<U> type() {
+        return this.type;
+    }
 
 
     /**
@@ -74,8 +94,9 @@ final class Kombiner_K<U> implements K<U> {
      */
     @Override
     @NotNull
-    public Handle registerSoft(@NonNull @NotNull KeyObserver observer) {
-        return origin.registerSoft(observer, this.key);
+    public Handle registerSoft(@NotNull final KeyObserver keyObserver) {
+        Objects.requireNonNull(keyObserver, "keyObserver");
+        return origin.registerSoft(keyObserver, this.key);
     }
 
     /**
@@ -85,8 +106,9 @@ final class Kombiner_K<U> implements K<U> {
      */
     @Override
     @NotNull
-    public Handle register(@NonNull @NotNull final KeyObserver observer) {
-        return this.origin.register(observer, this.key);
+    public Handle register(@NotNull final KeyObserver keyObserver) {
+        Objects.requireNonNull(keyObserver, "keyObserver");
+        return this.origin.register(keyObserver, this.key);
     }
 
     /**
@@ -102,14 +124,15 @@ final class Kombiner_K<U> implements K<U> {
      * only weak references and the observer will be garbage collected. Keep a
      * reference to the observer yourself.
      *
-     * @param observer listener being registered for key {@link #key()}
+     * @param observerHandle listener being registered for key {@link #key()}
      * @return this
      * @see #register(KeyObserver)
      */
     @Override
     @NotNull
-    public K<U> deregister(@NonNull @NotNull Handle observer) {
-        this.origin.deregister(observer, this.key);
+    public K<U> deregister(@NotNull Handle observerHandle) {
+        Objects.requireNonNull(observerHandle, "observerHandle");
+        this.origin.deregister(observerHandle, this.key);
         return this;
     }
 
@@ -125,6 +148,33 @@ final class Kombiner_K<U> implements K<U> {
         catch (final Exception e) {
             return format("K(%s)::error", this.key);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(final Object o) {
+        if (o == this)
+            return true;
+        if (!(o instanceof Kombiner_K))
+            return false;
+        final Kombiner_K<?> other = (Kombiner_K<?>) o;
+        return Objects.equals(this.origin, other.origin)
+                && Objects.equals(this.key, other.key)
+                && Objects.equals(this.type, other.type);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int hashCode() {
+        final int PRIME = 59;
+        int result = PRIME + this.origin.hashCode();
+        result = result * PRIME + this.key.hashCode();
+        result = result * PRIME + this.type.hashCode();
+        return result;
     }
 
 }

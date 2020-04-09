@@ -70,7 +70,6 @@ public class MapKonfigSourceTest extends KonfigValueTestMixin {
 
     @BeforeMethod
     public void setup() throws Exception {
-
         this.map = this.map0;
         this.k = Konfiguration.inMemory(() -> map);
     }
