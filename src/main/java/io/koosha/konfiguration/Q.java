@@ -74,7 +74,7 @@ public abstract class Q<TYPE> {
     }
 
     @Override
-    public boolean equals(final Object o) {
+    public final boolean equals(final Object o) {
         if (o == this)
             return true;
         if (!(o instanceof Q))
@@ -86,7 +86,7 @@ public abstract class Q<TYPE> {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         final int PRIME = 59;
         int result = 1;
         result = result * PRIME + (this.key == null ? 43 : ((Object) this.key).hashCode());
@@ -96,22 +96,22 @@ public abstract class Q<TYPE> {
     }
 
     @Nullable
-    public String key() {
+    public final String key() {
         return this.key;
     }
 
     @Nullable
-    public ParameterizedType pt() {
+    public final ParameterizedType pt() {
         return this.pt;
     }
 
     @NotNull
-    public Class<TYPE> klass() {
+    public final Class<TYPE> klass() {
         return this.klass;
     }
 
 
-    public Q<TYPE> withKey(final String key) {
+    public final Q<TYPE> withKey(final String key) {
         return Objects.equals(this.key, key)
                 ? new Q<TYPE>(key, this.pt, this.klass) {}
                 : this;
@@ -260,6 +260,7 @@ public abstract class Q<TYPE> {
     }
 
     public final boolean isVoid() {
+        //noinspection ConstantConditions
         return Void.class.isAssignableFrom(this.klass);
     }
 
@@ -277,7 +278,10 @@ public abstract class Q<TYPE> {
             pure = true)
     public static <U> Q<U> of(@NotNull final Class<U> klass) {
         Objects.requireNonNull(klass, "klass");
-        return new Q<U>(klass) {};
+        if (Q.isParametrized(klass))
+            throw new KfgIllegalArgumentException(null,
+                    "parametrized types are not supported, klass=" + klass);
+        return new Q<U>(klass) { };
     }
 
     public static final Q<Boolean> BOOL = of(Boolean.class);
@@ -300,6 +304,30 @@ public abstract class Q<TYPE> {
     public static final Q<Object> OBJECT = of_(Object.class);
     public static final Q<?> UNKNOWN = OBJECT;
 
+    public static final Q<List<Byte>> LIST_BYTE = new Q<List<Byte>>() {
+    };
+
+    public static final Q<List<Short>> LIST_SHORT = new Q<List<Short>>() { };
+    public static final Q<List<Integer>> LIST_INT = new Q<List<Integer>>() { };
+    public static final Q<List<Long>> LIST_LONG = new Q<List<Long>>() { };
+    public static final Q<List<Float>> LIST_FLOAT = new Q<List<Float>>() { };
+    public static final Q<List<Double>> LIST_DOUBLE = new Q<List<Double>>() { };
+    public static final Q<List<String>> LIST_STRING = new Q<List<String>>() { };
+
+    public static final Q<Set<Byte>> SET_BYTE = new Q<Set<Byte>>() { };
+    public static final Q<Set<Short>> SET_SHORT = new Q<Set<Short>>() { };
+    public static final Q<Set<Integer>> SET_INT = new Q<Set<Integer>>() { };
+    public static final Q<Set<Long>> SET_LONG = new Q<Set<Long>>() { };
+    public static final Q<Set<Float>> SET_FLOAT = new Q<Set<Float>>() { };
+    public static final Q<Set<Double>> SET_DOUBLE = new Q<Set<Double>>() { };
+    public static final Q<Set<String>> SET_STRING = new Q<Set<String>>() { };
+
+    public static final Q<Map<String, Short>> MAP_STRING__SHORT = new Q<Map<String, Short>>() { };
+    public static final Q<Map<String, Integer>> MAP_STRING__INT = new Q<Map<String, Integer>>() { };
+    public static final Q<Map<String, Long>> MAP_STRING__LONG = new Q<Map<String, Long>>() { };
+    public static final Q<Map<String, Float>> MAP_STRING__FLOAT = new Q<Map<String, Float>>() { };
+    public static final Q<Map<String, Double>> MAP_STRING__DOUBLE = new Q<Map<String, Double>>() { };
+    public static final Q<Map<String, String>> MAP_STRING__STRING = new Q<Map<String, String>>() { };
 
     public static final Q<?> _VOID = of_(Void.class);
 
@@ -314,8 +342,10 @@ public abstract class Q<TYPE> {
         return (Q<U>) of(klass);
     }
 
+    @ApiStatus.Internal
     @Contract(pure = true)
-    private static void checkIsClassOrParametrizedType(@Nullable final Type p, @Nullable Type root) {
+    static void checkIsClassOrParametrizedType(@Nullable final Type p,
+                                               @Nullable Type root) {
         if (root == null)
             root = p;
 
@@ -336,11 +366,11 @@ public abstract class Q<TYPE> {
             checkIsClassOrParametrizedType(root, ppp);
     }
 
+    @ApiStatus.Internal
     @Contract(pure = true)
-    public static Q<?> withKey0(@Nullable final Q<?> type,
-                                @NotNull final String key) {
-        Objects.requireNonNull(key, "key");
-        return type == null ? Q._VOID.withKey(key) : type.withKey(key);
+    static boolean isParametrized(@NotNull final Class<?> p) {
+        return p.getTypeParameters().length > 0 ||
+                p.getSuperclass() != null && isParametrized(p.getSuperclass());
     }
 
 }
