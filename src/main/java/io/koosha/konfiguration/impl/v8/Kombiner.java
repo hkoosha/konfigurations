@@ -254,7 +254,8 @@ final class Kombiner implements Konfiguration {
     public boolean has(@NotNull final String key,
                        @Nullable final Q<?> type) {
         Objects.requireNonNull(key, "key");
-        final Q<?> t = Q.withKey0(type, key);
+        Objects.requireNonNull(key, "key");
+        final Q<?> t = type == null ? Q._VOID.withKey(key) : type.withKey(key);
         return r(() -> this.values.has(t) || this.sources.has(key, type));
     }
 

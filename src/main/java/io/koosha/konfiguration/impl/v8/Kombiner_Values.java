@@ -45,7 +45,7 @@ final class Kombiner_Values {
             @SuppressWarnings("SameParameterValue") @Nullable final U def,
             @SuppressWarnings("SameParameterValue") final boolean mustExist) {
         Objects.requireNonNull(key, "key");
-        final Q<?> t = Q.withKey0(type, key);
+        final Q<?> t = type == null ? Q._VOID.withKey(key) : type.withKey(key);
 
         return this.origin.r(() -> {
             if (cache.containsKey(t))
@@ -83,7 +83,8 @@ final class Kombiner_Values {
 
     private void issue(@NotNull final String key,
                        @Nullable final Q<?> q) {
-        this.issuedKeys.add(Q.withKey0(q, key));
+        Objects.requireNonNull(key, "key");
+        this.issuedKeys.add(q == null ? Q._VOID.withKey(key) : q.withKey(key));
     }
 
 
