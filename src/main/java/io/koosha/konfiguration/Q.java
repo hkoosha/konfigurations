@@ -16,7 +16,7 @@ import java.util.*;
 @SuppressWarnings("unused")
 @ThreadSafe
 @Immutable
-@ApiStatus.AvailableSince(Factory.VERSION_8)
+@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public abstract class Q<TYPE> {
 
     @Nullable

@@ -39,13 +39,12 @@ final class Kombiner_Values {
         return new Kombiner_K<>(this.origin, key, type == null ? (Q) Q._VOID : type);
     }
 
-    @Contract(mutates = "this")
     @Nullable
     @SuppressWarnings("unchecked")
     <U> U v(@NotNull final String key,
             @Nullable final Q<?> type,
-            @Nullable final U def,
-            final boolean mustExist) {
+            @SuppressWarnings("SameParameterValue") @Nullable final U def,
+            @SuppressWarnings("SameParameterValue") final boolean mustExist) {
         Objects.requireNonNull(key, "key");
         final Q<?> t = Q.withKey0(type, key);
 

@@ -25,7 +25,7 @@ import static java.lang.String.format;
 @SuppressWarnings({"unused", "WeakerAccess"})
 @ThreadSafe
 @Immutable
-@ApiStatus.AvailableSince(Factory.VERSION_1)
+@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_1)
 public final class DummyV<U> implements K<U> {
 
     @NotNull
@@ -88,7 +88,7 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     public Handle registerSoft(@NotNull KeyObserver observer) {
         Objects.requireNonNull(observer, "observer");
-        return Handle.M_1;
+        return M_1;
     }
 
     /**
@@ -99,7 +99,7 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     public Handle register(@NotNull final KeyObserver observer) {
         Objects.requireNonNull(observer, "observer");
-        return Handle.M_1;
+        return M_1;
     }
 
     /**
@@ -855,6 +855,8 @@ public final class DummyV<U> implements K<U> {
         Objects.requireNonNull(key, "key");
         return missing(type, key);
     }
+
+    private static final Handle M_1 = () -> -1L;
 
 }
 

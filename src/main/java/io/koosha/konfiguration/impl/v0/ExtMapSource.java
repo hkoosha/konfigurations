@@ -49,7 +49,6 @@ final class ExtMapSource extends Source {
         /**
          * {@inheritDoc}
          */
-        @Contract(mutates = "this")
         @NotNull
         @Override
         public Konfiguration0 _update() {

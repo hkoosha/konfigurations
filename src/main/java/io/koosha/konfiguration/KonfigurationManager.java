@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.Map;
 
 @NotThreadSafe
-@ApiStatus.AvailableSince(Factory.VERSION_8)
+@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public interface KonfigurationManager {
 
     /**
@@ -50,7 +50,6 @@ public interface KonfigurationManager {
      * @return list of observers and the key they should be notified about.
      */
     @NotNull
-    @Contract(mutates = "this")
     Map<String, Collection<Runnable>> update();
 
     default void updateNow() {

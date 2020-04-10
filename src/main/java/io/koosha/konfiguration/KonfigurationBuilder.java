@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Range;
 import java.util.Collection;
 
 @ThreadSafe
-@ApiStatus.AvailableSince(Factory.VERSION_8)
+@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public interface KonfigurationBuilder {
 
     @NotNull

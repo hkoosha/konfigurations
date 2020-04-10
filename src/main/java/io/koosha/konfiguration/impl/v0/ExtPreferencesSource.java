@@ -58,7 +58,6 @@ final class ExtPreferencesSource extends Source {
          * {@inheritDoc}
          */
         @NotNull
-        @Contract(mutates = "this")
         @Override
         public Konfiguration0 _update() {
             return ExtPreferencesSource.this;
