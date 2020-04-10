@@ -6,11 +6,9 @@ import org.jetbrains.annotations.ApiStatus;
 
 @ThreadSafe
 @Immutable
-@ApiStatus.AvailableSince(Factory.VERSION_8)
+@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public interface Handle {
 
     long id();
-
-    static Handle M_1 = () -> -1L;
 
 }
