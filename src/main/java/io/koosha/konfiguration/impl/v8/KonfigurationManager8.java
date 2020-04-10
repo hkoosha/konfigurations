@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.Konfiguration;
@@ -15,7 +15,7 @@ import static java.util.Collections.emptyMap;
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
-interface KonfigurationManager0 extends KonfigurationManager {
+interface KonfigurationManager8 extends KonfigurationManager {
 
     /**
      * {@inheritDoc}
@@ -49,6 +49,6 @@ interface KonfigurationManager0 extends KonfigurationManager {
 
     @NotNull
     @ApiStatus.Internal
-    Konfiguration0 _update();
+    Konfiguration8 _update();
 
 }

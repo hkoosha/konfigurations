@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Handle;
 import io.koosha.konfiguration.Konfiguration;
@@ -76,8 +76,8 @@ final class Kombiner_Manager implements KonfigurationManager {
 
         final Map<Handle, Konfiguration> newSources = origin.sources.copy();
         newSources.entrySet().forEach(x -> x.setValue(
-                x.getValue() instanceof Konfiguration0
-                ? ((Konfiguration0) x.getValue()).manager()._update()
+                x.getValue() instanceof Konfiguration8
+                ? ((Konfiguration8) x.getValue()).manager()._update()
                 : x.getValue()
         ));
 
@@ -114,7 +114,7 @@ final class Kombiner_Manager implements KonfigurationManager {
                     .sources
                     .vs()
                     // External non-optimizable konfig sources.
-                    .filter(not(Konfiguration0.class::isInstance))
+                    .filter(not(Konfiguration8.class::isInstance))
                     .map(Konfiguration::manager)
                     .map(KonfigurationManager::update)
                     .peek(x -> x.entrySet().forEach(e -> e.setValue(

@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KfgTypeException;
@@ -31,7 +31,7 @@ final class ExtMapSource extends Source {
     private final String name;
 
     @NotNull
-    private final KonfigurationManager0 manager = new KonfigurationManager0() {
+    private final KonfigurationManager8 manager = new KonfigurationManager8() {
 
         /**
          * {@inheritDoc}
@@ -51,7 +51,7 @@ final class ExtMapSource extends Source {
          */
         @NotNull
         @Override
-        public Konfiguration0 _update() {
+        public Konfiguration8 _update() {
             return this.hasUpdate()
                    ? new ExtMapSource(name(), map, enableNestedMap)
                    : ExtMapSource.this;
@@ -265,7 +265,7 @@ final class ExtMapSource extends Source {
      */
     @Override
     @NotNull
-    public KonfigurationManager0 manager() {
+    public KonfigurationManager8 manager() {
         return this.manager;
     }
 

@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.Konfiguration;
@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
-interface Konfiguration0 extends Konfiguration {
+interface Konfiguration8 extends Konfiguration {
 
     /**
      * Manager object associated with this konfiguration.
@@ -19,6 +19,6 @@ interface Konfiguration0 extends Konfiguration {
      */
     @NotNull
     @Override
-    KonfigurationManager0 manager();
+    KonfigurationManager8 manager();
 
 }

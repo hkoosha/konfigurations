@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 
 import io.koosha.konfiguration.*;
@@ -43,7 +43,7 @@ final class ExtPreferencesSource extends Source {
     private final String name;
 
     @NotNull
-    private final KonfigurationManager0 manager = new KonfigurationManager0() {
+    private final KonfigurationManager8 manager = new KonfigurationManager8() {
 
         /**
          * {@inheritDoc}
@@ -59,7 +59,7 @@ final class ExtPreferencesSource extends Source {
          */
         @NotNull
         @Override
-        public Konfiguration0 _update() {
+        public Konfiguration8 _update() {
             return ExtPreferencesSource.this;
         }
 
@@ -254,7 +254,7 @@ final class ExtPreferencesSource extends Source {
      */
     @NotNull
     @Override
-    public KonfigurationManager0 manager() {
+    public KonfigurationManager8 manager() {
         return this.manager;
     }
 

@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Q;
 import io.koosha.konfiguration.ext.KfgSnakeYamlAssertionError;
@@ -303,7 +303,7 @@ final class ExtYamlSource extends Source {
     private final Map<String, ?> root;
 
     @NotNull
-    private final KonfigurationManager0 manager = new KonfigurationManager0() {
+    private final KonfigurationManager8 manager = new KonfigurationManager8() {
 
         /**
          * {@inheritDoc}
@@ -321,7 +321,7 @@ final class ExtYamlSource extends Source {
         @Override
         @Contract(pure = true,
                 value = "-> new")
-        public @NotNull Konfiguration0 _update() {
+        public @NotNull Konfiguration8 _update() {
             return this.hasUpdate()
                    ? new ExtYamlSource(name(), yaml, mapper, unsafe)
                    : ExtYamlSource.this;
@@ -383,7 +383,7 @@ final class ExtYamlSource extends Source {
      */
     @NotNull
     @Override
-    public KonfigurationManager0 manager() {
+    public KonfigurationManager8 manager() {
         return this.manager;
     }
 

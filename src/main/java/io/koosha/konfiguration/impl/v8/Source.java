@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.*;
 import net.jcip.annotations.Immutable;
@@ -11,12 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 /**
- * Reads konfig from a plain java map.
- *
- * <p>To fulfill contract of {@link Konfiguration}, all the values put in the
- * map of konfiguration key/values supplied to the konfiguration, should be
- * immutable.
- *
  * <p>Thread safe and immutable.
  */
 @SuppressWarnings({"WeakerAccess", "unused"})
@@ -24,7 +18,7 @@ import java.util.*;
 @Immutable
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
-abstract class Source implements Konfiguration0 {
+abstract class Source implements Konfiguration8 {
 
     /**
      * {@inheritDoc}

@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.koosha.konfiguration.Deserializer;

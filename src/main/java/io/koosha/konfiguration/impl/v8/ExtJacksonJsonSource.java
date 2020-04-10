@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v0;
+package io.koosha.konfiguration.impl.v8;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -57,7 +57,7 @@ final class ExtJacksonJsonSource extends Source {
     private final String name;
 
     @NotNull
-    private final KonfigurationManager0 manager = new KonfigurationManager0() {
+    private final KonfigurationManager8 manager = new KonfigurationManager8() {
 
         /**
          * {@inheritDoc}
@@ -75,7 +75,7 @@ final class ExtJacksonJsonSource extends Source {
         @Contract(pure = true,
                 value = "-> new")
         @Override
-        public @NotNull Konfiguration0 _update() {
+        public @NotNull Konfiguration8 _update() {
             return this.hasUpdate()
                    ? new ExtJacksonJsonSource(name(), json, mapperSupplier)
                    : ExtJacksonJsonSource.this;
@@ -194,7 +194,7 @@ final class ExtJacksonJsonSource extends Source {
      */
     @NotNull
     @Override
-    public KonfigurationManager0 manager() {
+    public KonfigurationManager8 manager() {
         return this.manager;
     }
 
