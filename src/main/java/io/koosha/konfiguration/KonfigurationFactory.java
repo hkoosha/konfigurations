@@ -27,7 +27,7 @@ public interface KonfigurationFactory {
     AtomicBoolean UNSAFE_YAML = new AtomicBoolean(true);
 
     static KonfigurationFactory getInstanceV8() {
-        return io.koosha.konfiguration.impl.v0.FactoryV0.defaultInstance();
+        return io.koosha.konfiguration.impl.v8.FactoryV0.defaultInstance();
     }
 
     static KonfigurationFactory getInstance(@NotNull final String version) {

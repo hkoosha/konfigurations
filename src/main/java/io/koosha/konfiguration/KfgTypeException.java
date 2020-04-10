@@ -1,7 +1,9 @@
 package io.koosha.konfiguration;
 
+
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Nullable;
+
 
 @SuppressWarnings({"WeakerAccess", "unused"})
 @ThreadSafe
