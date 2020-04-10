@@ -2,7 +2,7 @@ package io.koosha.konfiguration.impl.v0;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.koosha.konfiguration.Deserializer;
-import io.koosha.konfiguration.Factory;
+import io.koosha.konfiguration.KonfigurationFactory;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationBuilder;
 import net.jcip.annotations.Immutable;
@@ -22,21 +22,21 @@ import static java.util.Collections.unmodifiableMap;
 
 @ThreadSafe
 @Immutable
-@ApiStatus.AvailableSince(Factory.VERSION_8)
-public final class FactoryV0 implements Factory {
+@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
+public final class FactoryV0 implements KonfigurationFactory {
 
     static final String DEFAULT_KONFIG_NAME = "default_konfig";
 
     private FactoryV0() {
     }
 
-    private static final Factory INSTANCE = new FactoryV0();
+    private static final KonfigurationFactory INSTANCE = new FactoryV0();
 
     private static final String VERSION = "io.koosha.konfiguration:7.0.0";
 
     @Contract(pure = true)
     @NotNull
-    public static Factory defaultInstance() {
+    public static KonfigurationFactory defaultInstance() {
         return FactoryV0.INSTANCE;
     }
 
