@@ -143,6 +143,7 @@ public interface Konfiguration {
         return (K) set(key, (Q) Q.UNKNOWN_SET);
     }
 
+
     /**
      * Get a list of U konfiguration value.
      *
@@ -151,7 +152,6 @@ public interface Konfiguration {
      * @param <U>  generic type of elements in the list.
      * @return konfiguration value wrapper for the requested key.
      */
-
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     <U> K<List<U>> list(String key, @Nullable Q<List<U>> type);
@@ -224,6 +224,8 @@ public interface Konfiguration {
     <U> K<U> custom(String key, @Nullable Q<U> type);
 
 
+    // =========================================================================
+
     /**
      * Check if {@code key} exists in the configuration.
      *
@@ -234,115 +236,6 @@ public interface Konfiguration {
     @Contract(pure = true)
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     boolean has(@NotNull String key, @Nullable Q<?> type);
-
-
-    /**
-     * Check if boolean {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasBool(@NotNull final String key) {
-        return this.has(key, Q.BOOL);
-    }
-
-    /**
-     * Check if char {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasChar(@NotNull String key) {
-        return this.has(key, Q.CHAR);
-    }
-
-    /**
-     * Check if string {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasString(@NotNull String key) {
-        return this.has(key, Q.STRING);
-    }
-
-    /**
-     * Check if byte {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasByte(@NotNull String key) {
-        return this.has(key, Q.BYTE);
-    }
-
-    /**
-     * Check if short {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasShort(@NotNull String key) {
-        return this.has(key, Q.SHORT);
-    }
-
-    /**
-     * Check if int {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasInt(@NotNull String key) {
-        return this.has(key, Q.INT);
-    }
-
-    /**
-     * Check if long {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasLong(@NotNull String key) {
-        return this.has(key, Q.LONG);
-    }
-
-    /**
-     * Check if float {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasFloat(@NotNull String key) {
-        return this.has(key, Q.DOUBLE);
-    }
-
-    /**
-     * Check if double {@code key} exists in the configuration.
-     *
-     * @param key the config key to check it's existence
-     * @return true if the key exists, false otherwise.
-     */
-    @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default boolean hasDouble(@NotNull String key) {
-        return this.has(key, Q.DOUBLE);
-    }
 
 
     // =========================================================================
