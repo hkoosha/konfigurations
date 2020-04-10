@@ -356,15 +356,15 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    public static K<String> stringV(@Nullable final Object v) {
-        return stringV(String.valueOf(v), "");
+    public static K<String> string(@Nullable final Object v) {
+        return string(String.valueOf(v), "");
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
-    public static K<String> stringV(@Nullable final Object v,
-                                    @NotNull final String key) {
+    public static K<String> string(@Nullable final Object v,
+                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return of(String.valueOf(v), Q.STRING, key);
     }
@@ -372,14 +372,14 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "-> new")
-    public static K<String> stringM() {
-        return stringM("");
+    public static K<String> stringMissing() {
+        return stringMissing("");
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    public static K<String> stringM(@NotNull final String key) {
+    public static K<String> stringMissing(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Q.STRING, key);
     }
