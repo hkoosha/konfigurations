@@ -14,10 +14,13 @@ import java.util.Set;
 
 /**
  * All methods are thread-safe (and should be implemented as such).
+ *
+ * Entry point to this library is at {@link KonfigurationFactory#getInstance(String)}
+ * or the versioned alternative: {@link KonfigurationFactory#getInstanceV8()}.
  */
 @SuppressWarnings("unused")
 @ThreadSafe
-@ApiStatus.AvailableSince(Factory.VERSION_1)
+@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_1)
 public interface Konfiguration {
 
     /**
@@ -27,7 +30,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<Boolean> bool(@NotNull String key);
 
     /**
@@ -37,7 +39,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<Byte> byte_(@NotNull String key);
 
     /**
@@ -47,7 +48,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<Character> char_(String key);
 
     /**
@@ -57,7 +57,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<Short> short_(String key);
 
     /**
@@ -67,7 +66,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<Integer> int_(String key);
 
     /**
@@ -77,7 +75,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<Long> long_(String key);
 
     /**
@@ -87,7 +84,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<Float> float_(String key);
 
     /**
@@ -97,7 +93,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<Double> double_(String key);
 
     /**
@@ -107,7 +102,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
     K<String> string(String key);
 
 
@@ -119,7 +113,6 @@ public interface Konfiguration {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     @NotNull
-    @Contract(mutates = "this")
     default K<List<?>> list(@NotNull final String key) {
         return (K) list(key, (Q) Q.UNKNOWN_LIST);
     }
@@ -133,7 +126,6 @@ public interface Konfiguration {
     @SuppressWarnings({"unchecked", "rawtypes"})
 
     @NotNull
-    @Contract(mutates = "this")
     default K<Map<?, ?>> map(@NotNull final String key) {
         return (K) map(key, (Q) Q.UNKNOWN_MAP);
     }
@@ -147,7 +139,6 @@ public interface Konfiguration {
     @SuppressWarnings({"unchecked", "rawtypes"})
 
     @NotNull
-    @Contract(mutates = "this")
     default K<Set<?>> set(@NotNull final String key) {
         return (K) set(key, (Q) Q.UNKNOWN_SET);
     }
@@ -162,8 +153,7 @@ public interface Konfiguration {
      */
 
     @NotNull
-    @Contract(mutates = "this")
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     <U> K<List<U>> list(String key, @Nullable Q<List<U>> type);
 
     /**
@@ -176,8 +166,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     <U, V> K<Map<U, V>> map(@NotNull String key, @Nullable Q<Map<U, V>> type);
 
     /**
@@ -189,8 +178,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     <U> K<Set<U>> set(@NotNull String key, @Nullable Q<Set<U>> type);
 
 
@@ -210,8 +198,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default <U> K<U> custom(@NotNull final String key) {
         throw new UnsupportedOperationException();
     }
@@ -233,8 +220,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @Contract(mutates = "this")
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     <U> K<U> custom(String key, @Nullable Q<U> type);
 
 
@@ -246,7 +232,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     boolean has(@NotNull String key, @Nullable Q<?> type);
 
 
@@ -257,7 +243,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasBool(@NotNull final String key) {
         return this.has(key, Q.BOOL);
     }
@@ -269,7 +255,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasChar(@NotNull String key) {
         return this.has(key, Q.CHAR);
     }
@@ -281,7 +267,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasString(@NotNull String key) {
         return this.has(key, Q.STRING);
     }
@@ -293,7 +279,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasByte(@NotNull String key) {
         return this.has(key, Q.BYTE);
     }
@@ -305,7 +291,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasShort(@NotNull String key) {
         return this.has(key, Q.SHORT);
     }
@@ -317,7 +303,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasInt(@NotNull String key) {
         return this.has(key, Q.INT);
     }
@@ -329,7 +315,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasLong(@NotNull String key) {
         return this.has(key, Q.LONG);
     }
@@ -341,7 +327,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasFloat(@NotNull String key) {
         return this.has(key, Q.DOUBLE);
     }
@@ -353,7 +339,7 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(Factory.VERSION_8)
+    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     default boolean hasDouble(@NotNull String key) {
         return this.has(key, Q.DOUBLE);
     }

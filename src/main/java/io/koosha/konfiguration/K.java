@@ -16,6 +16,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <U> type of value being wrapped
  */
+@SuppressWarnings("unused")
 @ThreadSafe
 @Immutable
 public interface K<U> {
@@ -117,7 +118,6 @@ public interface K<U> {
      * @see #v(Object)
      */
     @Nullable
-    @Contract(mutates = "this")
     U v();
 
     /**
@@ -127,7 +127,6 @@ public interface K<U> {
      * @return value this konfig holds, but throws {@link KfgMissingKeyException} if that value is going to be null.
      */
     @NotNull
-    @Contract(mutates = "this")
     U vn();
 
     /**
@@ -142,9 +141,7 @@ public interface K<U> {
      * of this konfiguration has been removed from the original source.
      * @see #v()
      */
-    @SuppressWarnings("unused")
     @Nullable
-    @Contract(mutates = "this")
     default U v(@Nullable U defaultValue) {
         // Operation is not atomic.
         try {
