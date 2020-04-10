@@ -1,5 +1,8 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.impl.v8;
 
+import io.koosha.konfiguration.DummyCustom;
+import io.koosha.konfiguration.DummyCustom2;
+import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.Test;
 
 import java.io.File;

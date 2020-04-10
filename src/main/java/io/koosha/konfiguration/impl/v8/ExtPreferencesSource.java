@@ -59,7 +59,7 @@ final class ExtPreferencesSource extends Source {
          */
         @NotNull
         @Override
-        public Konfiguration8 _update() {
+        public Source _update() {
             return ExtPreferencesSource.this;
         }
 

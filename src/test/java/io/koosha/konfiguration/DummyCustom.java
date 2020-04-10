@@ -2,20 +2,20 @@ package io.koosha.konfiguration;
 
 
 @SuppressWarnings({"FieldCanBeLocal", "WeakerAccess"})
-class DummyCustom {
+public class DummyCustom {
 
-    String str = "";
-    int i = 0;
+    public String str = "";
+    public int i = 0;
 
-    DummyCustom() {
+    public DummyCustom() {
     }
 
-    DummyCustom(final String str, final int i) {
+    public DummyCustom(final String str, final int i) {
         this.str = str;
         this.i = i;
     }
 
-    String concat() {
+    public String concat() {
         return this.str + " ::: " + this.i;
     }
 

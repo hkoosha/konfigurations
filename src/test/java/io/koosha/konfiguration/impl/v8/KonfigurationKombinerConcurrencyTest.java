@@ -1,6 +1,7 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.impl.v8;
 
 
+import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -19,8 +20,7 @@ import static java.util.Arrays.asList;
 @SuppressWarnings("WeakerAccess")
 public class KonfigurationKombinerConcurrencyTest {
 
-    KonfigurationKombinerConcurrencyTest() throws Exception{
-
+    KonfigurationKombinerConcurrencyTest() throws Exception {
         // URL url0 = getClass().getResource("sample0.json");
         // File file0 = new File(url0.toURI());
         // this.JSON0 = new Scanner(file0, "UTF8").useDelimiter("\\Z").next();
@@ -69,13 +69,11 @@ public class KonfigurationKombinerConcurrencyTest {
 
     @BeforeMethod
     void reset() {
-
         this.map = this.MAP0;
         this.json = this.JSON0;
     }
 
     private void toggle() {
-
         this.json = Objects.equals(this.json, JSON0) ? JSON1 : JSON0;
         this.map = Objects.equals(this.map, MAP0) ? MAP1 : MAP0;
     }
@@ -117,7 +115,6 @@ public class KonfigurationKombinerConcurrencyTest {
 
     @Test(enabled = false)
     public void testMissedUpdates() {
-
         ExecutorService e = null;
         try {
             e = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() * 2);

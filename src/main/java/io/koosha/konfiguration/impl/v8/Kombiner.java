@@ -49,7 +49,7 @@ final class Kombiner implements Konfiguration {
                .peek(k -> {
                    if (k == null)
                        throw new KfgIllegalArgumentException(name, "null in config sources");
-                   if (k instanceof JSubsetView)
+                   if (k instanceof SubsetView)
                        throw new KfgIllegalArgumentException(name, "Can not kombine a " + k.getClass().getName() + " konfiguration.");
                })
                .flatMap(k ->// Unwrap.
@@ -310,7 +310,7 @@ final class Kombiner implements Konfiguration {
     public final Konfiguration subset(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         this.lock();
-        return new JSubsetView(this.name() + "::" + key, this, key);
+        return new SubsetView(this.name() + "::" + key, this, key);
     }
 
 }

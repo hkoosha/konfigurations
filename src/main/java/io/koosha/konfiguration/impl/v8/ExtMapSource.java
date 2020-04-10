@@ -51,7 +51,7 @@ final class ExtMapSource extends Source {
          */
         @NotNull
         @Override
-        public Konfiguration8 _update() {
+        public Source _update() {
             return this.hasUpdate()
                    ? new ExtMapSource(name(), map, enableNestedMap)
                    : ExtMapSource.this;

@@ -15,37 +15,39 @@ public class DummyVTest {
 
     @Test
     public void testRegister() throws Exception {
-        DummyV<?> dummyV = new DummyV<>(key);
-        assertSame(dummyV.register((KeyObserver) k -> {
+        final K<?> dummyV = DummyV.string(key);
+        assertSame(dummyV.register(k -> {
         }), dummyV);
     }
 
     @Test
     public void testGetKey() throws Exception {
-        DummyV<?> dummyV = new DummyV<>(key);
-        assertSame(dummyV.getKey(), key);
+        final K<?> dummyV = DummyV.string(key);
+        assertSame(dummyV.key(), key);
     }
 
     @Test
     public void testV() throws Exception {
         long value = 99L;
-        DummyV<?> dummyV = new DummyV<>(key, value);
+        K<?> dummyV = DummyV.long_(value, key);
         assertSame(dummyV.v(), value);
     }
 
     @Test
     public void testVWithDefaultValue() throws Exception {
         long value = 99L;
-        DummyV<Long> dummyV = new DummyV<>(key);
+        K<Long> dummyV = DummyV.long_(key);
         assertSame(dummyV.v(value), value);
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     public void testFalse_() throws Exception {
         assertFalse(DummyV.false_().v());
         assertFalse(DummyV.false_().v(true));
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test
     public void testTrue_() throws Exception {
         assertTrue(DummyV.true_().v());
@@ -67,8 +69,8 @@ public class DummyVTest {
     @Test
     public void testDouble_() throws Exception {
         // We are comparing doubles!!
-        assertEquals(DummyV.double_(99.9D).v(), 99.9D);
-        assertEquals(DummyV.double_(99.9D).v(99.9D), 99.9D);
+        assertEquals(DummyV.double_(99.9D).v(), (Double) 99.9D);
+        assertEquals(DummyV.double_(99.9D).v(99.9D), (Double) 99.9D);
     }
 
     @Test
@@ -111,8 +113,8 @@ public class DummyVTest {
 
     @Test
     public void testNull_() throws Exception {
-        assertNull(DummyV.null_().v());
-        assertNull(DummyV.null_().v(new Object()));
+        assertNull(DummyV.null_(Q._VOID).v());
+        assertNull(DummyV.null_(Q._VOID).v(null));
     }
 
 }

@@ -1,9 +1,13 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.impl.v8;
 
+import io.koosha.konfiguration.KonfigValueTestMixin;
+import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.KonfigurationManager;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -15,10 +19,10 @@ public class YamlKonfigSourceTest extends KonfigValueTestMixin {
     private String yaml1;
 
     private Konfiguration k;
+    private KonfigurationManager man;
 
     @BeforeClass
     public void classSetup() throws Exception {
-
         // URL url0 = getClass().getResource("sample0.yaml");
         // File file0 = new File(url0.toURI());
         // this.json0 = new Scanner(file0, "UTF8").useDelimiter("\\Z").next();
@@ -32,9 +36,9 @@ public class YamlKonfigSourceTest extends KonfigValueTestMixin {
 
     @BeforeMethod
     public void setup() throws Exception {
-
-        yaml = yaml0;
-        this.k = Konfiguration.snakeYaml(() -> yaml);
+        this.yaml = this.yaml0;
+        this.k = kFactory().snakeYaml("meNameYaml", () -> yaml);
+        this.man = this.k.manager();
     }
 
     @Override
@@ -44,20 +48,17 @@ public class YamlKonfigSourceTest extends KonfigValueTestMixin {
 
     @Override
     protected void update() {
-
         this.yaml = this.yaml1;
-        this.k = this.k.copyAndUpdate();
+        this.k = this.man.getAndSetToNull();
     }
 
     @Test
     public void testNotUpdatable() throws Exception {
-
         assertFalse(this.k().hasUpdate());
     }
 
     @Test
     public void testUpdatable() throws Exception {
-
         yaml = yaml1;
         assertTrue(this.k().hasUpdate());
     }

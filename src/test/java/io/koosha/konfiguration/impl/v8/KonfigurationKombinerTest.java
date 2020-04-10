@@ -1,6 +1,9 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.impl.v8;
 
 
+import io.koosha.konfiguration.KfgMissingKeyException;
+import io.koosha.konfiguration.KfgTypeException;
+import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -25,14 +28,12 @@ public final class KonfigurationKombinerTest {
 
     @BeforeMethod
     public void setup() {
-
         this.flag.set(true);
         this.k = Konfiguration.kombine(Konfiguration.inMemory(sup));
     }
 
     @Test
     public void testV1() throws Exception {
-
         assertEquals(k.int_("xxx").v(), (Integer) 12);
 
         flag.set(!flag.get());
@@ -43,14 +44,12 @@ public final class KonfigurationKombinerTest {
 
     @Test(expectedExceptions = KfgTypeException.class)
     public void testV3() throws Exception {
-
         k.string("xxx");
     }
 
 
     @Test
     public void testDoublyUpdate() throws Exception {
-
         assertEquals(k.int_("xxx").v(), (Integer) 12);
 
         flag.set(!flag.get());
@@ -64,13 +63,11 @@ public final class KonfigurationKombinerTest {
 
     @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testNoDefaultValue() {
-
         k.long_("some bla bla bla").v();
     }
 
     @Test
     public void testDefaultValue() {
-
         assertEquals(k.long_("someblablabla").v(9876L), (Long) 9876L);
     }
 

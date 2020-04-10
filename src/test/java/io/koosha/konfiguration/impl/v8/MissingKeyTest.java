@@ -1,6 +1,8 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.impl.v8;
 
 
+import io.koosha.konfiguration.KfgMissingKeyException;
+import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -23,20 +25,17 @@ public class MissingKeyTest {
 
     @BeforeMethod
     public void setup() {
-
         this.returnFourTaee = true;
         this.k = Konfiguration.kombine(Konfiguration.inMemory(sup));
     }
 
     @Test
     public void testMissingKeyNotRaisedUntilVIsNotCalled() {
-
         k.string("i.do.not.exist");
     }
 
     @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testMissingKey() {
-
         k.string("i.do.not.exist").v();
     }
 

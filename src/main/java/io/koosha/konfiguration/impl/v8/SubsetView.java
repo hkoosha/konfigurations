@@ -23,15 +23,15 @@ import java.util.Set;
  */
 @ThreadSafe
 @ApiStatus.Internal
-final class JSubsetView implements Konfiguration {
+final class SubsetView implements Konfiguration {
 
     private final String name;
     private final Konfiguration wrapped;
     private final String baseKey;
 
-    JSubsetView(@NotNull final String name,
-                @NotNull final Konfiguration wrappedKonfiguration,
-                @NotNull final String baseKey) {
+    SubsetView(@NotNull final String name,
+               @NotNull final Konfiguration wrappedKonfiguration,
+               @NotNull final String baseKey) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(wrappedKonfiguration, "wrappedKonfiguration");
         Objects.requireNonNull(baseKey, "baseKey");
@@ -269,7 +269,7 @@ final class JSubsetView implements Konfiguration {
         Objects.requireNonNull(key, "key");
         return key.isEmpty()
                ? this
-               : new JSubsetView(
+               : new SubsetView(
                        this.name.split("::")[0] + "::" + key,
                        this.wrapped,
                        this.baseKey + this.key(key)

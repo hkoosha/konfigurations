@@ -1,6 +1,8 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.impl.v8;
 
 
+import io.koosha.konfiguration.KonfigValueTestMixin;
+import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;

@@ -1,6 +1,8 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.impl.v8;
 
 
+import io.koosha.konfiguration.KonfigValueTestMixin;
+import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -36,7 +38,6 @@ public class SourceJacksonJsonTest extends KonfigValueTestMixin {
 
     @BeforeClass
     public void classSetup() throws Exception {
-
         // URL url0 = getClass().getResource("sample0.json");
         // File file0 = new File(url0.toURI());
         // this.json0 = new Scanner(file0, "UTF8").useDelimiter("\\Z").next();
@@ -50,13 +51,11 @@ public class SourceJacksonJsonTest extends KonfigValueTestMixin {
 
     @BeforeMethod
     public void setup() throws Exception {
-
         json = json0;
         this.k = Konfiguration.jacksonJson(() -> json);
     }
 
     protected void update() {
-
         this.json = this.json1;
         this.k = this.k.copyAndUpdate();
     }
@@ -67,13 +66,11 @@ public class SourceJacksonJsonTest extends KonfigValueTestMixin {
 
     @Test
     public void testNotUpdatable() throws Exception {
-
         assertFalse(this.k().hasUpdate());
     }
 
     @Test
     public void testUpdatable() throws Exception {
-
         json = json1;
         assertTrue(this.k().hasUpdate());
     }

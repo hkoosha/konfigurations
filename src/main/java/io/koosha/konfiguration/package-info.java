@@ -1,5 +1,5 @@
 /**
- * Entry point is at {@link io.koosha.konfiguration.KonfigurationFactory#getInstance(String)}
+ * Entry point is at {@link io.koosha.konfiguration.Konfiguration#kFactory()}
  * or the versioned alternatives such as {@link io.koosha.konfiguration.KonfigurationFactory#getInstanceV8()}.
  * <p>
  * For extending the konfiguration library for connecting new sources, look at the
@@ -12,5 +12,6 @@
  * {@link io.koosha.konfiguration.Konfiguration} just as
  * {@link io.koosha.konfiguration.impl.v8.FactoryV0#jacksonJson(java.lang.String, java.lang.String)}
  * does.
+ *
  */
 package io.koosha.konfiguration;

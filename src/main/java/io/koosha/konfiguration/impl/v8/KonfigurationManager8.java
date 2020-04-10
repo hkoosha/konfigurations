@@ -1,17 +1,18 @@
 package io.koosha.konfiguration.impl.v8;
 
+
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;
+
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
@@ -22,7 +23,6 @@ interface KonfigurationManager8 extends KonfigurationManager {
      *
      * @return
      */
-    @Contract("-> fail")
     @NotNull
     @Override
     default Map<String, Collection<Runnable>> update() {
@@ -33,7 +33,6 @@ interface KonfigurationManager8 extends KonfigurationManager {
      * {@inheritDoc}
      */
     @Contract("-> fail")
-    @Nullable
     @Override
     default Konfiguration getAndSetToNull() {
         throw new KfgAssertionException("shouldn't be called");
@@ -42,6 +41,7 @@ interface KonfigurationManager8 extends KonfigurationManager {
     /**
      * {@inheritDoc}
      */
+    @Contract("-> fail")
     @Override
     default void updateNow() {
         throw new KfgAssertionException("shouldn't be called");
@@ -49,6 +49,6 @@ interface KonfigurationManager8 extends KonfigurationManager {
 
     @NotNull
     @ApiStatus.Internal
-    Konfiguration8 _update();
+    Source _update();
 
 }

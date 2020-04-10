@@ -321,7 +321,7 @@ final class ExtYamlSource extends Source {
         @Override
         @Contract(pure = true,
                 value = "-> new")
-        public @NotNull Konfiguration8 _update() {
+        public @NotNull Source _update() {
             return this.hasUpdate()
                    ? new ExtYamlSource(name(), yaml, mapper, unsafe)
                    : ExtYamlSource.this;

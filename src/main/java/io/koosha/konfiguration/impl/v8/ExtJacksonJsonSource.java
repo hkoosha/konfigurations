@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
@@ -24,6 +25,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
+
 
 /**
  * Reads konfig from a json source (supplied as string).
@@ -75,10 +77,10 @@ final class ExtJacksonJsonSource extends Source {
         @Contract(pure = true,
                 value = "-> new")
         @Override
-        public @NotNull Konfiguration8 _update() {
+        public @NotNull Source _update() {
             return this.hasUpdate()
-                   ? new ExtJacksonJsonSource(name(), json, mapperSupplier)
-                   : ExtJacksonJsonSource.this;
+                    ? new ExtJacksonJsonSource(name(), json, mapperSupplier)
+                    : ExtJacksonJsonSource.this;
         }
 
     };
@@ -125,7 +127,7 @@ final class ExtJacksonJsonSource extends Source {
      * provider and object mapper provider.
      *
      * @param name         name of this source
-     * @param jsonSupplier         backing store provider. Must always return a non-null valid json
+     * @param jsonSupplier backing store provider. Must always return a non-null valid json
      *                     string.
      * @param objectMapper {@link ObjectMapper} provider. Must always return a valid
      *                     non-null ObjectMapper, and if required, it must be able to
@@ -295,7 +297,8 @@ final class ExtJacksonJsonSource extends Source {
 
             try {
                 return reader.readValue(at.traverse(), javaType);
-            } catch (final IOException e) {
+            }
+            catch (final IOException e) {
                 throw new KfgTypeException(this.name(), key, type, at, "type mismatch", e);
             }
         }
@@ -324,7 +327,8 @@ final class ExtJacksonJsonSource extends Source {
 
             try {
                 s = reader.readValue(at.traverse(), javaType);
-            } catch (final IOException e) {
+            }
+            catch (final IOException e) {
                 throw new KfgTypeException(this.name(), key, Q.UNKNOWN_LIST, type, "type mismatch", e);
             }
 
@@ -356,7 +360,8 @@ final class ExtJacksonJsonSource extends Source {
 
             try {
                 return reader.readValue(at.traverse(), javaType);
-            } catch (final IOException e) {
+            }
+            catch (final IOException e) {
                 throw new KfgTypeException(this.name(), key, Q.UNKNOWN_LIST, type, "type mismatch", e);
             }
         }
@@ -378,7 +383,8 @@ final class ExtJacksonJsonSource extends Source {
 
             try {
                 return reader.readValue(traverse, type.klass());
-            } catch (final IOException e) {
+            }
+            catch (final IOException e) {
                 throw new KfgTypeException(this.name(), key, type, null, "jackson error", e);
             }
         }
@@ -430,7 +436,8 @@ final class ExtJacksonJsonSource extends Source {
             try {
                 this.custom0(key, type);
                 return true;
-            } catch (Throwable t) {
+            }
+            catch (Throwable t) {
                 return false;
             }
         }

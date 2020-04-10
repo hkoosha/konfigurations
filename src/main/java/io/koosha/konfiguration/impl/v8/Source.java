@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
+
 import io.koosha.konfiguration.*;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
@@ -10,6 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+
 /**
  * <p>Thread safe and immutable.
  */
@@ -18,7 +20,12 @@ import java.util.*;
 @Immutable
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
-abstract class Source implements Konfiguration8 {
+abstract class Source implements Konfiguration {
+
+    @NotNull
+    @Override
+    public abstract KonfigurationManager8 manager();
+
 
     /**
      * {@inheritDoc}
@@ -271,8 +278,7 @@ abstract class Source implements Konfiguration8 {
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
         if (type == null) {
-            @SuppressWarnings({"unchecked", "rawtypes"})
-            final Q<List<U>> t = (Q) Q.UNKNOWN_LIST;
+            @SuppressWarnings({"unchecked", "rawtypes"}) final Q<List<U>> t = (Q) Q.UNKNOWN_LIST;
             type = t;
         }
 
@@ -307,8 +313,7 @@ abstract class Source implements Konfiguration8 {
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
         if (type == null) {
-            @SuppressWarnings({"unchecked", "rawtypes"})
-            final Q<Set<U>> t = (Q) Q.UNKNOWN_SET;
+            @SuppressWarnings({"unchecked", "rawtypes"}) final Q<Set<U>> t = (Q) Q.UNKNOWN_SET;
             type = t;
         }
 
@@ -343,8 +348,7 @@ abstract class Source implements Konfiguration8 {
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
         if (type == null) {
-            @SuppressWarnings({"unchecked", "rawtypes"})
-            final Q<Map<U, V>> t = (Q) Q.UNKNOWN_MAP;
+            @SuppressWarnings({"unchecked", "rawtypes"}) final Q<Map<U, V>> t = (Q) Q.UNKNOWN_MAP;
             type = t;
         }
 
@@ -403,8 +407,7 @@ abstract class Source implements Konfiguration8 {
             if (type.isFloat())
                 return (K<U>) double_(key);
 
-            @SuppressWarnings("rawtypes")
-            final Q raw = type;
+            @SuppressWarnings("rawtypes") final Q raw = type;
             if (type.isList())
                 return (K<U>) list(key, raw);
             if (type.isMap())
@@ -417,8 +420,8 @@ abstract class Source implements Konfiguration8 {
             throw new KfgAssertionException(this.name(), key, null, null, "untyped is not supported");
 
         final Object v = type == null
-                         ? this.custom0(key)
-                         : this.custom0(key, type);
+                ? this.custom0(key)
+                : this.custom0(key, type);
 
         if (type != null)
             this.checkType(key, type, v);
