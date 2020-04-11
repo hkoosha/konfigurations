@@ -1,6 +1,5 @@
 package io.koosha.konfiguration;
 
-
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -9,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import static java.util.Collections.emptyMap;
-
 
 /**
  * This shouldn't happen. This must be prevented by konfigurations.

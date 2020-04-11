@@ -1,6 +1,5 @@
 package io.koosha.konfiguration;
 
-
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -10,7 +9,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 
 /**
  * All methods are thread-safe (and should be implemented as such).
@@ -247,6 +245,18 @@ public interface Konfiguration {
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     boolean has(@NotNull String key, @Nullable Q<?> type);
 
+    /**
+     * Get a subset view of this konfiguration representing all the values under
+     * the namespace of supplied key.
+     *
+     * @param key the key to which the scope of returned konfiguration is
+     *            limited.
+     * @return a konfiguration whose scope is limited to the supplied key.
+     */
+    @NotNull
+    @Contract(pure = true)
+    Konfiguration subset(@NotNull String key);
+
 
     // =========================================================================
 
@@ -364,21 +374,6 @@ public interface Konfiguration {
     @NotNull
     @Contract(pure = true)
     String name();
-
-
-    /**
-     * Get a subset view of this konfiguration representing all the values under
-     * the namespace of supplied key.
-     *
-     * @param key the key to which the scope of returned konfiguration is
-     *            limited.
-     * @return a konfiguration whose scope is limited to the supplied key.
-     */
-    @NotNull
-    @Contract(pure = true)
-    Konfiguration subset(@NotNull String key);
-
-    // =========================================================================
 
     /**
      * Manager object associated with this konfiguration.

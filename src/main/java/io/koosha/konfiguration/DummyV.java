@@ -1,6 +1,5 @@
 package io.koosha.konfiguration;
 
-
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 import static java.lang.String.format;
-
 
 /**
  * Dummy konfig value, holding a constant konfig value with no source.

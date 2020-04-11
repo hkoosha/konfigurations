@@ -1,13 +1,11 @@
 package io.koosha.konfiguration;
 
-
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 import static java.lang.String.format;
-
 
 @SuppressWarnings("unused")
 @ThreadSafe

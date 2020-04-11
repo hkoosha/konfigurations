@@ -10,7 +10,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
@@ -114,12 +113,24 @@ final class Kombiner_Manager implements KonfigurationManager {
                     .sources
                     .vs()
                     // External non-optimizable konfig sources.
-                    .filter(not(Source.class::isInstance))
+                    .filter(target -> !(target instanceof Source))
                     .map(Konfiguration::manager)
                     .map(KonfigurationManager::update)
                     .peek(x -> x.entrySet().forEach(e -> e.setValue(
                             // just to wrap!
-                            e.getValue().stream().map(Kombiner_Manager::wrap)
+                            e.getValue().stream().map(r -> {
+                                Objects.requireNonNull(r, "runnable");
+                                // We can not be sure if given runnable is safe
+                                // to be put in a map // So we create a plain
+                                // object wrapping it.
+                                //noinspection Convert2Lambda,Anonymous2MethodRef
+                                return new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        r.run();
+                                    }
+                                };
+                            })
                              .collect(toList())
                     )))
                     .reduce(new HashMap<>(), (m0, m1) -> {
@@ -129,7 +140,6 @@ final class Kombiner_Manager implements KonfigurationManager {
                     });
 
             for (final Q<?> q : updated)
-                //noinspection ConstantConditions
                 result.computeIfAbsent(q.key(), (q_) -> new ArrayList<>())
                       .addAll(this.origin.observers.get(q.key()));
 
@@ -138,26 +148,6 @@ final class Kombiner_Manager implements KonfigurationManager {
 
             return result;
         });
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> Predicate<T> not(@NotNull final Predicate<? super T> target) {
-        Objects.requireNonNull(target, "target");
-        return (Predicate<T>) target.negate();
-    }
-
-    @SuppressWarnings({"Convert2Lambda", "Anonymous2MethodRef"})
-    private static Runnable wrap(@NotNull final Runnable r) {
-        Objects.requireNonNull(r, "runnable");
-
-        // We can not be sure if given runnable is safe to be put in a map
-        // So we create a plain object wrapping it.
-        return new Runnable() {
-            @Override
-            public void run() {
-                r.run();
-            }
-        };
     }
 
 }

@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
+import io.koosha.konfiguration.KfgIllegalArgumentException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationBuilder;
 import net.jcip.annotations.ThreadSafe;
@@ -83,6 +84,10 @@ final class Kombiner_Builder implements KonfigurationBuilder {
     @Override
     @NotNull
     public KonfigurationBuilder lockWaitTime(final long waitTime) {
+        if(waitTime < 0)
+            throw new KfgIllegalArgumentException(null,
+                    "accepted value range for waitTime=0~Long.MAX_VALUE");
+
         synchronized (LOCK) {
             //noinspection ResultOfMethodCallIgnored
             this.ensure();

@@ -1,6 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import io.koosha.konfiguration.*;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
@@ -10,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-
 
 /**
  * <p>Thread safe and immutable.

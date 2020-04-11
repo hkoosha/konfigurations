@@ -1,13 +1,11 @@
 package io.koosha.konfiguration.ext;
 
-
 import io.koosha.konfiguration.Q;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;
-
 
 public class KfgSnakeYamlAssertionError extends KfgSnakeYamlError {
 

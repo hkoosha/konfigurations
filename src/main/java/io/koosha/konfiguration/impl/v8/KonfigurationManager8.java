@@ -1,6 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
@@ -12,7 +11,6 @@ import java.util.Collection;
 import java.util.Map;
 
 import static java.util.Collections.emptyMap;
-
 
 @ApiStatus.Internal
 @ApiStatus.NonExtendable

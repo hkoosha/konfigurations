@@ -1,10 +1,8 @@
 package io.koosha.konfiguration.ext;
 
-
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.Q;
 import org.jetbrains.annotations.Nullable;
-
 
 public class KfgSnakeYamlError extends KfgSourceException {
 

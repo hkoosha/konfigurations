@@ -1,6 +1,5 @@
 package io.koosha.konfiguration;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -13,7 +12,6 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
-
 
 @SuppressWarnings("unused")
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
@@ -44,6 +42,9 @@ public interface KonfigurationFactory {
         }
     }
 
+
+    // =========================================================================
+
     /**
      * Implementation version.
      *
@@ -53,11 +54,10 @@ public interface KonfigurationFactory {
     @NotNull
     String getVersion();
 
-    // =========================================================================
-
     @Contract("_ -> new")
     @NotNull
     KonfigurationBuilder builder(@NotNull final String name);
+
 
     /**
      * Create a new konfiguration object from given sources.
@@ -129,6 +129,9 @@ public interface KonfigurationFactory {
      */
     @Contract("_ -> new")
     Konfiguration kombine(@NotNull Collection<Konfiguration> sources);
+
+
+    // =========================================================================
 
     /**
      * Creates a {@link Konfiguration} with the given backing store.

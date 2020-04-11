@@ -1,6 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import io.koosha.konfiguration.*;
 import io.koosha.konfiguration.ext.KfgPreferencesError;
 import net.jcip.annotations.ThreadSafe;
@@ -15,7 +14,6 @@ import java.util.*;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.NodeChangeListener;
 import java.util.prefs.Preferences;
-
 
 /**
  * Reads konfig from a {@link Preferences} source.

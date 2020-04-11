@@ -1,6 +1,5 @@
 package io.koosha.konfiguration;
 
-
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -11,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
-
 
 @SuppressWarnings("unused")
 @ThreadSafe

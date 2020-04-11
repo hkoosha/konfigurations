@@ -1,12 +1,10 @@
 package io.koosha.konfiguration;
 
-
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static io.koosha.konfiguration.KfgException.toStringOf;
-
 
 @ThreadSafe
 public class KfgIllegalStateException extends IllegalStateException {

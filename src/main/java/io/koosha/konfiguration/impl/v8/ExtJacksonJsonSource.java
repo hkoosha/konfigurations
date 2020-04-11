@@ -1,6 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
@@ -25,7 +24,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
-
 
 /**
  * Reads konfig from a json source (supplied as string).
