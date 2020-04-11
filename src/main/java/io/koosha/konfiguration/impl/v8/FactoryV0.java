@@ -2,14 +2,14 @@ package io.koosha.konfiguration.impl.v8;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.koosha.konfiguration.Deserializer;
-import io.koosha.konfiguration.KonfigurationFactory;
 import io.koosha.konfiguration.Konfiguration;
-import io.koosha.konfiguration.KonfigurationBuilder;
+import io.koosha.konfiguration.KonfigurationFactory;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.*;
@@ -25,26 +25,41 @@ import static java.util.Collections.unmodifiableMap;
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public final class FactoryV0 implements KonfigurationFactory {
 
-    static final String DEFAULT_KONFIG_NAME = "default_konfig";
-
-    private FactoryV0() {
-    }
-
-    private static final KonfigurationFactory INSTANCE = new FactoryV0();
+    private static final String DEFAULT_KONFIG_NAME = "unnamed_konfig";
 
     private static final String VERSION = "io.koosha.konfiguration:7.0.0";
 
+    private static final boolean DEFAULT_FAIR_LOCK = false;
+
+    private static final Long DEFAULT_LOCK_WAIT_TIME_MILLIS = null;
+
     @Contract(pure = true)
     @NotNull
-    public static KonfigurationFactory defaultInstance() {
-        return FactoryV0.INSTANCE;
+    public static KonfigurationFactory getInstance() {
+        return new FactoryV0();
     }
 
     @Contract(pure = true)
     @NotNull
-    public String defaultKonfigName() {
-        return DEFAULT_KONFIG_NAME;
+    public static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
+                                                   final boolean fairLock) {
+        return new FactoryV0(lockWaitTime, fairLock);
     }
+
+    @Nullable
+    private final Long lockWaitTime;
+    private final boolean fairLock;
+
+    private FactoryV0() {
+        this(DEFAULT_LOCK_WAIT_TIME_MILLIS, DEFAULT_FAIR_LOCK);
+    }
+
+    private FactoryV0(@Nullable final Long lockWaitTime,
+                      final boolean fairLock) {
+        this.lockWaitTime = lockWaitTime;
+        this.fairLock = fairLock;
+    }
+
 
     /**
      * {@inheritDoc}
@@ -58,14 +73,6 @@ public final class FactoryV0 implements KonfigurationFactory {
 
     // ================================================================ KOMBINER
 
-    @Override
-    @Contract("_ ->new")
-    @NotNull
-    public KonfigurationBuilder builder(@NotNull final String name) {
-        Objects.requireNonNull(name, "name");
-        return new Kombiner_Builder(name);
-    }
-
     /**
      * {@inheritDoc}
      */
@@ -75,7 +82,7 @@ public final class FactoryV0 implements KonfigurationFactory {
     public Konfiguration kombine(@NotNull final String name,
                                  @NotNull final Konfiguration source) {
         Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(source , "source");
+        Objects.requireNonNull(source, "source");
         return kombine(name, singleton(source));
     }
 
@@ -89,12 +96,12 @@ public final class FactoryV0 implements KonfigurationFactory {
                                  @NotNull final Konfiguration source,
                                  @NotNull final Konfiguration... sources) {
         Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(source , "source");
-        Objects.requireNonNull(sources , "sources");
+        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(sources, "sources");
         final List<Konfiguration> l = new ArrayList<>();
         l.add(source);
         l.addAll(asList(sources));
-        return new Kombiner(name, l, LOCK_WAIT_MILLIS__DEFAULT, true);
+        return new Kombiner(name, l, this.lockWaitTime, this.fairLock);
     }
 
     /**
@@ -106,8 +113,8 @@ public final class FactoryV0 implements KonfigurationFactory {
     public Konfiguration kombine(@NotNull final String name,
                                  @NotNull final Collection<Konfiguration> sources) {
         Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(sources , "sources");
-        return new Kombiner(name, sources, LOCK_WAIT_MILLIS__DEFAULT, true);
+        Objects.requireNonNull(sources, "sources");
+        return new Kombiner(name, sources, this.lockWaitTime, this.fairLock);
     }
 
     /**
@@ -116,7 +123,7 @@ public final class FactoryV0 implements KonfigurationFactory {
     @Override
     @Contract("_ -> new")
     public Konfiguration kombine(@NotNull final Konfiguration source) {
-        Objects.requireNonNull(source , "source");
+        Objects.requireNonNull(source, "source");
         return kombine(DEFAULT_KONFIG_NAME, source);
     }
 
@@ -127,8 +134,8 @@ public final class FactoryV0 implements KonfigurationFactory {
     @Contract("_, _ -> new")
     public Konfiguration kombine(@NotNull final Konfiguration source,
                                  @NotNull final Konfiguration... sources) {
-        Objects.requireNonNull(source , "source");
-        Objects.requireNonNull(sources , "sources");
+        Objects.requireNonNull(source, "source");
+        Objects.requireNonNull(sources, "sources");
         return kombine(DEFAULT_KONFIG_NAME, source, sources);
     }
 
@@ -138,7 +145,7 @@ public final class FactoryV0 implements KonfigurationFactory {
     @Override
     @Contract("_ -> new")
     public Konfiguration kombine(@NotNull final Collection<Konfiguration> sources) {
-        Objects.requireNonNull(sources , "sources");
+        Objects.requireNonNull(sources, "sources");
         return kombine(DEFAULT_KONFIG_NAME, sources);
     }
 

@@ -1,9 +1,11 @@
 package io.koosha.konfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.koosha.konfiguration.impl.v8.FactoryV0;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
 import java.util.Collection;
@@ -26,10 +28,21 @@ public interface KonfigurationFactory {
     long LOCK_WAIT_MILLIS__DEFAULT = 300;
     AtomicBoolean UNSAFE_YAML = new AtomicBoolean(true);
 
+    @Contract(pure = true)
+    @NotNull
     static KonfigurationFactory getInstanceV8() {
-        return io.koosha.konfiguration.impl.v8.FactoryV0.defaultInstance();
+        return FactoryV0.getInstance();
     }
 
+    @Contract(pure = true)
+    @NotNull
+    static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
+                                              final boolean fairLock) {
+        return FactoryV0.getInstance(lockWaitTime, false);
+    }
+
+    @Contract(pure = true)
+    @NotNull
     static KonfigurationFactory getInstance(@NotNull final String version) {
         Objects.requireNonNull(version, "version");
         //noinspection SwitchStatementWithTooFewBranches
@@ -54,16 +67,12 @@ public interface KonfigurationFactory {
     @NotNull
     String getVersion();
 
-    @Contract("_ -> new")
-    @NotNull
-    KonfigurationBuilder builder(@NotNull final String name);
-
 
     /**
      * Create a new konfiguration object from given sources.
      *
      * @param name name of created konfiguration.
-     * @param k0 first source
+     * @param k0   first source
      * @return kombined sources.
      */
     @Contract("_, _ -> new")
@@ -74,7 +83,7 @@ public interface KonfigurationFactory {
     /**
      * Create a new konfiguration object from given sources.
      *
-     * @param name name of created konfiguration.
+     * @param name    name of created konfiguration.
      * @param k0      first source
      * @param sources rest of sources
      * @return kombined sources.
@@ -88,7 +97,7 @@ public interface KonfigurationFactory {
     /**
      * Create a new konfiguration object from given sources.
      *
-     * @param name name of created konfiguration.
+     * @param name    name of created konfiguration.
      * @param sources sources to combine.
      * @return kombined sources.
      * @throws NullPointerException     if sources is null.
@@ -286,7 +295,7 @@ public interface KonfigurationFactory {
      * Creates a {@link Konfiguration} with the given backing store.
      *
      * @param storage konfig source.
-     * @param deser deserializer in case {@link Konfiguration#custom(String, Q)} is used.
+     * @param deser   deserializer in case {@link Konfiguration#custom(String, Q)} is used.
      * @return a konfig source.
      * @throws NullPointerException if provided storage provider is null
      * @throws KfgSourceException   if the provided storage by provider is null
@@ -299,9 +308,9 @@ public interface KonfigurationFactory {
     /**
      * Creates a {@link Konfiguration} with the given backing store.
      *
-     * @param name name of created configuration.
+     * @param name    name of created configuration.
      * @param storage konfig source.
-     * @param deser deserializer in case {@link Konfiguration#custom(String, Q)} is used.
+     * @param deser   deserializer in case {@link Konfiguration#custom(String, Q)} is used.
      * @return a konfig source.
      * @throws NullPointerException if provided storage provider is null
      * @throws KfgSourceException   if the provided storage by provider is null
@@ -468,7 +477,7 @@ public interface KonfigurationFactory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
-     * @param name name of created konfiguration.
+     * @param name         name of created konfiguration.
      * @param json         backing store.
      * @param objectMapper A {@link ObjectMapper} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
@@ -496,7 +505,7 @@ public interface KonfigurationFactory {
      * type (instance of {@link Q}) the source will act as if it does not
      * contain that key.
      *
-     * @param name name of created konfiguration.
+     * @param name         name of created konfiguration.
      * @param json         backing store provider. Must always return a
      *                     non-null valid json string.
      * @param objectMapper A {@link ObjectMapper} provider. Must always return
@@ -654,7 +663,7 @@ public interface KonfigurationFactory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
-     * @param name name of created konfiguration.
+     * @param name         name of created konfiguration.
      * @param yaml         backing store.
      * @param objectMapper A {@link Yaml} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
@@ -710,7 +719,7 @@ public interface KonfigurationFactory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
-     * @param name name of created konfiguration.
+     * @param name         name of created konfiguration.
      * @param yaml         backing store provider. Must always return a
      *                     non-null valid json string.
      * @param objectMapper A {@link Yaml} provider. Must always return
@@ -767,7 +776,7 @@ public interface KonfigurationFactory {
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
      *
-     * @param name name of created konfiguration.
+     * @param name         name of created konfiguration.
      * @param yaml         backing store provider. Must always return a
      *                     non-null valid json string.
      * @param objectMapper A {@link Yaml} provider. Must always return
