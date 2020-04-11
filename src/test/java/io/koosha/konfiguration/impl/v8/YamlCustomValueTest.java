@@ -18,9 +18,10 @@ public class YamlCustomValueTest {
     @Test
     public void testCustomValue() {
         final DummyCustom bang = kFactory().snakeYaml(
+                "yaml",
                 () -> "bang:\n  str : hello\n  i: 99")
                                            .custom("bang", new Q<DummyCustom>() {
-                                           });
+                                           }).vn();
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");
     }
@@ -28,6 +29,7 @@ public class YamlCustomValueTest {
     @Test
     public void testCustomValue2() {
         final DummyCustom2 bang = kFactory().snakeYaml(
+                "snake",
                 () -> {
                     try {
                         File file = new File(getClass().getResource("/sample2.yaml").getPath());
@@ -39,7 +41,7 @@ public class YamlCustomValueTest {
                     }
                 })
                                             .custom("bang", new Q<DummyCustom2>() {
-                                            });
+                                            }).vn();
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");
         assertEquals(bang.olf, Map.of(

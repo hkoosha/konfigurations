@@ -48,14 +48,16 @@ final class Kombiner implements Konfiguration {
         sources.stream()
                .peek(k -> {
                    if (k == null)
-                       throw new KfgIllegalArgumentException(name, "null in config sources");
+                       throw new KfgIllegalArgumentException(
+                               name, "null in config sources");
                    if (k instanceof SubsetView)
-                       throw new KfgIllegalArgumentException(name, "Can not kombine a " + k.getClass().getName() + " konfiguration.");
+                       throw new KfgIllegalArgumentException(
+                               name, "can not kombine a " + k.getClass().getName() + " konfiguration.");
                })
                .flatMap(k ->// Unwrap.
-                       k instanceof Kombiner
-                       ? ((Kombiner) k).sources.vs()
-                       : Stream.of(k))
+                                k instanceof Kombiner
+                                        ? ((Kombiner) k).sources.vs()
+                                        : Stream.of(k))
                .forEach(x -> s.put(new HandleImpl(), x));
         if (s.isEmpty())
             throw new KfgIllegalArgumentException(name, "no source given");

@@ -53,7 +53,7 @@ public class SourceJacksonJsonTest extends KonfigValueTestMixin {
     @BeforeMethod
     public void setup() throws Exception {
         json = json0;
-        this.k = kFactory().jacksonJson(() -> json);
+        this.k = kFactory().jacksonJson("json", () -> json);
     }
 
     protected void update() {

@@ -1,6 +1,5 @@
 package io.koosha.konfiguration;
 
-
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -10,7 +9,6 @@ import java.util.Map;
 
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
-
 
 @SuppressWarnings("RedundantThrows")
 public abstract class KonfigValueTestMixin {

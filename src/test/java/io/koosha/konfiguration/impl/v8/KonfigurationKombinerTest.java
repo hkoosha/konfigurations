@@ -28,7 +28,7 @@ public final class KonfigurationKombinerTest {
     @BeforeMethod
     public void setup() {
         this.flag.set(true);
-        this.k = kFactory().kombine(kFactory().map(sup));
+        this.k = kFactory().kombine("def", kFactory().map("map", sup));
     }
 
     @Test

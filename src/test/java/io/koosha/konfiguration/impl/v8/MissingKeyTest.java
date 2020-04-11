@@ -27,7 +27,7 @@ public class MissingKeyTest {
     @BeforeMethod
     public void setup() {
         this.returnFourTaee = true;
-        this.k = kFactory().map(sup);
+        this.k = kFactory().map("map", sup);
     }
 
     @Test
