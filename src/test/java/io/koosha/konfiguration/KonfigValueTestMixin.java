@@ -10,6 +10,9 @@ import java.util.Map;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 
+/**
+ * Base test cases. Must be extended.
+ */
 @SuppressWarnings("RedundantThrows")
 public abstract class KonfigValueTestMixin {
 

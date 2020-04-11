@@ -22,7 +22,7 @@ import static java.util.Collections.unmodifiableMap;
 
 @ThreadSafe
 @Immutable
-@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
+@ApiStatus.Internal
 public final class FactoryV8 implements KonfigurationFactory {
 
     private static final String VERSION = "io.koosha.konfiguration:7.0.0";

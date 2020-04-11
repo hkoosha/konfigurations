@@ -1,9 +1,7 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import io.koosha.konfiguration.KonfigValueTestMixin;
 import io.koosha.konfiguration.Konfiguration;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -11,13 +9,8 @@ import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-// import java.io.File;
-// import java.net.URL;
-// import java.util.Scanner;
-
-
 @SuppressWarnings("RedundantThrows")
-public class SourceJacksonJsonTest extends KonfigValueTestMixin {
+public class ExtJacksonJsonSourceTest extends KonfigValueTestMixin {
 
     static final String SAMPLE_0 = "{ \"aInt\": 12, \"aBool\": true, " +
             "\"aIntList\": [1, 0, 2], \"aStringList\": [\"a\", \"B\", \"c\"], " +
@@ -32,33 +25,18 @@ public class SourceJacksonJsonTest extends KonfigValueTestMixin {
             "\"c\": \"e\" }, \"aSet\": [3, 2, 1, 2], \"aString\": \"goodbye world\" }";
 
     private String json;
-    private String json0;
-    private String json1;
 
     private Konfiguration k;
 
-    @BeforeClass
-    public void classSetup() throws Exception {
-        // URL url0 = getClass().getResource("sample0.json");
-        // File file0 = new File(url0.toURI());
-        // this.json0 = new Scanner(file0, "UTF8").useDelimiter("\\Z").next();
-        this.json0 = SourceJacksonJsonTest.SAMPLE_0;
-
-        // URL url1 = getClass().getResource("sample1.json");
-        // File file1 = new File(url1.toURI());
-        // this.json1 = new Scanner(file1, "UTF8").useDelimiter("\\Z").next();
-        this.json1 = SourceJacksonJsonTest.SAMPLE_1;
-    }
-
     @BeforeMethod
     public void setup() throws Exception {
-        json = json0;
-        this.k = kFactory().jacksonJson("json", () -> json);
+        this.json = SAMPLE_0;
+        this.k = kFactory().jacksonJson("json", () -> this.json);
     }
 
     protected void update() {
-        this.json = this.json1;
-        this.k = this.k.copyAndUpdate();
+        this.json = SAMPLE_0;
+        this.k = ((KonfigurationManager8) this.k.manager())._update();
     }
 
     public Konfiguration k() {
@@ -72,7 +50,7 @@ public class SourceJacksonJsonTest extends KonfigValueTestMixin {
 
     @Test
     public void testUpdatable() throws Exception {
-        json = json1;
+        this.json = SAMPLE_1;
         assertTrue(this.k().manager().hasUpdate());
     }
 

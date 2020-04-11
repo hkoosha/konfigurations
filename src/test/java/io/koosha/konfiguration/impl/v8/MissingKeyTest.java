@@ -1,6 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeMethod;
@@ -11,7 +10,6 @@ import java.util.function.Supplier;
 
 import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static java.util.Collections.singletonMap;
-
 
 public class MissingKeyTest {
 

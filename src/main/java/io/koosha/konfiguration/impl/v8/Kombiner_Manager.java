@@ -31,14 +31,6 @@ final class Kombiner_Manager implements KonfigurationManager {
      * {@inheritDoc}
      */
     @Override
-    public Konfiguration getAndSetToNull() {
-        return this.kombiner.getAndSet(null);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public boolean hasUpdate() {
         if (this.kombiner.get() != null)
             throw new KfgIllegalStateException(this.kombiner.get().name(), "getAndSetToNull() not called yet");
@@ -59,6 +51,7 @@ final class Kombiner_Manager implements KonfigurationManager {
     }
 
     private boolean hasUpdate0() {
+        //noinspection ConstantConditions
         return origin
                 .sources
                 .vs()
@@ -71,10 +64,11 @@ final class Kombiner_Manager implements KonfigurationManager {
             return emptyMap();
 
         final Map<Handle, Konfiguration> newSources = origin.sources.copy();
+        //noinspection ConstantConditions
         newSources.entrySet().forEach(x -> x.setValue(
                 x.getValue() instanceof Source
-                ? ((Source) x.getValue()).manager()._update()
-                : x.getValue()
+                        ? ((Source) x.getValue()).manager()._update()
+                        : x.getValue()
         ));
 
         final Set<Q<?>> updated = new HashSet<>();
@@ -89,12 +83,12 @@ final class Kombiner_Manager implements KonfigurationManager {
                     .findFirst();
 
             final Object newV = first.map(konfiguration ->
-                    konfiguration.custom(q.key(), q)).orElse(null);
+                                                  konfiguration.custom(q.key(), q)).orElse(null);
 
             final Object oldV =
                     origin.has(q.key(), q)
-                    ? origin.values.v_(q, null, true)
-                    : null;
+                            ? origin.values.v_(q, null, true)
+                            : null;
 
             // Went missing or came into existence.
             if (origin.values.has(q) != first.isPresent()
@@ -106,6 +100,7 @@ final class Kombiner_Manager implements KonfigurationManager {
         });
 
         return origin.w(() -> {
+            //noinspection ConstantConditions
             final Map<String, Collection<Runnable>> result = origin
                     .sources
                     .vs()
@@ -137,6 +132,7 @@ final class Kombiner_Manager implements KonfigurationManager {
                     });
 
             for (final Q<?> q : updated)
+                //noinspection ConstantConditions
                 result.computeIfAbsent(q.key(), (q_) -> new ArrayList<>())
                       .addAll(this.origin.observers.get(q.key()));
 

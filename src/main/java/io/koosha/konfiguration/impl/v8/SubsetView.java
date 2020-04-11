@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Read only subset view of a konfiguration. Prepends a pre-defined key
  * to all konfig values
- *
+ * <p>
  * Ignore the J prefix.
  *
  * <p>Immutable and thread safe by itself, although the underlying wrapped
@@ -268,28 +268,33 @@ final class SubsetView implements Konfiguration {
     public Konfiguration subset(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return key.isEmpty()
-               ? this
-               : new SubsetView(
-                       this.name.split("::")[0] + "::" + key,
-                       this.wrapped,
-                       this.baseKey + this.key(key)
-               );
+                ? this
+                : new SubsetView(
+                this.name.split("::")[0] + "::" + key,
+                this.wrapped,
+                this.baseKey + this.key(key)
+        );
     }
 
     /**
-     * Manager object associated with this konfiguration.
-     *
-     * @return On first invocation, a manager instance. An second invocation
-     * and on, throws exception.
-     * @throws KfgIllegalStateException if manager is already called once
-     *                                  before.
+     * {@inheritDoc}
      */
-    @Contract(pure = true,
-            value = "-> fail")
-    @NotNull
+    @Contract(value = "-> fail")
+    @Nullable
     @Override
     public KonfigurationManager manager() {
-        return wrapped.manager();
+        throw new KfgIllegalStateException(this.name(), null, null, null, "manager is already taken out");
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Contract(pure = true,
+            value = "->null")
+    @Nullable
+    @Override
+    public KonfigurationManager getManagerAndSetItToNull() {
+        return null;
     }
 
     @Contract(pure = true,

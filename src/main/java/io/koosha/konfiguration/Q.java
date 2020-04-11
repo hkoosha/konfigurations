@@ -17,6 +17,9 @@ import java.util.*;
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public abstract class Q<TYPE> {
 
+    @ApiStatus.Experimental
+    private static final boolean ALLOW_PARAMETRIZED = true;
+
     @Nullable
     private final String key;
 
@@ -111,8 +114,8 @@ public abstract class Q<TYPE> {
 
     public final Q<TYPE> withKey(final String key) {
         return Objects.equals(this.key, key)
-                ? new Q<TYPE>(key, this.pt, this.klass) {}
-                : this;
+                ? this
+                : new Q<TYPE>(key, this.pt, this.klass) { };
     }
 
     public final boolean isParametrized() {
@@ -276,9 +279,14 @@ public abstract class Q<TYPE> {
             pure = true)
     public static <U> Q<U> of(@NotNull final Class<U> klass) {
         Objects.requireNonNull(klass, "klass");
-        if (Q.isParametrized(klass))
+        if (!ALLOW_PARAMETRIZED && Q.isParametrized(klass))
             throw new KfgIllegalArgumentException(null,
                     "parametrized types are not supported, klass=" + klass);
+        return new Q<U>(klass) { };
+    }
+
+    private static <U> Q<U> unsafeOf(@NotNull final Class<U> klass) {
+        Objects.requireNonNull(klass, "klass");
         return new Q<U>(klass) { };
     }
 

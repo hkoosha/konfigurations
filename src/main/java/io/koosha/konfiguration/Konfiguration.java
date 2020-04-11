@@ -12,7 +12,7 @@ import java.util.Set;
 
 /**
  * All methods are thread-safe (and should be implemented as such).
- *
+ * <p>
  * Entry point to this library is at {@link KonfigurationFactory#getInstance(String)}
  * or the versioned alternative: {@link KonfigurationFactory#getInstanceV8()}.
  */
@@ -237,7 +237,7 @@ public interface Konfiguration {
     /**
      * Check if {@code key} exists in the configuration.
      *
-     * @param key the config key to check it's existence
+     * @param key  the config key to check it's existence
      * @param type type of konfiguration value.
      * @return true if the key exists, false otherwise.
      */
@@ -341,7 +341,7 @@ public interface Konfiguration {
     /**
      * Deregister a previously registered listener of a key.
      *
-     * @param key  the key to deregister from.
+     * @param key      the key to deregister from.
      * @param observer handle returned by one of register methods.
      * @return this.
      */
@@ -377,14 +377,28 @@ public interface Konfiguration {
 
     /**
      * Manager object associated with this konfiguration.
+     * <p>
+     * Returns null if {@link #getManagerAndSetItToNull()} has been called
+     * previously.
      *
-     * @return On first invocation, a manager instance. An second invocation
-     * and on, throws exception.
-     * @throws KfgIllegalStateException if manager is already called once
-     *                                  before.
+     * @return manager associated with this konfiguration or null if
+     * {@link #getManagerAndSetItToNull()} has been called previously.
+     * @see #getManagerAndSetItToNull()
      */
-    @NotNull
-    @Contract(mutates = "this")
+    @Contract(pure = true)
     KonfigurationManager manager();
+
+    /**
+     * Manager object associated with this konfiguration.
+     * <p>
+     * Returns null if this method has been called previously.
+     *
+     * @return manager associated with this konfiguration or null if this
+     * method has been called previously.
+     * @see #getManagerAndSetItToNull()
+     */
+    @Nullable
+    @Contract(mutates = "this")
+    KonfigurationManager getManagerAndSetItToNull();
 
 }

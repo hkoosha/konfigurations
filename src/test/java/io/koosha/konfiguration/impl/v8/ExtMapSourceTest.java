@@ -1,6 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import io.koosha.konfiguration.KonfigValueTestMixin;
 import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeClass;
@@ -17,9 +16,8 @@ import static java.util.Arrays.asList;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-
 @SuppressWarnings({"RedundantThrows", "WeakerAccess"})
-public class MapKonfigSourceTest extends KonfigValueTestMixin {
+public class ExtMapSourceTest extends KonfigValueTestMixin {
 
     protected Map<String, Object> map;
     protected Map<String, Object> map0;
@@ -74,13 +72,13 @@ public class MapKonfigSourceTest extends KonfigValueTestMixin {
     @BeforeMethod
     public void setup() throws Exception {
         this.map = this.map0;
-        this.k = kFactory().map(() -> map);
+        this.k = kFactory().map("map", () -> map);
     }
 
     @Override
     protected void update() {
         this.map = this.map1;
-        this.k = this.k.copyAndUpdate();
+        this.k = ((KonfigurationManager8) this.k.manager())._update();
     }
 
     public Konfiguration k() {
@@ -89,13 +87,13 @@ public class MapKonfigSourceTest extends KonfigValueTestMixin {
 
     @Test
     public void testNotUpdatable() throws Exception {
-        assertFalse(this.k().hasUpdate());
+        assertFalse(this.k().manager().hasUpdate());
     }
 
     @Test
     public void testUpdatable() throws Exception {
         map = map1;
-        assertTrue(this.k().hasUpdate());
+        assertTrue(this.k().manager().hasUpdate());
     }
 
 }

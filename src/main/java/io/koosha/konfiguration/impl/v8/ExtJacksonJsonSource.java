@@ -49,7 +49,7 @@ final class ExtJacksonJsonSource extends Source {
 
     private final Supplier<ObjectMapper> mapperSupplier;
     private final Supplier<String> json;
-    private final int lastHash;
+    private final String lastJson;
     private final JsonNode root;
     private final Object LOCK = new Object();
 
@@ -66,7 +66,7 @@ final class ExtJacksonJsonSource extends Source {
         @Contract(pure = true)
         public boolean hasUpdate() {
             final String newJson = json.get();
-            return newJson != null && newJson.hashCode() != lastHash;
+            return newJson != null && !Objects.equals(newJson, lastJson);
         }
 
         /**
@@ -176,7 +176,7 @@ final class ExtJacksonJsonSource extends Source {
         requireNonNull(update, "root element is null");
 
         this.root = update;
-        this.lastHash = this.json.get().hashCode();
+        this.lastJson = this.json.get();
     }
 
 

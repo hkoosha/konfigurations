@@ -3,6 +3,7 @@ package io.koosha.konfiguration.impl.v8;
 import io.koosha.konfiguration.*;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -72,8 +73,6 @@ final class Kombiner implements Konfiguration {
     }
 
     Kombiner_Lock lock() {
-        if (this.man != null)
-            throw new KfgIllegalStateException(this.name(), "konfiguration manager is not taken out yet");
         return this._lock;
     }
 
@@ -93,6 +92,7 @@ final class Kombiner implements Konfiguration {
      * {@inheritDoc}
      */
     @Override
+    @Contract(pure = true)
     @NotNull
     public String name() {
         return this.name;
@@ -101,9 +101,25 @@ final class Kombiner implements Konfiguration {
     /**
      * {@inheritDoc}
      */
+    @Contract(pure = true)
     @Override
     @NotNull
     public KonfigurationManager manager() {
+        return w(() -> {
+            final KonfigurationManager m = this.man;
+            if (m == null)
+                throw new KfgIllegalStateException(this.name(), null, null, null, "manager is already taken out");
+            return m;
+        });
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Contract(mutates = "this")
+    @Nullable
+    @Override
+    public KonfigurationManager getManagerAndSetItToNull() {
         return w(() -> {
             final KonfigurationManager m = this.man;
             this.man = null;

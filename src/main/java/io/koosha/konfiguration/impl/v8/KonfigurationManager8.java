@@ -32,15 +32,6 @@ interface KonfigurationManager8 extends KonfigurationManager {
      */
     @Contract("-> fail")
     @Override
-    default Konfiguration getAndSetToNull() {
-        throw new KfgIllegalStateException(null, "shouldn't be called");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Contract("-> fail")
-    @Override
     default boolean updateNow() {
         throw new KfgIllegalStateException(null, "shouldn't be called");
     }

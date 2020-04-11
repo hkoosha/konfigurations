@@ -6,28 +6,17 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import static io.koosha.konfiguration.Konfiguration.kFactory;
+import static io.koosha.konfiguration.TestUtil.mapOf;
 import static java.util.Arrays.asList;
 
-@SuppressWarnings({"WeakerAccess"})
+@SuppressWarnings("WeakerAccess")
 public class KonfigurationKombinerConcurrencyTest {
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    static <K, V> Map<K, V> mapOf(final K k, final V v, Object... rest) {
-        final Map map = new HashMap<>();
-        map.put(k, v);
-        for (int i = 0; i < rest.length; i += 2) {
-            map.put(rest[i], rest[i + 1]);
-        }
-        return map;
-    }
-
 
     private Map<String, Object> MAP0;
     private Map<String, Object> MAP1;
@@ -48,12 +37,12 @@ public class KonfigurationKombinerConcurrencyTest {
         // URL url0 = getClass().getResource("sample0.json");
         // File file0 = new File(url0.toURI());
         // this.JSON0 = new Scanner(file0, "UTF8").useDelimiter("\\Z").next();
-        this.JSON0 = SourceJacksonJsonTest.SAMPLE_0;
+        this.JSON0 = ExtJacksonJsonSourceTest.SAMPLE_0;
 
         // URL url1 = getClass().getResource("sample1.json");
         // File file1 = new File(url1.toURI());
         // this.JSON1 = new Scanner(file1, "UTF8").useDelimiter("\\Z").next();
-        this.JSON1 = SourceJacksonJsonTest.SAMPLE_1;
+        this.JSON1 = ExtJacksonJsonSourceTest.SAMPLE_1;
 
         this.MAP0 = mapOf("aInt", 12, "aBool", false, "aIntList", asList(1, 0, 2), "aLong", 88L);
 

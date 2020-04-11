@@ -189,9 +189,9 @@ final class ExtYamlSource extends Source {
                 java.lang.reflect.Constructor<?> c0;
                 try {
                     c0 = find(marker,
-                            markerExtractor,
-                            node.getType(),
-                            byName, names);
+                              markerExtractor,
+                              node.getType(),
+                              byName, names);
                 }
                 catch (YAMLException y) {
                     c0 = null;
@@ -323,8 +323,8 @@ final class ExtYamlSource extends Source {
                 value = "-> new")
         public @NotNull Source _update() {
             return this.hasUpdate()
-                   ? new ExtYamlSource(name(), yaml, mapper, unsafe)
-                   : ExtYamlSource.this;
+                    ? new ExtYamlSource(name(), yaml, mapper, unsafe)
+                    : ExtYamlSource.this;
         }
     };
 
@@ -334,11 +334,11 @@ final class ExtYamlSource extends Source {
     /**
      * Creates an instance with the given Yaml parser.
      *
-     * @param yamlSupplier   backing store provider. Must always return a non-null valid yaml
-     *               string.
-     * @param mapper {@link Yaml} provider. Must always return a valid non-null Yaml,
-     *               and if required, it must be able to deserialize custom types, so
-     *               that {@link #custom(String, Q)} works as well.
+     * @param yamlSupplier backing store provider. Must always return a non-null valid yaml
+     *                     string.
+     * @param mapper       {@link Yaml} provider. Must always return a valid non-null Yaml,
+     *                     and if required, it must be able to deserialize custom types, so
+     *                     that {@link #custom(String, Q)} works as well.
      * @throws NullPointerException if any of its arguments are null.
      * @throws KfgSnakeYamlError    if org.yaml.snakeyaml library is not in the classpath. it
      *                              specifically looks for the class: "org.yaml.snakeyaml"
@@ -363,9 +363,9 @@ final class ExtYamlSource extends Source {
         }
         catch (final ClassNotFoundException e) {
             throw new KfgSnakeYamlError(this.name(),
-                    "org.yaml.snakeyaml library is required to be" +
-                            " present in the class path, can not find the" +
-                            "class: org.yaml.snakeyaml.Yaml", e);
+                                        "org.yaml.snakeyaml library is required to be" +
+                                                " present in the class path, can not find the" +
+                                                "class: org.yaml.snakeyaml.Yaml", e);
         }
 
         final String newYaml = this.yaml.get();

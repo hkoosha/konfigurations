@@ -20,6 +20,7 @@ import static java.util.stream.Collectors.toList;
 @ApiStatus.Internal
 final class Kombiner_Observers {
 
+    @SuppressWarnings("FieldCanBeLocal")
     @NotNull
     private final String name;
 

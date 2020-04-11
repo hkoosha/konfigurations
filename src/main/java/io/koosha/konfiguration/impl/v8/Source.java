@@ -11,18 +11,24 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 
 /**
- * <p>Thread safe and immutable.
+ * Thread safe and immutable.
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
 @ThreadSafe
 @Immutable
 @ApiStatus.Internal
 @ApiStatus.NonExtendable
 abstract class Source implements Konfiguration {
 
-    @NotNull
+    /**
+     * {@inheritDoc}
+     */
+    @Nullable
     @Override
     public abstract KonfigurationManager8 manager();
+
+
+    abstract boolean isNull(@NotNull String key);
+
 
 
     /**
@@ -35,7 +41,7 @@ abstract class Source implements Konfiguration {
 
         final Q<Boolean> q = Q.BOOL;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -58,7 +64,7 @@ abstract class Source implements Konfiguration {
 
         final Q<Character> q = Q.CHAR;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -94,7 +100,7 @@ abstract class Source implements Konfiguration {
 
         final Q<String> q = Q.STRING;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -123,7 +129,7 @@ abstract class Source implements Konfiguration {
 
         final Q<Byte> q = Q.BYTE;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -148,7 +154,7 @@ abstract class Source implements Konfiguration {
 
         final Q<Short> q = Q.SHORT;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -173,7 +179,7 @@ abstract class Source implements Konfiguration {
 
         final Q<Integer> q = Q.INT;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -198,7 +204,7 @@ abstract class Source implements Konfiguration {
 
         final Q<Long> q = Q.LONG;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -223,7 +229,7 @@ abstract class Source implements Konfiguration {
 
         final Q<Float> q = Q.FLOAT;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -248,7 +254,7 @@ abstract class Source implements Konfiguration {
 
         final Q<Double> q = Q.DOUBLE;
 
-        if (this.has(key, q))
+        if (!this.has(key, q))
             throw new KfgAssertionException(this.name(), key, q, null, "missing key");
 
         if (this.isNull(key))
@@ -272,7 +278,7 @@ abstract class Source implements Konfiguration {
                                      @Nullable Q<List<U>> type) {
         Objects.requireNonNull(key, "key");
 
-        if (this.has(key, type))
+        if (!this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
         if (type == null) {
@@ -307,7 +313,7 @@ abstract class Source implements Konfiguration {
                                    @Nullable Q<Set<U>> type) {
         Objects.requireNonNull(key, "key");
 
-        if (this.has(key, type))
+        if (!this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
         if (type == null) {
@@ -342,7 +348,7 @@ abstract class Source implements Konfiguration {
                                          @Nullable Q<Map<U, V>> type) {
         Objects.requireNonNull(key, "key");
 
-        if (this.has(key, type))
+        if (!this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
         if (type == null) {
@@ -378,7 +384,7 @@ abstract class Source implements Konfiguration {
                                  @Nullable final Q<U> type) {
         Objects.requireNonNull(key, "key");
 
-        if (this.has(key, type))
+        if (!this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
         if (this.isNull(key))
@@ -457,7 +463,7 @@ abstract class Source implements Konfiguration {
                             @NotNull Q<? extends Map<?, ?>> type);
 
     @NotNull
-    Object custom0(@NotNull String key) {
+    private Object custom0(@NotNull String key) {
         throw new UnsupportedOperationException();
     }
 
@@ -533,7 +539,7 @@ abstract class Source implements Konfiguration {
     @Contract(pure = true,
             value = "null -> null")
     @Nullable
-    static Boolean toBool(@Nullable final Object o) {
+    private static Boolean toBool(@Nullable final Object o) {
         if (o instanceof Boolean)
             return (Boolean) o;
 
@@ -551,28 +557,28 @@ abstract class Source implements Konfiguration {
     @Contract(pure = true,
             value = "null -> null")
     @Nullable
-    static Long toByte(@Nullable final Number o) {
+    private static Long toByte(@Nullable final Number o) {
         return toIntegral(o, Byte.MIN_VALUE, Byte.MAX_VALUE);
     }
 
     @Contract(pure = true,
             value = "null -> null")
     @Nullable
-    static Long toShort(@Nullable final Number o) {
+    private static Long toShort(@Nullable final Number o) {
         return toIntegral(o, Short.MIN_VALUE, Short.MAX_VALUE);
     }
 
     @Contract(pure = true,
             value = "null -> null")
     @Nullable
-    static Long toInt(@Nullable final Number o) {
+    private static Long toInt(@Nullable final Number o) {
         return toIntegral(o, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     @Contract(pure = true,
             value = "null -> null")
     @Nullable
-    static Long toLong(@Nullable final Number o) {
+    private static Long toLong(@Nullable final Number o) {
         return toIntegral(o, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
@@ -594,7 +600,7 @@ abstract class Source implements Konfiguration {
     @Contract(pure = true,
             value = "null -> null")
     @Nullable
-    static Float toFloat(@Nullable final Number o) {
+    private static Float toFloat(@Nullable final Number o) {
         if (o == null)
             return null;
 
@@ -608,7 +614,7 @@ abstract class Source implements Konfiguration {
     @Contract(pure = true,
             value = "null -> null")
     @Nullable
-    static Double toDouble(@Nullable final Number o) {
+    private static Double toDouble(@Nullable final Number o) {
         if (o == null)
             return null;
 
@@ -624,11 +630,9 @@ abstract class Source implements Konfiguration {
      *
      * @return true if {@link #custom(String)} is supported.
      */
-    boolean supportsUnTyped() {
+    private boolean supportsUnTyped() {
         return false;
     }
-
-    abstract boolean isNull(@NotNull String key);
 
     /**
      * Handle the case where value of a key is null.
@@ -637,8 +641,9 @@ abstract class Source implements Konfiguration {
      * @param type type of requested konfig.
      * @return true if it's ok to have null values.
      */
-    @NotNull <U> K<U> null_(@NotNull final String key,
-                            @Nullable final Q<U> type) {
+    @NotNull
+    private <U> K<U> null_(@NotNull final String key,
+                           @Nullable final Q<U> type) {
         Objects.requireNonNull(key, "key");
         return k(key, type, null);
     }
@@ -651,9 +656,9 @@ abstract class Source implements Konfiguration {
      * @param type       type of requested konfig.
      * @return true if it's ok to have null values.
      */
-    boolean allowNullInCollection_(@NotNull final String key,
-                                   @Nullable final Q<?> type,
-                                   @NotNull final Object collection) {
+    private boolean allowNullInCollection_(@NotNull final String key,
+                                           @Nullable final Q<?> type,
+                                           @NotNull final Object collection) {
         Objects.requireNonNull(key, "key");
         return true;
     }
@@ -667,9 +672,9 @@ abstract class Source implements Konfiguration {
      * @throws KfgTypeException if the requested type does not match the type
      *                          of value in the given in.
      */
-    void checkType(@NotNull final String key,
-                   @NotNull final Q<?> neededType,
-                   @NotNull final Object value) {
+    private void checkType(@NotNull final String key,
+                           @NotNull final Q<?> neededType,
+                           @NotNull final Object value) {
         Objects.requireNonNull(neededType, "neededType");
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(value, "value");
@@ -685,9 +690,9 @@ abstract class Source implements Konfiguration {
      * @throws KfgTypeException if the requested type does not match the type
      *                          of value in the given in.
      */
-    void checkCollectionType(@NotNull final String key,
-                             @NotNull final Q<?> neededType,
-                             @NotNull final Object value) {
+    private void checkCollectionType(@NotNull final String key,
+                                     @NotNull final Q<?> neededType,
+                                     @NotNull final Object value) {
         Objects.requireNonNull(neededType, "neededType");
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(value, "value");
@@ -705,24 +710,27 @@ abstract class Source implements Konfiguration {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    final <U> K<U> k(@NotNull final String key,
-                     @Nullable final Q<U> type,
-                     @Nullable final Object value) {
+    private <U> K<U> k(@NotNull final String key,
+                       @Nullable final Q<U> type,
+                       @Nullable final Object value) {
         Objects.requireNonNull(key, "key");
         return DummyV.of((U) value, type, key);
     }
 
+
     // ============================================================= UNSUPPORTED
 
-
     /**
      * {@inheritDoc}
      */
     @NotNull
     @Contract("_ -> fail")
     @Override
-    public Konfiguration subset(@NotNull final String key) {
-        throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
+    public final Konfiguration subset(@NotNull final String key) {
+        throw new KfgAssertionException(
+                this.name(), null, null, null,
+                "subset(key) shouldn't be called on classes extending="
+                        + getClass().getName() + ", key=" + key);
     }
 
     /**
@@ -731,9 +739,11 @@ abstract class Source implements Konfiguration {
     @Override
     @NotNull
     @Contract("_ -> fail")
-    public Handle registerSoft(@NotNull final KeyObserver observer) {
-        Objects.requireNonNull(observer, "observer");
-        throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
+    public final Handle registerSoft(@NotNull final KeyObserver observer) {
+        throw new KfgAssertionException(
+                this.name(), null, null, null,
+                "registerSoft(observer) shouldn't be called on classes extending="
+                        + getClass().getName() + ", observer=" + observer);
     }
 
     /**
@@ -742,9 +752,11 @@ abstract class Source implements Konfiguration {
     @Override
     @Contract("_ -> fail")
     @NotNull
-    public Handle register(@NotNull final KeyObserver observer) {
-        Objects.requireNonNull(observer, "observer");
-        throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
+    public final Handle register(@NotNull final KeyObserver observer) {
+        throw new KfgAssertionException(
+                this.name(), null, null, null,
+                "register(observer) shouldn't be called on classes extending="
+                        + getClass().getName() + ", observer=" + observer);
     }
 
     /**
@@ -753,11 +765,13 @@ abstract class Source implements Konfiguration {
     @Contract("_, _ -> fail")
     @Override
     @NotNull
-    public Handle registerSoft(@NotNull final KeyObserver observer,
-                               @NotNull final String key) {
-        Objects.requireNonNull(observer, "observer");
-        Objects.requireNonNull(key, "key");
-        throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
+    public final Handle registerSoft(@NotNull final KeyObserver observer,
+                                     @NotNull final String key) {
+        throw new KfgAssertionException(
+                this.name(), null, null, null,
+                "registerSoft(observer, key) shouldn't be called on classes extending="
+                        + getClass().getName() + ", observer=" + observer
+                        + ", key=" + key);
     }
 
     /**
@@ -766,11 +780,13 @@ abstract class Source implements Konfiguration {
     @Override
     @Contract("_, _ -> fail")
     @NotNull
-    public Handle register(@NotNull final KeyObserver observer,
-                           @NotNull final String key) {
-        Objects.requireNonNull(observer, "observer");
-        Objects.requireNonNull(key, "key");
-        throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
+    public final Handle register(@NotNull final KeyObserver observer,
+                                 @NotNull final String key) {
+        throw new KfgAssertionException(
+                this.name(), null, null, null,
+                "register(observer, key) shouldn't be called on classes extending="
+                        + getClass().getName() + ", observer=" + observer
+                        + ", key=" + key);
     }
 
     /**
@@ -779,11 +795,13 @@ abstract class Source implements Konfiguration {
     @Contract("_, _ -> fail")
     @Override
     @NotNull
-    public Konfiguration deregister(@NotNull final Handle observer,
-                                    @NotNull final String key) {
-        Objects.requireNonNull(observer, "observer");
-        Objects.requireNonNull(key, "key");
-        throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
+    public final Konfiguration deregister(@NotNull final Handle observer,
+                                          @NotNull final String key) {
+        throw new KfgAssertionException(
+                this.name(), null, null, null,
+                "deregister(observer, key) shouldn't be called on classes extending="
+                        + getClass().getName() + ", observer=" + observer
+                        + ", key=" + key);
     }
 
     /**
@@ -792,9 +810,23 @@ abstract class Source implements Konfiguration {
     @Contract("_ -> fail")
     @Override
     @NotNull
-    public Konfiguration deregister(@NotNull final Handle observer) {
-        Objects.requireNonNull(observer, "observer");
-        throw new UnsupportedOperationException("do not use this directly, put this source in a kombiner");
+    public final Konfiguration deregister(@NotNull final Handle observer) {
+        throw new KfgAssertionException(
+                this.name(), null, null, null,
+                "deregister(observer) shouldn't be called on classes extending="
+                        + getClass().getName() + ", observer=" + observer);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Contract("->fail")
+    public final KonfigurationManager8 getManagerAndSetItToNull() {
+        throw new KfgAssertionException(
+                this.name(), null, null, null,
+                "getManagerAndSetItToNull() shouldn't be called on classes extending="
+                        + getClass().getName());
     }
 
 }

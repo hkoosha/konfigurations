@@ -4,7 +4,7 @@ import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collection;
 import java.util.Map;
@@ -50,6 +50,7 @@ public interface KonfigurationManager {
      * @return list of observers and the key they should be notified about.
      */
     @NotNull
+    @Unmodifiable
     Map<String, Collection<Runnable>> update();
 
     default boolean updateNow() {
@@ -60,8 +61,5 @@ public interface KonfigurationManager {
         }
         return any;
     }
-
-    @Nullable
-    Konfiguration getAndSetToNull();
 
 }

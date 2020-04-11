@@ -3,11 +3,11 @@ package io.koosha.konfiguration.impl.v8;
 import io.koosha.konfiguration.DummyCustom;
 import io.koosha.konfiguration.DummyCustom2;
 import io.koosha.konfiguration.Q;
+import io.koosha.konfiguration.TestUtil;
 import org.testng.annotations.Test;
 
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
 import java.util.Scanner;
 
 import static io.koosha.konfiguration.Konfiguration.kFactory;
@@ -19,9 +19,8 @@ public class YamlCustomValueTest {
     public void testCustomValue() {
         final DummyCustom bang = kFactory().snakeYaml(
                 "yaml",
-                () -> "bang:\n  str : hello\n  i: 99")
-                                           .custom("bang", new Q<DummyCustom>() {
-                                           }).vn();
+                () -> "bang:\n  str : hello\n  i: 99").custom("bang", new Q<DummyCustom>() {
+        }).vn();
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");
     }
@@ -44,7 +43,7 @@ public class YamlCustomValueTest {
                                             }).vn();
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");
-        assertEquals(bang.olf, Map.of(
+        assertEquals(bang.olf, TestUtil.mapOf(
                 "manga", "panga", "foo", "bar", "baz", "quo"));
         assertEquals(bang.again, "no");
         assertEquals(bang.i, 99);

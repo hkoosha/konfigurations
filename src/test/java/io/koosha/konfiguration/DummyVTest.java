@@ -1,13 +1,14 @@
 package io.koosha.konfiguration;
 
-
 import org.testng.annotations.Test;
 
 import java.util.*;
 
 import static org.testng.Assert.*;
 
-
+/**
+ * Test cases for {@link DummyV}.
+ */
 @SuppressWarnings("RedundantThrows")
 public class DummyVTest {
 

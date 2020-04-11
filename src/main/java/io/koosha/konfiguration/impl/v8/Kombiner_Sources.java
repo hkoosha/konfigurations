@@ -45,12 +45,6 @@ final class Kombiner_Sources {
         return sources.values().stream();
     }
 
-    @Contract(pure = true)
-    @NotNull
-    Stream<Map.Entry<Handle, Konfiguration>> es() {
-        return sources.entrySet().stream();
-    }
-
     @Contract(mutates = "this")
     void replace(@NotNull final Map<Handle, Konfiguration> s) {
         Objects.requireNonNull(s, "origin");
