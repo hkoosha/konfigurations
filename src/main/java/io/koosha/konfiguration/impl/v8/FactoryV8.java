@@ -23,7 +23,7 @@ import static java.util.Collections.unmodifiableMap;
 @ThreadSafe
 @Immutable
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-public final class FactoryV0 implements KonfigurationFactory {
+public final class FactoryV8 implements KonfigurationFactory {
 
     private static final String DEFAULT_KONFIG_NAME = "unnamed_konfig";
 
@@ -36,25 +36,25 @@ public final class FactoryV0 implements KonfigurationFactory {
     @Contract(pure = true)
     @NotNull
     public static KonfigurationFactory getInstance() {
-        return new FactoryV0();
+        return new FactoryV8();
     }
 
     @Contract(pure = true)
     @NotNull
     public static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
                                                    final boolean fairLock) {
-        return new FactoryV0(lockWaitTime, fairLock);
+        return new FactoryV8(lockWaitTime, fairLock);
     }
 
     @Nullable
     private final Long lockWaitTime;
     private final boolean fairLock;
 
-    private FactoryV0() {
+    private FactoryV8() {
         this(DEFAULT_LOCK_WAIT_TIME_MILLIS, DEFAULT_FAIR_LOCK);
     }
 
-    private FactoryV0(@Nullable final Long lockWaitTime,
+    private FactoryV8(@Nullable final Long lockWaitTime,
                       final boolean fairLock) {
         this.lockWaitTime = lockWaitTime;
         this.fairLock = fairLock;

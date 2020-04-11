@@ -1,7 +1,7 @@
 package io.koosha.konfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.koosha.konfiguration.impl.v8.FactoryV0;
+import io.koosha.konfiguration.impl.v8.FactoryV8;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -31,14 +31,14 @@ public interface KonfigurationFactory {
     @Contract(pure = true)
     @NotNull
     static KonfigurationFactory getInstanceV8() {
-        return FactoryV0.getInstance();
+        return FactoryV8.getInstance();
     }
 
     @Contract(pure = true)
     @NotNull
     static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
                                               final boolean fairLock) {
-        return FactoryV0.getInstance(lockWaitTime, false);
+        return FactoryV8.getInstance(lockWaitTime, false);
     }
 
     @Contract(pure = true)
