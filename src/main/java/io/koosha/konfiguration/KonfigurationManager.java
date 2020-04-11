@@ -52,9 +52,13 @@ public interface KonfigurationManager {
     @NotNull
     Map<String, Collection<Runnable>> update();
 
-    default void updateNow() {
-        this.update().forEach((key, observers) ->
-                observers.forEach(Runnable::run));
+    default boolean updateNow() {
+        boolean any = false;
+        for (Map.Entry<String, Collection<Runnable>> entry : this.update().entrySet()) {
+            entry.getValue().forEach(Runnable::run);
+            any = true;
+        }
+        return any;
     }
 
     @Nullable

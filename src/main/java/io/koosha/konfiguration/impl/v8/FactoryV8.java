@@ -25,8 +25,6 @@ import static java.util.Collections.unmodifiableMap;
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public final class FactoryV8 implements KonfigurationFactory {
 
-    private static final String DEFAULT_KONFIG_NAME = "unnamed_konfig";
-
     private static final String VERSION = "io.koosha.konfiguration:7.0.0";
 
     private static final boolean DEFAULT_FAIR_LOCK = false;
@@ -94,13 +92,13 @@ public final class FactoryV8 implements KonfigurationFactory {
     @Contract("_, _, _ -> new")
     public Konfiguration kombine(@NotNull final String name,
                                  @NotNull final Konfiguration source,
-                                 @NotNull final Konfiguration... sources) {
+                                 @NotNull final Konfiguration... rest) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(source, "source");
-        Objects.requireNonNull(sources, "sources");
+        Objects.requireNonNull(rest, "sources");
         final List<Konfiguration> l = new ArrayList<>();
         l.add(source);
-        l.addAll(asList(sources));
+        l.addAll(asList(rest));
         return new Kombiner(name, l, this.lockWaitTime, this.fairLock);
     }
 
@@ -115,38 +113,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(sources, "sources");
         return new Kombiner(name, sources, this.lockWaitTime, this.fairLock);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Contract("_ -> new")
-    public Konfiguration kombine(@NotNull final Konfiguration source) {
-        Objects.requireNonNull(source, "source");
-        return kombine(DEFAULT_KONFIG_NAME, source);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Contract("_, _ -> new")
-    public Konfiguration kombine(@NotNull final Konfiguration source,
-                                 @NotNull final Konfiguration... sources) {
-        Objects.requireNonNull(source, "source");
-        Objects.requireNonNull(sources, "sources");
-        return kombine(DEFAULT_KONFIG_NAME, source, sources);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Contract("_ -> new")
-    public Konfiguration kombine(@NotNull final Collection<Konfiguration> sources) {
-        Objects.requireNonNull(sources, "sources");
-        return kombine(DEFAULT_KONFIG_NAME, sources);
     }
 
     // ==================================================================== MAP
@@ -186,31 +152,6 @@ public final class FactoryV8 implements KonfigurationFactory {
      */
     @Override
     @NotNull
-    @Contract(pure = true,
-            value = "_ -> new")
-    public Konfiguration map_(@NotNull final Map<String, ?> storage) {
-        Objects.requireNonNull(storage, "storage");
-        return map(DEFAULT_KONFIG_NAME, storage);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract(pure = true,
-            value = "_ -> new")
-    public Konfiguration map_(@NotNull final Supplier<Map<String, ?>> storage) {
-        Objects.requireNonNull(storage, "storage");
-        return map(DEFAULT_KONFIG_NAME, storage);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
     @Contract(value = "_, _ -> new",
             pure = true)
     public Konfiguration mapWithNested(@NotNull final String name,
@@ -237,43 +178,7 @@ public final class FactoryV8 implements KonfigurationFactory {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract(value = "_ -> new",
-            pure = true)
-    public Konfiguration mapWithNested_(@NotNull final Map<String, ?> storage) {
-        Objects.requireNonNull(storage, "storage");
-        return mapWithNested(DEFAULT_KONFIG_NAME, storage);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract(value = "_ -> new",
-            pure = true)
-    public Konfiguration mapWithNested_(@NotNull final Supplier<Map<String, ?>> storage) {
-        Objects.requireNonNull(storage, "storage");
-        return mapWithNested(DEFAULT_KONFIG_NAME, storage);
-    }
-
-
     // ============================================================ PREFERENCES
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_ -> new")
-    public Konfiguration preferences_(@NotNull final Preferences storage) {
-        Objects.requireNonNull(storage, "storage");
-        return preferences(DEFAULT_KONFIG_NAME, storage);
-    }
 
     /**
      * {@inheritDoc}
@@ -287,18 +192,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(storage, "storage");
         final Konfiguration k = new ExtPreferencesSource(name, storage, null);
         return kombine(name, k);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_, _ -> new")
-    public Konfiguration preferences_(@NotNull final Preferences storage,
-                                      @NotNull final Deserializer deser) {
-        Objects.requireNonNull(storage, "storage");
-        return preferences(DEFAULT_KONFIG_NAME, storage, deser);
     }
 
     /**
@@ -331,53 +224,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(json, "json");
         final ObjectMapper mapper = ExtJacksonJsonSource.defaultJacksonObjectMapper();
         return jacksonJson(name, json, () -> mapper);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_ -> new")
-    public Konfiguration jacksonJson_(@NotNull final String json) {
-        Objects.requireNonNull(json, "json");
-        return jacksonJson(DEFAULT_KONFIG_NAME, json);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_, _ -> new")
-    public Konfiguration jacksonJson_(@NotNull final String json,
-                                      @NotNull final Supplier<ObjectMapper> objectMapper) {
-        Objects.requireNonNull(json, "json");
-        Objects.requireNonNull(objectMapper, "objectMapper");
-        return jacksonJson(DEFAULT_KONFIG_NAME, json, objectMapper);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Contract("_ -> new")
-    public Konfiguration jacksonJson_(@NotNull final Supplier<String> json) {
-        Objects.requireNonNull(json, "json");
-        return jacksonJson(DEFAULT_KONFIG_NAME, json);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_, _ -> new")
-    public Konfiguration jacksonJson_(@NotNull final Supplier<String> json,
-                                      @NotNull final Supplier<ObjectMapper> objectMapper) {
-        Objects.requireNonNull(json, "json");
-        Objects.requireNonNull(objectMapper, "objectMapper");
-        return jacksonJson(DEFAULT_KONFIG_NAME, json, objectMapper);
     }
 
     /**
@@ -425,54 +271,6 @@ public final class FactoryV8 implements KonfigurationFactory {
     }
 
     // ============================================================= SNAKE YAML
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_ -> new")
-    public Konfiguration snakeYaml_(@NotNull final String yaml) {
-        Objects.requireNonNull(yaml, "yaml");
-        return snakeYaml(DEFAULT_KONFIG_NAME, yaml);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_, _ -> new")
-    public Konfiguration snakeYaml_(@NotNull final String yaml,
-                                    @NotNull final Supplier<Yaml> objectMapper) {
-        Objects.requireNonNull(yaml, "yaml");
-        Objects.requireNonNull(objectMapper, "objectMapper");
-        return snakeYaml(DEFAULT_KONFIG_NAME, yaml, objectMapper);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_ -> new")
-    public Konfiguration snakeYaml_(@NotNull final Supplier<String> yaml) {
-        Objects.requireNonNull(yaml, "yaml");
-        return snakeYaml(DEFAULT_KONFIG_NAME, yaml);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_, _ -> new")
-    public Konfiguration snakeYaml_(@NotNull final Supplier<String> yaml,
-                                    @NotNull final Supplier<Yaml> objectMapper) {
-        Objects.requireNonNull(yaml, "yaml");
-        Objects.requireNonNull(objectMapper, "objectMapper");
-        return snakeYaml(DEFAULT_KONFIG_NAME, yaml, objectMapper);
-    }
 
     /**
      * {@inheritDoc}

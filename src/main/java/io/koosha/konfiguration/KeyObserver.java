@@ -32,27 +32,4 @@ public interface KeyObserver extends Consumer<String> {
      */
     void accept(@NotNull String key);
 
-
-    /**
-     * Don't forget to have a proper hashcode which works with {@link java.util.Map}.
-     * <p>
-     * {@link Object#hashCode()}'s default implementation would suffice, but
-     * if you've overridden that, keep {@link java.util.Map} in mind.
-     *
-     * @return hashCode.
-     */
-    @Override
-    int hashCode();
-
-    /**
-     * Don't forget to have a proper equals which works with {@link java.util.Map}.
-     * <p>
-     * {@link Object#equals(Object)}'s default implementation would suffice,
-     * but if you've overridden that, keep {@link java.util.Map} in mind.
-     *
-     * @return true if equals..
-     */
-    @Override
-    boolean equals(Object obj);
-
 }

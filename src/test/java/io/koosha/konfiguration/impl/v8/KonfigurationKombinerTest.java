@@ -1,6 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Konfiguration;
@@ -11,25 +10,25 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
+import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static java.util.Collections.singletonMap;
 import static org.testng.Assert.*;
-
 
 @SuppressWarnings("RedundantThrows")
 public final class KonfigurationKombinerTest {
 
-    private AtomicBoolean flag = new AtomicBoolean(true);
+    private final AtomicBoolean flag = new AtomicBoolean(true);
 
-    private final Supplier<Map<String, Object>> sup = () -> flag.get()
-                                                            ? singletonMap("xxx", (Object) 12)
-                                                            : singletonMap("xxx", (Object) 99);
+    private final Supplier<Map<String, ?>> sup = () -> flag.get()
+            ? singletonMap("xxx", (Object) 12)
+            : singletonMap("xxx", (Object) 99);
 
     private Konfiguration k;
 
     @BeforeMethod
     public void setup() {
         this.flag.set(true);
-        this.k = Konfiguration.kombine(Konfiguration.inMemory(sup));
+        this.k = kFactory().kombine(kFactory().map(sup));
     }
 
     @Test
@@ -37,7 +36,7 @@ public final class KonfigurationKombinerTest {
         assertEquals(k.int_("xxx").v(), (Integer) 12);
 
         flag.set(!flag.get());
-        k.update();
+        k.manager().updateNow();
 
         assertEquals(k.int_("xxx").v(), (Integer) 99);
     }
@@ -53,11 +52,10 @@ public final class KonfigurationKombinerTest {
         assertEquals(k.int_("xxx").v(), (Integer) 12);
 
         flag.set(!flag.get());
-        assertTrue(k.update());
-        assertFalse(k.update());
+        assertTrue(k.manager().updateNow());
+        assertFalse(k.manager().updateNow());
 
         assertEquals(k.int_("xxx").v(), (Integer) 99);
-
     }
 
 

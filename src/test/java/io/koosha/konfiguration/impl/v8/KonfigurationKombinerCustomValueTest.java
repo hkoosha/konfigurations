@@ -1,6 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-
 import io.koosha.konfiguration.DummyCustom;
 import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.Konfiguration;
@@ -11,7 +10,6 @@ import org.testng.annotations.Test;
 import java.util.Collections;
 
 import static io.koosha.konfiguration.Konfiguration.kFactory;
-
 
 @SuppressWarnings("WeakerAccess")
 public class KonfigurationKombinerCustomValueTest {

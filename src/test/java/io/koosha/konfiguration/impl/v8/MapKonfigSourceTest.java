@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static java.util.Arrays.asList;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -73,7 +74,7 @@ public class MapKonfigSourceTest extends KonfigValueTestMixin {
     @BeforeMethod
     public void setup() throws Exception {
         this.map = this.map0;
-        this.k = Konfiguration.inMemory(() -> map);
+        this.k = kFactory().map(() -> map);
     }
 
     @Override

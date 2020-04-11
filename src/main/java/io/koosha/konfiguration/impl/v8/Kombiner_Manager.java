@@ -1,9 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.Handle;
-import io.koosha.konfiguration.Konfiguration;
-import io.koosha.konfiguration.KonfigurationManager;
-import io.koosha.konfiguration.Q;
+import io.koosha.konfiguration.*;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +41,7 @@ final class Kombiner_Manager implements KonfigurationManager {
     @Override
     public boolean hasUpdate() {
         if (this.kombiner.get() != null)
-            throw new IllegalStateException("getAndSetToNull() not called yet");
+            throw new KfgIllegalStateException(this.kombiner.get().name(), "getAndSetToNull() not called yet");
         return origin.r(this::hasUpdate0);
     }
 
@@ -57,7 +54,7 @@ final class Kombiner_Manager implements KonfigurationManager {
     @Override
     public Map<String, Collection<Runnable>> update() {
         if (this.kombiner.get() != null)
-            throw new IllegalStateException("getAndSetToNull() not called yet");
+            throw new KfgIllegalStateException(this.kombiner.get().name(), "getAndSetToNull() not called yet");
         return origin.r(this::update0);
     }
 

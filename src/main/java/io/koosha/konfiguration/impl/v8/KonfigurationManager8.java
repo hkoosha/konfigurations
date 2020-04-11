@@ -1,6 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.KfgAssertionException;
+import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import org.jetbrains.annotations.ApiStatus;
@@ -33,7 +33,7 @@ interface KonfigurationManager8 extends KonfigurationManager {
     @Contract("-> fail")
     @Override
     default Konfiguration getAndSetToNull() {
-        throw new KfgAssertionException("shouldn't be called");
+        throw new KfgIllegalStateException(null, "shouldn't be called");
     }
 
     /**
@@ -41,8 +41,8 @@ interface KonfigurationManager8 extends KonfigurationManager {
      */
     @Contract("-> fail")
     @Override
-    default void updateNow() {
-        throw new KfgAssertionException("shouldn't be called");
+    default boolean updateNow() {
+        throw new KfgIllegalStateException(null, "shouldn't be called");
     }
 
     @NotNull

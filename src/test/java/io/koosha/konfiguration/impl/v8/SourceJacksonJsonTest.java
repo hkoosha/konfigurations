@@ -7,6 +7,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -52,7 +53,7 @@ public class SourceJacksonJsonTest extends KonfigValueTestMixin {
     @BeforeMethod
     public void setup() throws Exception {
         json = json0;
-        this.k = Konfiguration.jacksonJson(() -> json);
+        this.k = kFactory().jacksonJson(() -> json);
     }
 
     protected void update() {
@@ -66,13 +67,13 @@ public class SourceJacksonJsonTest extends KonfigValueTestMixin {
 
     @Test
     public void testNotUpdatable() throws Exception {
-        assertFalse(this.k().hasUpdate());
+        assertFalse(this.k().manager().hasUpdate());
     }
 
     @Test
     public void testUpdatable() throws Exception {
         json = json1;
-        assertTrue(this.k().hasUpdate());
+        assertTrue(this.k().manager().hasUpdate());
     }
 
 }
