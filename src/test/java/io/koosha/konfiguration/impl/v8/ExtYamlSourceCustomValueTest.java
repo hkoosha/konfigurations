@@ -13,7 +13,7 @@ import java.util.Scanner;
 import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static org.testng.Assert.assertEquals;
 
-public class YamlCustomValueTest {
+public class ExtYamlSourceCustomValueTest {
 
     @Test
     public void testCustomValue() {

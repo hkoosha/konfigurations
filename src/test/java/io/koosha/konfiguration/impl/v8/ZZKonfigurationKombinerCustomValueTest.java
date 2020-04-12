@@ -12,7 +12,7 @@ import java.util.Collections;
 import static io.koosha.konfiguration.Konfiguration.kFactory;
 
 @SuppressWarnings("WeakerAccess")
-public class KonfigurationKombinerCustomValueTest {
+public class ZZKonfigurationKombinerCustomValueTest {
 
     final DummyCustom value = new DummyCustom();
 

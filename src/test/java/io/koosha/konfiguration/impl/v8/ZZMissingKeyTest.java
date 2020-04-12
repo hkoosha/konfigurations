@@ -11,8 +11,7 @@ import java.util.function.Supplier;
 import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static java.util.Collections.singletonMap;
 
-public class MissingKeyTest {
-
+public class ZZMissingKeyTest {
 
     private boolean returnFourTaee = true;
 

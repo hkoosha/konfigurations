@@ -423,12 +423,14 @@ abstract class Source implements Konfiguration {
         if (type == null && !this.supportsUnTyped())
             throw new KfgAssertionException(this.name(), key, null, null, "untyped is not supported");
 
-        final Object v = type == null
-                ? this.custom0(key)
-                : this.custom0(key, type);
-
-        if (type != null)
+        final Object v;
+        if (type == null) {
+            v = this.custom0(key);
+        }
+        else {
+            v = this.custom0(key, type);
             this.checkType(key, type, v);
+        }
 
         return this.k(key, type, v);
     }
@@ -452,7 +454,7 @@ abstract class Source implements Konfiguration {
 
     @NotNull
     abstract List<?> list0(@NotNull String key,
-                           @NotNull Q<? extends List<?>> q);
+                           @NotNull Q<? extends List<?>> type);
 
     @NotNull
     abstract Set<?> set0(@NotNull final String key,

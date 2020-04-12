@@ -15,7 +15,7 @@ import static java.util.Collections.singletonMap;
 import static org.testng.Assert.*;
 
 @SuppressWarnings("RedundantThrows")
-public final class KonfigurationKombinerTest {
+public final class ZZKonfigurationKombinerTest {
 
     private final AtomicBoolean flag = new AtomicBoolean(true);
 

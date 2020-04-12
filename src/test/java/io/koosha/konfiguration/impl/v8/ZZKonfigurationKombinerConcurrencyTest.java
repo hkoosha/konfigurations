@@ -16,7 +16,7 @@ import static io.koosha.konfiguration.TestUtil.mapOf;
 import static java.util.Arrays.asList;
 
 @SuppressWarnings("WeakerAccess")
-public class KonfigurationKombinerConcurrencyTest {
+public class ZZKonfigurationKombinerConcurrencyTest {
 
     private Map<String, Object> MAP0;
     private Map<String, Object> MAP1;
@@ -77,7 +77,7 @@ public class KonfigurationKombinerConcurrencyTest {
             e = Executors.newSingleThreadExecutor();
             e.submit(() -> {
                 while (run) {
-                    KonfigurationKombinerConcurrencyTest.this.toggle();
+                    ZZKonfigurationKombinerConcurrencyTest.this.toggle();
                     this.man.updateNow();
                     c++;
                 }
@@ -114,7 +114,7 @@ public class KonfigurationKombinerConcurrencyTest {
             for (int i = 0; i < Runtime.getRuntime().availableProcessors(); i++) {
                 e.submit(() -> {
                     while (run) {
-                        KonfigurationKombinerConcurrencyTest.this.toggle();
+                        ZZKonfigurationKombinerConcurrencyTest.this.toggle();
                         this.man.updateNow();
                     }
                 });
@@ -135,6 +135,10 @@ public class KonfigurationKombinerConcurrencyTest {
             if (e != null)
                 e.shutdown();
         }
+    }
+
+    @Test
+    public void dummy() {
     }
 
 }
