@@ -15,7 +15,7 @@ import java.util.*;
 @ThreadSafe
 @Immutable
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-public abstract class Q<TYPE> {
+public abstract class Typer<TYPE> {
 
     @ApiStatus.Experimental
     private static final boolean ALLOW_PARAMETRIZED = true;
@@ -29,16 +29,16 @@ public abstract class Q<TYPE> {
     @NotNull
     private final Class<TYPE> klass;
 
-    private Q(@NotNull final Class<TYPE> type) {
+    private Typer(@NotNull final Class<TYPE> type) {
         Objects.requireNonNull(type, "type");
         this.key = null;
         this.pt = null;
         this.klass = type;
     }
 
-    private Q(@Nullable final String key,
-              @Nullable final ParameterizedType pt,
-              @NotNull final Class<TYPE> klass) {
+    private Typer(@Nullable final String key,
+                  @Nullable final ParameterizedType pt,
+                  @NotNull final Class<TYPE> klass) {
         Objects.requireNonNull(klass, "klass");
         this.key = key;
         this.pt = pt;
@@ -46,7 +46,7 @@ public abstract class Q<TYPE> {
     }
 
     @SuppressWarnings("unchecked")
-    protected Q() {
+    protected Typer() {
         final Type t = ((ParameterizedType) this.getClass().getGenericSuperclass())
                 .getActualTypeArguments()[0];
 
@@ -69,8 +69,11 @@ public abstract class Q<TYPE> {
      */
     @Override
     public final String toString() {
-        return String.format("Q<>::%s",
-                this.klass().getTypeName()
+        return String.format(
+                "Q::%s::%s::%s",
+                this.klass().getTypeName(),
+                this.pt == null ? "?" : this.pt,
+                this.key == null ? "?" : this.key
         );
     }
 
@@ -78,9 +81,9 @@ public abstract class Q<TYPE> {
     public final boolean equals(final Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof Q))
+        if (!(o instanceof Typer))
             return false;
-        final Q<?> other = (Q<?>) o;
+        final Typer<?> other = (Typer<?>) o;
         return Objects.equals(this.key, other.key)
                 && Objects.equals(this.pt, other.pt)
                 && Objects.equals(this.klass, other.klass);
@@ -96,35 +99,42 @@ public abstract class Q<TYPE> {
         return result;
     }
 
+    @Contract(pure = true)
     @Nullable
     public final String key() {
         return this.key;
     }
 
+    @Contract(pure = true)
     @Nullable
     public final ParameterizedType pt() {
         return this.pt;
     }
 
+    @Contract(pure = true)
     @NotNull
     public final Class<TYPE> klass() {
         return this.klass;
     }
 
-
-    public final Q<TYPE> withKey(final String key) {
-        return Objects.equals(this.key, key)
-                ? this
-                : new Q<TYPE>(key, this.pt, this.klass) { };
-    }
-
+    @Contract(pure = true)
     public final boolean isParametrized() {
         return this.pt != null;
     }
 
+    @Contract(pure = true)
+    @NotNull
+    public final Typer<TYPE> withKey(@Nullable final String key) {
+        return Objects.equals(this.key, key)
+                ? this
+                : new Typer<TYPE>(key, this.pt, this.klass) {
+        };
+    }
+
+    // ---------------------------------
 
     @Contract(pure = true)
-    final boolean matchesType(final Q<?> other) {
+    final boolean matchesType(@Nullable final Typer<?> other) {
         if (other == null || other == this)
             return true;
         // TODO
@@ -132,28 +142,30 @@ public abstract class Q<TYPE> {
     }
 
     @Contract(pure = true)
-    final boolean matchesValue(final Object v) {
+    final boolean matchesValue(@Nullable final Object v) {
         if (v == null)
             return true;
         // TODO
         return v.getClass().isAssignableFrom(this.klass());
     }
 
-
     @Contract(pure = true)
-    public static boolean matchesType(final Q<?> q0, final Q<?> q1) {
-        if (q0 == null || q1 == null)
+    public static boolean matchesType(@Nullable final Typer<?> typer0,
+                                      @Nullable final Typer<?> typer1) {
+        if (typer0 == null || typer1 == null)
             return true;
-        return q0.matchesType(q1);
+        return typer0.matchesType(typer1);
     }
 
     @Contract(pure = true)
-    public static boolean matchesValue(final Q<?> q0, final Object value) {
-        if (q0 == null)
+    public static boolean matchesValue(@Nullable final Typer<?> typer0,
+                                       @Nullable final Object value) {
+        if (typer0 == null || value == null)
             return true;
-        return q0.matchesValue(value);
+        return typer0.matchesValue(value);
     }
 
+    // ---------------------------------
 
     /**
      * If Q represents a collection, get type argument of the collection.
@@ -161,10 +173,11 @@ public abstract class Q<TYPE> {
      * @return type argument of the collection represented by Q instance.
      * @throws KfgIllegalStateException if Q does not represent a collection.
      */
+    @Contract(pure = true)
     @Nullable
     public final Type getCollectionContainedType() {
-        if (!this.isSet() && !this.isList())
-            throw new KfgIllegalStateException(null, "type is not a set or list");
+        if (!this.isCollection())
+            throw new KfgIllegalStateException(null, "type is not a collection");
         return this.pt == null ? null : this.pt.getActualTypeArguments()[0];
     }
 
@@ -174,10 +187,11 @@ public abstract class Q<TYPE> {
      * @return type argument of the map's key represented by Q instance.
      * @throws KfgIllegalStateException if Q does not represent a map.
      */
+    @Contract(pure = true)
     @Nullable
     public final Type getMapKeyType() {
         if (!this.isMap())
-            throw new KfgIllegalStateException(null, null, Q.UNKNOWN_MAP, null, "type is not a map");
+            throw new KfgIllegalStateException(null, this.key, null, null, "type is not a map");
         return this.pt == null ? null : this.pt.getActualTypeArguments()[0];
     }
 
@@ -187,13 +201,15 @@ public abstract class Q<TYPE> {
      * @return type argument of the map's value represented by Q instance.
      * @throws KfgIllegalStateException if Q does not represent a map.
      */
+    @Contract(pure = true)
     @Nullable
     public final Type getMapValueType() {
         if (!this.isMap())
-            throw new KfgIllegalStateException(null, null, Q.UNKNOWN_MAP, null, "type is not a map");
+            throw new KfgIllegalStateException(null, this.key, null, null, "type is not a map");
         return this.pt == null ? null : this.pt.getActualTypeArguments()[1];
     }
 
+    // ---------------------------------
 
     @Contract(pure = true)
     public final boolean isBool() {
@@ -246,6 +262,11 @@ public abstract class Q<TYPE> {
     }
 
     @Contract(pure = true)
+    public final boolean isCollection() {
+        return this.isList() || this.isSet();
+    }
+
+    @Contract(pure = true)
     public final boolean isList() {
         return List.class.isAssignableFrom(this.klass);
     }
@@ -260,6 +281,7 @@ public abstract class Q<TYPE> {
         return isVoid();
     }
 
+    @Contract(pure = true)
     public final boolean isVoid() {
         //noinspection ConstantConditions
         return Void.class.isAssignableFrom(this.klass);
@@ -275,83 +297,34 @@ public abstract class Q<TYPE> {
      * @return a Q instance representing Class&lt;U&gt;
      */
     @NotNull
-    @Contract(value = "_ -> new",
-            pure = true)
-    public static <U> Q<U> of(@NotNull final Class<U> klass) {
+    @Contract(value = "_ -> new", pure = true)
+    public static <U> Typer<U> of(@NotNull final Class<U> klass) {
         Objects.requireNonNull(klass, "klass");
-        if (!ALLOW_PARAMETRIZED && Q.isParametrized(klass))
-            throw new KfgIllegalArgumentException(null,
-                    "parametrized types are not supported, klass=" + klass);
-        return new Q<U>(klass) { };
+        if (!ALLOW_PARAMETRIZED && Typer.isParametrized(klass))
+            throw new KfgIllegalArgumentException(
+                    null, "parametrized types are not supported, klass=" + klass);
+        return new Typer<U>(klass) {
+        };
     }
 
-    private static <U> Q<U> unsafeOf(@NotNull final Class<U> klass) {
+    @Contract(value = "_ -> new", pure = true)
+    private static <U> Typer<U> unsafeOf(@NotNull final Class<U> klass) {
         Objects.requireNonNull(klass, "klass");
-        return new Q<U>(klass) { };
+        return new Typer<U>(klass) {
+        };
     }
-
-    public static final Q<Boolean> BOOL = of(Boolean.class);
-    public static final Q<Character> CHAR = of(Character.class);
-
-    public static final Q<Byte> BYTE = of(Byte.class);
-    public static final Q<Short> SHORT = of(Short.class);
-    public static final Q<Integer> INT = of(Integer.class);
-    public static final Q<Long> LONG = of(Long.class);
-    public static final Q<Float> FLOAT = of(Float.class);
-    public static final Q<Double> DOUBLE = of(Double.class);
-
-    public static final Q<String> STRING = of(String.class);
-
-    public static final Q<Map<?, ?>> UNKNOWN_MAP = of_(Map.class);
-    public static final Q<Set<?>> UNKNOWN_SET = of_(Set.class);
-    public static final Q<List<?>> UNKNOWN_LIST = of_(List.class);
-    public static final Q<Collection<?>> UNKNOWN_COLLECTION = of_(Collection.class);
-
-    public static final Q<Object> OBJECT = of_(Object.class);
-    public static final Q<?> UNKNOWN = OBJECT;
-
-    public static final Q<List<Byte>> LIST_BYTE = new Q<List<Byte>>() {
-    };
-
-    public static final Q<List<Short>> LIST_SHORT = new Q<List<Short>>() { };
-    public static final Q<List<Integer>> LIST_INT = new Q<List<Integer>>() { };
-    public static final Q<List<Long>> LIST_LONG = new Q<List<Long>>() { };
-    public static final Q<List<Float>> LIST_FLOAT = new Q<List<Float>>() { };
-    public static final Q<List<Double>> LIST_DOUBLE = new Q<List<Double>>() { };
-    public static final Q<List<String>> LIST_STRING = new Q<List<String>>() { };
-
-    public static final Q<Set<Byte>> SET_BYTE = new Q<Set<Byte>>() { };
-    public static final Q<Set<Short>> SET_SHORT = new Q<Set<Short>>() { };
-    public static final Q<Set<Integer>> SET_INT = new Q<Set<Integer>>() { };
-    public static final Q<Set<Long>> SET_LONG = new Q<Set<Long>>() { };
-    public static final Q<Set<Float>> SET_FLOAT = new Q<Set<Float>>() { };
-    public static final Q<Set<Double>> SET_DOUBLE = new Q<Set<Double>>() { };
-    public static final Q<Set<String>> SET_STRING = new Q<Set<String>>() { };
-
-    public static final Q<Map<String, Short>> MAP_STRING__SHORT = new Q<Map<String, Short>>() { };
-    public static final Q<Map<String, Integer>> MAP_STRING__INT = new Q<Map<String, Integer>>() { };
-    public static final Q<Map<String, Long>> MAP_STRING__LONG = new Q<Map<String, Long>>() { };
-    public static final Q<Map<String, Float>> MAP_STRING__FLOAT = new Q<Map<String, Float>>() { };
-    public static final Q<Map<String, Double>> MAP_STRING__DOUBLE = new Q<Map<String, Double>>() { };
-    public static final Q<Map<String, String>> MAP_STRING__STRING = new Q<Map<String, String>>() { };
-
-    public static final Q<?> _VOID = of_(Void.class);
-
-    // =========================================================================
 
     @SuppressWarnings("unchecked")
     @NotNull
-    @Contract(value = "_ -> new",
-            pure = true)
-    private static <U> Q<U> of_(@NotNull final Class<?> klass) {
+    @Contract(value = "_ -> new", pure = true)
+    private static <U> Typer<U> of_(@NotNull final Class<?> klass) {
         Objects.requireNonNull(klass, "klass");
-        return (Q<U>) of(klass);
+        return (Typer<U>) of(klass);
     }
 
-    @ApiStatus.Internal
     @Contract(pure = true)
-    static void checkIsClassOrParametrizedType(@Nullable final Type p,
-                                               @Nullable Type root) {
+    private static void checkIsClassOrParametrizedType(@Nullable final Type p,
+                                                       @Nullable Type root) {
         if (root == null)
             root = p;
 
@@ -372,11 +345,78 @@ public abstract class Q<TYPE> {
             checkIsClassOrParametrizedType(root, ppp);
     }
 
-    @ApiStatus.Internal
     @Contract(pure = true)
-    static boolean isParametrized(@NotNull final Class<?> p) {
+    private static boolean isParametrized(@NotNull final Class<?> p) {
         return p.getTypeParameters().length > 0 ||
                 p.getSuperclass() != null && isParametrized(p.getSuperclass());
     }
+
+    // =========================================================================
+
+    public static final Typer<Boolean> BOOL = of(Boolean.class);
+    public static final Typer<Character> CHAR = of(Character.class);
+
+    public static final Typer<Byte> BYTE = of(Byte.class);
+    public static final Typer<Short> SHORT = of(Short.class);
+    public static final Typer<Integer> INT = of(Integer.class);
+    public static final Typer<Long> LONG = of(Long.class);
+    public static final Typer<Float> FLOAT = of(Float.class);
+    public static final Typer<Double> DOUBLE = of(Double.class);
+
+    public static final Typer<String> STRING = of(String.class);
+
+    public static final Typer<Map<?, ?>> UNKNOWN_MAP = of_(Map.class);
+    public static final Typer<Set<?>> UNKNOWN_SET = of_(Set.class);
+    public static final Typer<List<?>> UNKNOWN_LIST = of_(List.class);
+    public static final Typer<Collection<?>> UNKNOWN_COLLECTION = of_(Collection.class);
+
+    public static final Typer<Object> OBJECT = of_(Object.class);
+    public static final Typer<?> UNKNOWN = OBJECT;
+
+    public static final Typer<List<Byte>> LIST_BYTE = new Typer<List<Byte>>() {
+    };
+
+    public static final Typer<List<Short>> LIST_SHORT = new Typer<List<Short>>() {
+    };
+    public static final Typer<List<Integer>> LIST_INT = new Typer<List<Integer>>() {
+    };
+    public static final Typer<List<Long>> LIST_LONG = new Typer<List<Long>>() {
+    };
+    public static final Typer<List<Float>> LIST_FLOAT = new Typer<List<Float>>() {
+    };
+    public static final Typer<List<Double>> LIST_DOUBLE = new Typer<List<Double>>() {
+    };
+    public static final Typer<List<String>> LIST_STRING = new Typer<List<String>>() {
+    };
+
+    public static final Typer<Set<Byte>> SET_BYTE = new Typer<Set<Byte>>() {
+    };
+    public static final Typer<Set<Short>> SET_SHORT = new Typer<Set<Short>>() {
+    };
+    public static final Typer<Set<Integer>> SET_INT = new Typer<Set<Integer>>() {
+    };
+    public static final Typer<Set<Long>> SET_LONG = new Typer<Set<Long>>() {
+    };
+    public static final Typer<Set<Float>> SET_FLOAT = new Typer<Set<Float>>() {
+    };
+    public static final Typer<Set<Double>> SET_DOUBLE = new Typer<Set<Double>>() {
+    };
+    public static final Typer<Set<String>> SET_STRING = new Typer<Set<String>>() {
+    };
+
+    public static final Typer<Map<String, Short>> MAP_STRING__SHORT = new Typer<Map<String, Short>>() {
+    };
+    public static final Typer<Map<String, Integer>> MAP_STRING__INT = new Typer<Map<String, Integer>>() {
+    };
+    public static final Typer<Map<String, Long>> MAP_STRING__LONG = new Typer<Map<String, Long>>() {
+    };
+    public static final Typer<Map<String, Float>> MAP_STRING__FLOAT = new Typer<Map<String, Float>>() {
+    };
+    public static final Typer<Map<String, Double>> MAP_STRING__DOUBLE = new Typer<Map<String, Double>>() {
+    };
+    public static final Typer<Map<String, String>> MAP_STRING__STRING = new Typer<Map<String, String>>() {
+    };
+
+    public static final Typer<?> _VOID = of_(Void.class);
 
 }

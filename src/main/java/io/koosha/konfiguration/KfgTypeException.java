@@ -9,7 +9,7 @@ public class KfgTypeException extends KfgException {
 
     public KfgTypeException(@Nullable final String source,
                             @Nullable final String key,
-                            @Nullable final Q<?> neededType,
+                            @Nullable final Typer<?> neededType,
                             @Nullable final Object actualValue,
                             @Nullable final String message,
                             @Nullable final Throwable cause) {
@@ -18,7 +18,7 @@ public class KfgTypeException extends KfgException {
 
     public KfgTypeException(@Nullable final String source,
                             @Nullable final String key,
-                            @Nullable final Q<?> neededType,
+                            @Nullable final Typer<?> neededType,
                             @Nullable final Object actualValue,
                             @Nullable final String message) {
         super(source, key, neededType, actualValue, message);
@@ -26,7 +26,7 @@ public class KfgTypeException extends KfgException {
 
     public KfgTypeException(@Nullable final String source,
                             @Nullable final String key,
-                            @Nullable final Q<?> neededType,
+                            @Nullable final Typer<?> neededType,
                             @Nullable final Object actualValue,
                             @Nullable final Throwable cause) {
         super(source, key, neededType, actualValue, cause);
@@ -34,7 +34,7 @@ public class KfgTypeException extends KfgException {
 
     public KfgTypeException(@Nullable final String source,
                             @Nullable final String key,
-                            @Nullable final Q<?> neededType,
+                            @Nullable final Typer<?> neededType,
                             @Nullable final Object actualValue) {
         super(source, key, neededType, actualValue);
     }

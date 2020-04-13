@@ -3,7 +3,7 @@ package io.koosha.konfiguration.impl.v8;
 import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
-import io.koosha.konfiguration.Q;
+import io.koosha.konfiguration.Typer;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -20,10 +20,10 @@ final class Kombiner_Values {
     private final Kombiner origin;
 
     @NotNull
-    final Set<Q<?>> issuedKeys = new HashSet<>();
+    final Set<Typer<?>> issuedKeys = new HashSet<>();
 
     @NotNull
-    final Map<Q<?>, ? super Object> cache = new HashMap<>();
+    final Map<Typer<?>, ? super Object> cache = new HashMap<>();
 
     Kombiner_Values(@NotNull final Kombiner origin) {
         Objects.requireNonNull(origin, "origin");
@@ -32,20 +32,20 @@ final class Kombiner_Values {
 
     @SuppressWarnings({"unchecked", "rawtypes", "RedundantCast"})
     <U> K<U> k(@NotNull final String key,
-               @Nullable final Q<U> type) {
+               @Nullable final Typer<U> type) {
         Objects.requireNonNull(key, "key");
         this.issue(key, type);
-        return new Kombiner_K<>(this.origin, key, type == null ? (Q) Q._VOID : type);
+        return new Kombiner_K<>(this.origin, key, type == null ? (Typer) Typer._VOID : type);
     }
 
     @Nullable
     @SuppressWarnings("unchecked")
     <U> U v(@NotNull final String key,
-            @Nullable final Q<?> type,
+            @Nullable final Typer<?> type,
             @SuppressWarnings("SameParameterValue") @Nullable final U def,
             @SuppressWarnings("SameParameterValue") final boolean mustExist) {
         Objects.requireNonNull(key, "key");
-        final Q<?> t = type == null ? Q._VOID.withKey(key) : type.withKey(key);
+        final Typer<?> t = type == null ? Typer._VOID.withKey(key) : type.withKey(key);
 
         return this.origin.r(() -> {
             if (cache.containsKey(t))
@@ -54,7 +54,7 @@ final class Kombiner_Values {
         });
     }
 
-    Object v_(@NotNull final Q<?> key,
+    Object v_(@NotNull final Typer<?> key,
               final Object def,
               final boolean mustExist) {
         Objects.requireNonNull(key, "key");
@@ -76,30 +76,30 @@ final class Kombiner_Values {
         return value;
     }
 
-    boolean has(@NotNull final Q<?> t) {
+    boolean has(@NotNull final Typer<?> t) {
         Objects.requireNonNull(t.key());
         return this.cache.containsKey(t);
     }
 
     private void issue(@NotNull final String key,
-                       @Nullable final Q<?> q) {
+                       @Nullable final Typer<?> typer) {
         Objects.requireNonNull(key, "key");
-        this.issuedKeys.add(q == null ? Q._VOID.withKey(key) : q.withKey(key));
+        this.issuedKeys.add(typer == null ? Typer._VOID.withKey(key) : typer.withKey(key));
     }
 
 
     @NotNull
-    Map<Q<?>, Object> copy() {
+    Map<Typer<?>, Object> copy() {
         return new HashMap<>(this.cache);
     }
 
-    void replace(@NotNull final Map<Q<?>, Object> copy) {
+    void replace(@NotNull final Map<Typer<?>, Object> copy) {
         Objects.requireNonNull(copy, "copy");
         this.cache.clear();
         this.cache.putAll(copy);
     }
 
-    void origForEach(Consumer<Q<?>> action) {
+    void origForEach(Consumer<Typer<?>> action) {
         this.issuedKeys.forEach(action);
     }
 

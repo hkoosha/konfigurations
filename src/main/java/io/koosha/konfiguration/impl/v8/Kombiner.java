@@ -138,7 +138,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Boolean> bool(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.BOOL);
+        return this.values.k(key, Typer.BOOL);
     }
 
     /**
@@ -148,7 +148,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Byte> byte_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.BYTE);
+        return this.values.k(key, Typer.BYTE);
     }
 
     /**
@@ -158,7 +158,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Character> char_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.CHAR);
+        return this.values.k(key, Typer.CHAR);
     }
 
     /**
@@ -168,7 +168,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Short> short_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.SHORT);
+        return this.values.k(key, Typer.SHORT);
     }
 
     /**
@@ -178,7 +178,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Integer> int_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.INT);
+        return this.values.k(key, Typer.INT);
     }
 
     /**
@@ -188,7 +188,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Long> long_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.LONG);
+        return this.values.k(key, Typer.LONG);
     }
 
     /**
@@ -198,7 +198,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Float> float_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.FLOAT);
+        return this.values.k(key, Typer.FLOAT);
     }
 
     /**
@@ -208,7 +208,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Double> double_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.DOUBLE);
+        return this.values.k(key, Typer.DOUBLE);
     }
 
     /**
@@ -218,7 +218,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<String> string(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Q.STRING);
+        return this.values.k(key, Typer.STRING);
     }
 
     /**
@@ -227,7 +227,7 @@ final class Kombiner implements Konfiguration {
     @Override
     @NotNull
     public <U> K<List<U>> list(@NotNull final String key,
-                               @Nullable final Q<List<U>> type) {
+                               @Nullable final Typer<List<U>> type) {
         Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
@@ -238,7 +238,7 @@ final class Kombiner implements Konfiguration {
     @Override
     @NotNull
     public <U, V> K<Map<U, V>> map(@NotNull final String key,
-                                   @Nullable final Q<Map<U, V>> type) {
+                                   @Nullable final Typer<Map<U, V>> type) {
         Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
@@ -249,7 +249,7 @@ final class Kombiner implements Konfiguration {
     @Override
     @NotNull
     public <U> K<Set<U>> set(@NotNull final String key,
-                             @Nullable final Q<Set<U>> type) {
+                             @Nullable final Typer<Set<U>> type) {
         Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
@@ -260,7 +260,7 @@ final class Kombiner implements Konfiguration {
     @Override
     @NotNull
     public <U> K<U> custom(final String key,
-                           @Nullable final Q<U> type) {
+                           @Nullable final Typer<U> type) {
         Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
@@ -270,10 +270,10 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Q<?> type) {
+                       @Nullable final Typer<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(key, "key");
-        final Q<?> t = type == null ? Q._VOID.withKey(key) : type.withKey(key);
+        final Typer<?> t = type == null ? Typer._VOID.withKey(key) : type.withKey(key);
         return r(() -> this.values.has(t) || this.sources.has(key, type));
     }
 

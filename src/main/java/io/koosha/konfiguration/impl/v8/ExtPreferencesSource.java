@@ -18,7 +18,7 @@ import java.util.prefs.Preferences;
 /**
  * Reads konfig from a {@link Preferences} source.
  *
- * <p>for {@link #custom(String, Q)} to work, the supplied deserializer
+ * <p>for {@link #custom(String, Typer)} to work, the supplied deserializer
  * must be configured to handle arbitrary types accordingly.
  *
  * <p><b>IMPORTANT</b> Does not coup too well with keys being added / removed
@@ -94,7 +94,7 @@ final class ExtPreferencesSource extends Source {
         Objects.requireNonNull(key, "key");
         final String s = ((String) this.string0(sane(key)));
         if (s.length() != 1)
-            throw new KfgTypeException(this.name(), key, Q.CHAR, s);
+            throw new KfgTypeException(this.name(), key, Typer.CHAR, s);
         return ((String) this.string0(sane(key))).charAt(0);
     }
 
@@ -134,7 +134,7 @@ final class ExtPreferencesSource extends Source {
     @Override
     @NotNull
     List<?> list0(@NotNull final String key,
-                  @NotNull final Q<? extends List<?>> type) {
+                  @NotNull final Typer<? extends List<?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -149,7 +149,7 @@ final class ExtPreferencesSource extends Source {
     @Override
     @NotNull
     Set<?> set0(@NotNull final String key,
-                @NotNull final Q<? extends Set<?>> type) {
+                @NotNull final Typer<? extends Set<?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -164,7 +164,7 @@ final class ExtPreferencesSource extends Source {
     @Override
     @NotNull
     Map<?, ?> map0(@NotNull final String key,
-                   @NotNull final Q<? extends Map<?, ?>> type) {
+                   @NotNull final Typer<? extends Map<?, ?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -179,7 +179,7 @@ final class ExtPreferencesSource extends Source {
     @Override
     @NotNull
     Object custom0(@NotNull final String key,
-                   @NotNull final Q<?> type) {
+                   @NotNull final Typer<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -202,7 +202,7 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Q<?> type) {
+                       @Nullable final Typer<?> type) {
         Objects.requireNonNull(key, "key");
         try {
             return source.nodeExists(sane(key));

@@ -60,12 +60,12 @@ public abstract class KonfigValueTestMixin {
 
     @Test
     public void testList() throws Exception {
-        final List<Integer> before = this.k().list("aIntList", Q.LIST_INT).v();
+        final List<Integer> before = this.k().list("aIntList", Typer.LIST_INT).v();
         assertEquals(before, asList(1, 0, 2));
 
         this.update();
 
-        List<Integer> after = this.k().list("aIntList", Q.LIST_INT).v();
+        List<Integer> after = this.k().list("aIntList", Typer.LIST_INT).v();
         assertEquals(after, asList(2, 2));
     }
 
@@ -80,16 +80,16 @@ public abstract class KonfigValueTestMixin {
         after.put("a", "b");
         after.put("c", "e");
 
-        assertEquals(this.k().map("aMap", Q.MAP_STRING__INT).v(), before);
+        assertEquals(this.k().map("aMap", Typer.MAP_STRING__INT).v(), before);
         this.update();
-        assertEquals(this.k().map("aMap", Q.MAP_STRING__STRING).v(), after);
+        assertEquals(this.k().map("aMap", Typer.MAP_STRING__STRING).v(), after);
     }
 
     @Test
     public void testSet() throws Exception {
-        assertEquals(this.k().set("aSet", Q.SET_INT).v(), new HashSet<>(asList(1, 2)));
+        assertEquals(this.k().set("aSet", Typer.SET_INT).v(), new HashSet<>(asList(1, 2)));
         this.update();
-        assertEquals(this.k().set("aSet", Q.SET_INT).v(), new HashSet<>(asList(1, 2, 3)));
+        assertEquals(this.k().set("aSet", Typer.SET_INT).v(), new HashSet<>(asList(1, 2, 3)));
     }
 
 
@@ -181,13 +181,13 @@ public abstract class KonfigValueTestMixin {
     @Test(expectedExceptions = KfgTypeException.class,
           expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
     public void testBadList0() throws Exception {
-        this.k().list("aInt", Q.LIST_INT);
+        this.k().list("aInt", Typer.LIST_INT);
     }
 
     @Test(expectedExceptions = KfgTypeException.class,
           expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
     public void testBadList1() throws Exception {
-        this.k().list("aString", Q.LIST_STRING);
+        this.k().list("aString", Typer.LIST_STRING);
     }
 
 }

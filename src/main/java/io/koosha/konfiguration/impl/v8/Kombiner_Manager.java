@@ -71,8 +71,8 @@ final class Kombiner_Manager implements KonfigurationManager {
                         : x.getValue()
         ));
 
-        final Set<Q<?>> updated = new HashSet<>();
-        final Map<Q<?>, Object> newCache = origin.values.copy();
+        final Set<Typer<?>> updated = new HashSet<>();
+        final Map<Typer<?>, Object> newCache = origin.values.copy();
         origin.values.origForEach(q -> {
             final String key = requireNonNull(q.key(), "ket passed through kombiner is null");
 
@@ -131,10 +131,10 @@ final class Kombiner_Manager implements KonfigurationManager {
                         return m0;
                     });
 
-            for (final Q<?> q : updated)
+            for (final Typer<?> typer : updated)
                 //noinspection ConstantConditions
-                result.computeIfAbsent(q.key(), (q_) -> new ArrayList<>())
-                      .addAll(this.origin.observers.get(q.key()));
+                result.computeIfAbsent(typer.key(), (q_) -> new ArrayList<>())
+                      .addAll(this.origin.observers.get(typer.key()));
 
             origin.sources.replace(newSources);
             origin.values.replace(newCache);

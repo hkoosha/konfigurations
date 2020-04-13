@@ -168,7 +168,7 @@ final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public <U> K<List<U>> list(@NotNull final String key,
-                               @Nullable final Q<List<U>> type) {
+                               @Nullable final Typer<List<U>> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.list(key(key), type);
     }
@@ -180,7 +180,7 @@ final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public <U, V> K<Map<U, V>> map(@NotNull final String key,
-                                   @Nullable final Q<Map<U, V>> type) {
+                                   @Nullable final Typer<Map<U, V>> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.map(key(key), type);
     }
@@ -192,7 +192,7 @@ final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public <U> K<Set<U>> set(@NotNull final String key,
-                             @Nullable final Q<Set<U>> type) {
+                             @Nullable final Typer<Set<U>> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.set(key(key), type);
     }
@@ -204,7 +204,7 @@ final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public <U> K<U> custom(@NotNull final String key,
-                           @Nullable final Q<U> type) {
+                           @Nullable final Typer<U> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.custom(key(key), type);
     }
@@ -215,7 +215,7 @@ final class SubsetView implements Konfiguration {
     @Contract(pure = true)
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Q<?> type) {
+                       @Nullable final Typer<?> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.has(key(key), type);
     }

@@ -22,11 +22,11 @@ final class Kombiner_K<U> implements K<U> {
     private final String key;
 
     @NotNull
-    private final Q<U> type;
+    private final Typer<U> type;
 
     public Kombiner_K(@NotNull final Kombiner origin,
                       @NotNull final String key,
-                      @NotNull final Q<U> type) {
+                      @NotNull final Typer<U> type) {
         Objects.requireNonNull(origin, "origin");
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
@@ -51,7 +51,7 @@ final class Kombiner_K<U> implements K<U> {
      */
     @Override
     @NotNull
-    public Q<U> type() {
+    public Typer<U> type() {
         return this.type;
     }
 

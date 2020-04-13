@@ -19,7 +19,7 @@ public class KfgMissingKeyException extends KfgException {
 
     public KfgMissingKeyException(@Nullable final String source,
                                   @Nullable final String key,
-                                  @Nullable final Q<?> type) {
+                                  @Nullable final Typer<?> type) {
         super(source, key, type, null);
     }
 

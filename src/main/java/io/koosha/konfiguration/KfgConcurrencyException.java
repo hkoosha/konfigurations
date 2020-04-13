@@ -24,7 +24,7 @@ public class KfgConcurrencyException extends KfgException {
 
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable String key,
-                                   @Nullable Q<?> neededType,
+                                   @Nullable Typer<?> neededType,
                                    @Nullable Object actualValue,
                                    @Nullable String message, @Nullable Throwable cause) {
         super(source, key, neededType, actualValue, message, cause);
@@ -32,13 +32,13 @@ public class KfgConcurrencyException extends KfgException {
 
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable String key,
-                                   @Nullable Q<?> neededType, @Nullable Object actualValue, @Nullable String message) {
+                                   @Nullable Typer<?> neededType, @Nullable Object actualValue, @Nullable String message) {
         super(source, key, neededType, actualValue, message);
     }
 
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable String key,
-                                   @Nullable Q<?> neededType,
+                                   @Nullable Typer<?> neededType,
                                    @Nullable Object actualValue,
                                    @Nullable Throwable cause) {
         super(source, key, neededType, actualValue, cause);
@@ -46,7 +46,7 @@ public class KfgConcurrencyException extends KfgException {
 
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable String key,
-                                   @Nullable Q<?> neededType, @Nullable Object actualValue) {
+                                   @Nullable Typer<?> neededType, @Nullable Object actualValue) {
         super(source, key, neededType, actualValue);
     }
 

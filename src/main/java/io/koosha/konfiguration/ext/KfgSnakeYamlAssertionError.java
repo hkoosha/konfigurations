@@ -1,6 +1,6 @@
 package io.koosha.konfiguration.ext;
 
-import io.koosha.konfiguration.Q;
+import io.koosha.konfiguration.Typer;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -35,7 +35,7 @@ public class KfgSnakeYamlAssertionError extends KfgSnakeYamlError {
 
     public KfgSnakeYamlAssertionError(@Nullable final String source,
                                       @Nullable final String key,
-                                      @Nullable final Q<?> neededType,
+                                      @Nullable final Typer<?> neededType,
                                       @Nullable final Object actualValue,
                                       @Nullable final String message,
                                       @Nullable final Throwable cause) {
@@ -45,7 +45,7 @@ public class KfgSnakeYamlAssertionError extends KfgSnakeYamlError {
 
     public KfgSnakeYamlAssertionError(@Nullable final String source,
                                       @Nullable final String key,
-                                      @Nullable final Q<?> neededType,
+                                      @Nullable final Typer<?> neededType,
                                       @Nullable final Object actualValue,
                                       @Nullable final String message) {
         super(source, key, neededType, actualValue, message);
@@ -54,7 +54,7 @@ public class KfgSnakeYamlAssertionError extends KfgSnakeYamlError {
 
     public KfgSnakeYamlAssertionError(@Nullable final String source,
                                       @Nullable final String key,
-                                      @Nullable final Q<?> neededType,
+                                      @Nullable final Typer<?> neededType,
                                       @Nullable final Object actualValue,
                                       @Nullable final Throwable cause) {
         super(source, key, neededType, actualValue, cause);
@@ -63,7 +63,7 @@ public class KfgSnakeYamlAssertionError extends KfgSnakeYamlError {
 
     public KfgSnakeYamlAssertionError(@Nullable final String source,
                                       @Nullable final String key,
-                                      @Nullable final Q<?> neededType,
+                                      @Nullable final Typer<?> neededType,
                                       @Nullable final Object actualValue) {
         super(source, key, neededType, actualValue);
         this.context = emptyMap();

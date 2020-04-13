@@ -1,7 +1,7 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgException;
-import io.koosha.konfiguration.Q;
+import io.koosha.konfiguration.Typer;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,7 +13,7 @@ class KfgAssertionException extends KfgException {
 
     public KfgAssertionException(@Nullable String source,
                                  @Nullable String key,
-                                 @Nullable Q<?> neededType,
+                                 @Nullable Typer<?> neededType,
                                  @Nullable Object actualValue,
                                  @Nullable String message) {
         super(source, key, neededType, actualValue, message);

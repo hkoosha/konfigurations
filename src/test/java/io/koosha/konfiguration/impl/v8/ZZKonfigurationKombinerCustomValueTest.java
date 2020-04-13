@@ -3,7 +3,7 @@ package io.koosha.konfiguration.impl.v8;
 import io.koosha.konfiguration.DummyCustom;
 import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.Konfiguration;
-import io.koosha.konfiguration.Q;
+import io.koosha.konfiguration.Typer;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
@@ -25,7 +25,7 @@ public class ZZKonfigurationKombinerCustomValueTest {
 
     @Test
     public void testCustomValue() {
-        K<DummyCustom> custom = k.custom(key, Q.of(DummyCustom.class));
+        K<DummyCustom> custom = k.custom(key, Typer.of(DummyCustom.class));
         Assert.assertSame(custom.v(), value);
     }
 

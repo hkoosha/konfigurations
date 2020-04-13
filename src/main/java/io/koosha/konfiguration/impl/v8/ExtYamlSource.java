@@ -1,6 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.Q;
+import io.koosha.konfiguration.Typer;
 import io.koosha.konfiguration.ext.KfgSnakeYamlAssertionError;
 import io.koosha.konfiguration.ext.KfgSnakeYamlError;
 import net.jcip.annotations.Immutable;
@@ -31,7 +31,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Reads konfig from a yaml source (supplied as string).
  *
- * <p>for {@link #custom(String, Q)} to work, the supplied yaml reader must be
+ * <p>for {@link #custom(String, Typer)} to work, the supplied yaml reader must be
  * configured to handle arbitrary types accordingly.
  *
  * <p>Thread safe and immutable.
@@ -338,7 +338,7 @@ final class ExtYamlSource extends Source {
      *                     string.
      * @param mapper       {@link Yaml} provider. Must always return a valid non-null Yaml,
      *                     and if required, it must be able to deserialize custom types, so
-     *                     that {@link #custom(String, Q)} works as well.
+     *                     that {@link #custom(String, Typer)} works as well.
      * @throws NullPointerException if any of its arguments are null.
      * @throws KfgSnakeYamlError    if org.yaml.snakeyaml library is not in the classpath. it
      *                              specifically looks for the class: "org.yaml.snakeyaml"
@@ -453,7 +453,7 @@ final class ExtYamlSource extends Source {
     @Override
     @NotNull
     List<?> list0(@NotNull final String key,
-                  @NotNull final Q<? extends List<?>> type) {
+                  @NotNull final Typer<? extends List<?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -470,7 +470,7 @@ final class ExtYamlSource extends Source {
     @Override
     @NotNull
     Set<?> set0(@NotNull final String key,
-                @NotNull final Q<? extends Set<?>> type) {
+                @NotNull final Typer<? extends Set<?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -487,7 +487,7 @@ final class ExtYamlSource extends Source {
     @Override
     @NotNull
     Map<?, ?> map0(@NotNull final String key,
-                   @NotNull final Q<? extends Map<?, ?>> type) {
+                   @NotNull final Typer<? extends Map<?, ?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -504,7 +504,7 @@ final class ExtYamlSource extends Source {
     @Override
     @NotNull
     Object custom0(@NotNull final String key,
-                   @NotNull final Q<?> type) {
+                   @NotNull final Typer<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -534,10 +534,10 @@ final class ExtYamlSource extends Source {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Q<?> type) {
+                       @Nullable final Typer<?> type) {
         Objects.requireNonNull(key, "key");
         try {
-            return Q.matchesValue(type, get(key));
+            return Typer.matchesValue(type, get(key));
         }
         catch (final KfgSnakeYamlAssertionError e) {
             return false;
@@ -562,7 +562,7 @@ final class ExtYamlSource extends Source {
         throw new KfgSnakeYamlAssertionError(this.name(), "assertion error");
     }
 
-    private void ensureSafe(@Nullable final Q<?> type) {
+    private void ensureSafe(@Nullable final Typer<?> type) {
         //        Constructor constructor = new Constructor(Customer.class);
         //        TypeDescription customTypeDescription = new TypeDescription(Customer.class);
         //        customTypeDescription.addPropertyParameters("contactDetails", Contact.class);

@@ -91,7 +91,7 @@ public interface K<U> {
      */
     @Nullable
     @Contract(pure = true)
-    Q<U> type();
+    Typer<U> type();
 
     /**
      * If the value denoted by {@link #key()} in the original source exists.

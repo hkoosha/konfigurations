@@ -7,6 +7,6 @@ import org.jetbrains.annotations.NotNull;
 @FunctionalInterface
 public interface Deserializer {
 
-    <T> T deserialize(@NotNull byte[] bytes, @NotNull Q<T> q);
+    <T> T deserialize(@NotNull byte[] bytes, @NotNull Typer<T> typer);
 
 }

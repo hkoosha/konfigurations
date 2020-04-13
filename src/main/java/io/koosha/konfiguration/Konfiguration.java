@@ -122,7 +122,7 @@ public interface Konfiguration {
     @SuppressWarnings({"unchecked", "rawtypes"})
     @NotNull
     default K<List<?>> list(@NotNull final String key) {
-        return (K) list(key, (Q) Q.UNKNOWN_LIST);
+        return (K) list(key, (Typer) Typer.UNKNOWN_LIST);
     }
 
     /**
@@ -135,7 +135,7 @@ public interface Konfiguration {
 
     @NotNull
     default K<Map<?, ?>> map(@NotNull final String key) {
-        return (K) map(key, (Q) Q.UNKNOWN_MAP);
+        return (K) map(key, (Typer) Typer.UNKNOWN_MAP);
     }
 
     /**
@@ -148,7 +148,7 @@ public interface Konfiguration {
 
     @NotNull
     default K<Set<?>> set(@NotNull final String key) {
-        return (K) set(key, (Q) Q.UNKNOWN_SET);
+        return (K) set(key, (Typer) Typer.UNKNOWN_SET);
     }
 
 
@@ -162,7 +162,7 @@ public interface Konfiguration {
      */
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U> K<List<U>> list(String key, @Nullable Q<List<U>> type);
+    <U> K<List<U>> list(String key, @Nullable Typer<List<U>> type);
 
     /**
      * Get a map of U to V konfiguration value.
@@ -175,7 +175,7 @@ public interface Konfiguration {
      */
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U, V> K<Map<U, V>> map(@NotNull String key, @Nullable Q<Map<U, V>> type);
+    <U, V> K<Map<U, V>> map(@NotNull String key, @Nullable Typer<Map<U, V>> type);
 
     /**
      * Get a set of konfiguration value.
@@ -187,7 +187,7 @@ public interface Konfiguration {
      */
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U> K<Set<U>> set(@NotNull String key, @Nullable Q<Set<U>> type);
+    <U> K<Set<U>> set(@NotNull String key, @Nullable Typer<Set<U>> type);
 
 
     /**
@@ -198,8 +198,8 @@ public interface Konfiguration {
      *
      * <p><b>Important:</b> this method must <em>NOT</em> be used to obtain
      * maps, lists or sets. Use the corresponding methods
-     * {@link #map(String, Q)}, {@link #list(String, Q)} and
-     * {@link #set(String, Q)}.
+     * {@link #map(String, Typer)}, {@link #list(String, Typer)} and
+     * {@link #set(String, Typer)}.
      *
      * @param key unique key of the konfiguration being requested.
      * @param <U> generic type of the returned konfig value.
@@ -219,8 +219,8 @@ public interface Konfiguration {
      *
      * <p><b>Important:</b> this method must <em>NOT</em> be used to obtain
      * maps, lists or sets. Use the corresponding methods
-     * {@link #map(String, Q)}, {@link #list(String, Q)} and
-     * {@link #set(String, Q)}.
+     * {@link #map(String, Typer)}, {@link #list(String, Typer)} and
+     * {@link #set(String, Typer)}.
      *
      * @param key  unique key of the konfiguration being requested.
      * @param type type object of the requested value.
@@ -229,7 +229,7 @@ public interface Konfiguration {
      */
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U> K<U> custom(String key, @Nullable Q<U> type);
+    <U> K<U> custom(String key, @Nullable Typer<U> type);
 
 
     // =========================================================================
@@ -243,7 +243,7 @@ public interface Konfiguration {
      */
     @Contract(pure = true)
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    boolean has(@NotNull String key, @Nullable Q<?> type);
+    boolean has(@NotNull String key, @Nullable Typer<?> type);
 
     /**
      * Get a subset view of this konfiguration representing all the values under

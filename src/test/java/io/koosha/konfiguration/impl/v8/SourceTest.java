@@ -1,12 +1,13 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgTypeException;
-import io.koosha.konfiguration.Q;
+import io.koosha.konfiguration.Typer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,7 +32,22 @@ public class SourceTest {
 
     private static final String STRING_ABC = "stringAbc";
 
-    static class ExtSampleSource extends Source {
+    private Boolean allowNullInCollection = null;
+    private List<?> listValue = null;
+    private Set<?> setValue = null;
+    private Map<?, ?> mapValue = null;
+    private Object customValue = null;
+
+    class ExtSampleSource extends Source {
+
+        @Override
+        protected boolean allowNullInCollection_(@NotNull String key,
+                                                 @Nullable Typer<?> type,
+                                                 @NotNull Object collection) {
+            return SourceTest.this.allowNullInCollection == null
+                    ? super.allowNullInCollection_(key, type, collection)
+                    : SourceTest.this.allowNullInCollection;
+        }
 
         @Override
         @Nullable
@@ -46,7 +62,7 @@ public class SourceTest {
         }
 
         @Override
-        public boolean has(@NotNull String key, @Nullable Q<?> type) {
+        public boolean has(@NotNull String key, @Nullable Typer<?> type) {
             return !MISSING.equals(key);
         }
 
@@ -110,15 +126,6 @@ public class SourceTest {
                 return Integer.valueOf(value);
             if (key.startsWith("long"))
                 return Long.valueOf(value);
-            if (key.startsWith("double"))
-                return Double.valueOf(value);
-            throw new RuntimeException("unknown key=" + key);
-        }
-
-        @Override
-        @NotNull
-        Number numberDouble0(@NotNull String key) {
-            final String value = key.split(":")[1];
             if (key.startsWith("float"))
                 return Float.valueOf(value);
             if (key.startsWith("double"))
@@ -128,26 +135,32 @@ public class SourceTest {
 
         @Override
         @NotNull
-        List<?> list0(@NotNull String key, @NotNull Q<? extends List<?>> type) {
-            return null;
+        Number numberDouble0(@NotNull String key) {
+            return number0(key);
+        }
+
+        @NotNull
+        @Override
+        List<?> list0(@NotNull final String key, @NotNull final Typer<? extends List<?>> type) {
+            return listValue;
         }
 
         @Override
         @NotNull
-        Set<?> set0(@NotNull String key, @NotNull Q<? extends Set<?>> type) {
-            return null;
+        Set<?> set0(@NotNull String key, @NotNull Typer<? extends Set<?>> type) {
+            return setValue;
         }
 
         @Override
         @NotNull
-        Map<?, ?> map0(@NotNull String key, @NotNull Q<? extends Map<?, ?>> type) {
-            return null;
+        Map<?, ?> map0(@NotNull String key, @NotNull Typer<? extends Map<?, ?>> type) {
+            return mapValue;
         }
 
         @Override
         @NotNull
-        Object custom0(@NotNull String key, @NotNull Q<?> type) {
-            return null;
+        Object custom0(@NotNull String key, @NotNull Typer<?> type) {
+            return customValue;
         }
 
     }
@@ -156,6 +169,11 @@ public class SourceTest {
 
     @BeforeMethod
     public void setup() {
+        allowNullInCollection = null;
+        listValue = null;
+        setValue = null;
+        mapValue = null;
+        customValue = null;
         this.source = new ExtSampleSource();
     }
 
@@ -375,12 +393,10 @@ public class SourceTest {
 
         final Short min = Short.MIN_VALUE;
         assertEquals(this.source.short_("short:" + min).v(), min);
-        assertEquals(this.source.short_("short:" + min).v(), min);
         assertEquals(this.source.short_("int:" + min).v(), min);
         assertEquals(this.source.short_("long:" + min).v(), min);
 
         final Short max = Short.MAX_VALUE;
-        assertEquals(this.source.short_("short:" + max).v(), max);
         assertEquals(this.source.short_("short:" + max).v(), max);
         assertEquals(this.source.short_("int:" + max).v(), max);
         assertEquals(this.source.short_("long:" + max).v(), max);
@@ -437,13 +453,9 @@ public class SourceTest {
 
         final Integer min = Integer.MIN_VALUE;
         assertEquals(this.source.int_("int:" + min).v(), min);
-        assertEquals(this.source.int_("int:" + min).v(), min);
-        assertEquals(this.source.int_("int:" + min).v(), min);
         assertEquals(this.source.int_("long:" + min).v(), min);
 
         final Integer max = Integer.MAX_VALUE;
-        assertEquals(this.source.int_("int:" + max).v(), max);
-        assertEquals(this.source.int_("int:" + max).v(), max);
         assertEquals(this.source.int_("int:" + max).v(), max);
         assertEquals(this.source.int_("long:" + max).v(), max);
     }
@@ -488,14 +500,8 @@ public class SourceTest {
 
         final Long min = Long.MIN_VALUE;
         assertEquals(this.source.long_("long:" + min).v(), min);
-        assertEquals(this.source.long_("long:" + min).v(), min);
-        assertEquals(this.source.long_("long:" + min).v(), min);
-        assertEquals(this.source.long_("long:" + min).v(), min);
 
         final Long max = Long.MAX_VALUE;
-        assertEquals(this.source.long_("long:" + max).v(), max);
-        assertEquals(this.source.long_("long:" + max).v(), max);
-        assertEquals(this.source.long_("long:" + max).v(), max);
         assertEquals(this.source.long_("long:" + max).v(), max);
     }
 
@@ -512,6 +518,74 @@ public class SourceTest {
     @Test(expectedExceptions = KfgAssertionException.class)
     public void testLongMissingValue() {
         this.source.long_(MISSING).v();
+    }
+
+    // --------------------------------- FLOAT
+
+    @Test
+    public void testFloatValue() {
+        final long value0 = 9L;
+        final Float value = 9F;
+        assertEquals(this.source.float_("byte:" + value0).v(), value);
+        assertEquals(this.source.float_("short:" + value0).v(), value);
+        assertEquals(this.source.float_("int:" + value0).v(), value);
+        assertEquals(this.source.float_("long:" + value0).v(), value);
+        assertEquals(this.source.float_("float:" + value0).v(), value);
+        assertEquals(this.source.float_("double:" + value0).v(), value);
+
+        final Float min = Float.MIN_VALUE;
+        assertEquals(this.source.float_("float:" + min).v(), min);
+
+        final Float max = Float.MAX_VALUE;
+        assertEquals(this.source.float_("float:" + max).v(), max);
+    }
+
+    @Test(expectedExceptions = KfgTypeException.class)
+    public void testFloatBadValue0() {
+        this.source.int_("double:" + Double.MAX_VALUE).v();
+    }
+
+    @Test(expectedExceptions = KfgTypeException.class)
+    public void testFloatBadValue1() {
+        this.source.int_("double:" + Double.MIN_VALUE).v();
+    }
+
+    @Test
+    public void testFloatNullValue() {
+        assertNull(this.source.int_(NULL).v());
+    }
+
+    @Test(expectedExceptions = KfgAssertionException.class)
+    public void testFloatMissingValue() {
+        this.source.int_(MISSING).v();
+    }
+
+    // --------------------------------- LIST
+
+    @Test
+    public void testListWithNullAllowed() {
+        final List<String> value = Arrays.asList("a", null, "b", "c");
+        this.listValue = value;
+        this.allowNullInCollection = true;
+        assertEquals(this.source.list("any").v(), value);
+    }
+
+    @Test
+    public void testListWithNullNotAllowed() {
+        final List<String> value = Arrays.asList("a", null, "b", "c");
+        this.listValue = value;
+        this.allowNullInCollection = false;
+        assertEquals(this.source.list("any").v(), value);
+    }
+
+    @Test
+    public void testListNullValue() {
+        assertNull(this.source.list(NULL).v());
+    }
+
+    @Test(expectedExceptions = KfgAssertionException.class)
+    public void testListMissingValue() {
+        this.source.list(MISSING).v();
     }
 
 }

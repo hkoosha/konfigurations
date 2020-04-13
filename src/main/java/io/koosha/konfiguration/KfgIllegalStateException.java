@@ -16,7 +16,7 @@ public class KfgIllegalStateException extends IllegalStateException {
     private final String key;
 
     @Nullable
-    private final Q<?> neededType;
+    private final Typer<?> neededType;
 
     @Nullable
     private final String actualValue;
@@ -35,7 +35,7 @@ public class KfgIllegalStateException extends IllegalStateException {
 
     public KfgIllegalStateException(@Nullable final String source,
                                     @Nullable final String key,
-                                    @Nullable final Q<?> neededType,
+                                    @Nullable final Typer<?> neededType,
                                     @Nullable final Object actualValue,
                                     final String message) {
         super(message);
@@ -47,7 +47,7 @@ public class KfgIllegalStateException extends IllegalStateException {
 
     public KfgIllegalStateException(@Nullable final String source,
                                     @Nullable final String key,
-                                    @Nullable final Q<?> neededType,
+                                    @Nullable final Typer<?> neededType,
                                     @Nullable final Object actualValue,
                                     final String message,
                                     final Throwable cause) {
@@ -60,7 +60,7 @@ public class KfgIllegalStateException extends IllegalStateException {
 
     public KfgIllegalStateException(@NotNull final String source,
                                     @Nullable final String key,
-                                    @Nullable final Q<?> neededType,
+                                    @Nullable final Typer<?> neededType,
                                     @Nullable final Object actualValue) {
         this.source = source;
         this.key = key;
@@ -79,7 +79,7 @@ public class KfgIllegalStateException extends IllegalStateException {
     }
 
     @Nullable
-    public Q<?> getNeededType() {
+    public Typer<?> getNeededType() {
         return this.neededType;
     }
 
