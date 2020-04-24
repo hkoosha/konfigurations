@@ -1,6 +1,6 @@
 package io.koosha.konfiguration;
 
-import net.jcip.annotations.ThreadSafe;
+import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -8,7 +8,6 @@ import java.util.Objects;
 import static java.lang.String.format;
 
 @SuppressWarnings("unused")
-@ThreadSafe
 public class KfgException extends RuntimeException {
 
     @Nullable
@@ -18,7 +17,7 @@ public class KfgException extends RuntimeException {
     private final String key;
 
     @Nullable
-    private final Typer<?> neededType;
+    private final Kind<?> neededType;
 
     @Nullable
     private final String actualValue;
@@ -53,7 +52,7 @@ public class KfgException extends RuntimeException {
 
     public KfgException(@Nullable final String source,
                         @Nullable final String key,
-                        @Nullable final Typer<?> neededType,
+                        @Nullable final Kind<?> neededType,
                         @Nullable final Object actualValue,
                         @Nullable final String message,
                         @Nullable final Throwable cause) {
@@ -66,7 +65,7 @@ public class KfgException extends RuntimeException {
 
     public KfgException(@Nullable final String source,
                         @Nullable final String key,
-                        @Nullable final Typer<?> neededType,
+                        @Nullable final Kind<?> neededType,
                         @Nullable final Object actualValue,
                         @Nullable String message) {
         super(message);
@@ -78,7 +77,7 @@ public class KfgException extends RuntimeException {
 
     public KfgException(@Nullable final String source,
                         @Nullable final String key,
-                        @Nullable final Typer<?> neededType,
+                        @Nullable final Kind<?> neededType,
                         @Nullable final Object actualValue,
                         @Nullable final Throwable cause) {
         super(cause);
@@ -90,7 +89,7 @@ public class KfgException extends RuntimeException {
 
     public KfgException(@Nullable final String source,
                         @Nullable final String key,
-                        @Nullable final Typer<?> neededType,
+                        @Nullable final Kind<?> neededType,
                         @Nullable final Object actualValue) {
         this.source = source;
         this.key = key;
@@ -104,7 +103,7 @@ public class KfgException extends RuntimeException {
      */
     @Override
     public String toString() {
-        return format("%s[key=%s, neededType=%s, actualValue=%s]",
+        return format("%s(key=%s, neededType=%s, actualValue=%s)",
                 this.getClass().getName(),
                 this.key(),
                 this.neededType(),
@@ -140,7 +139,7 @@ public class KfgException extends RuntimeException {
     }
 
     @Nullable
-    public Typer<?> neededType() {
+    public Kind<?> neededType() {
         return this.neededType;
     }
 

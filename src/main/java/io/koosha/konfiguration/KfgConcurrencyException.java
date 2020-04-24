@@ -1,9 +1,8 @@
 package io.koosha.konfiguration;
 
-import net.jcip.annotations.ThreadSafe;
+import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Nullable;
 
-@ThreadSafe
 public class KfgConcurrencyException extends KfgException {
 
     public KfgConcurrencyException(@Nullable String source,
@@ -24,7 +23,7 @@ public class KfgConcurrencyException extends KfgException {
 
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable String key,
-                                   @Nullable Typer<?> neededType,
+                                   @Nullable Kind<?> neededType,
                                    @Nullable Object actualValue,
                                    @Nullable String message, @Nullable Throwable cause) {
         super(source, key, neededType, actualValue, message, cause);
@@ -32,13 +31,13 @@ public class KfgConcurrencyException extends KfgException {
 
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable String key,
-                                   @Nullable Typer<?> neededType, @Nullable Object actualValue, @Nullable String message) {
+                                   @Nullable Kind<?> neededType, @Nullable Object actualValue, @Nullable String message) {
         super(source, key, neededType, actualValue, message);
     }
 
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable String key,
-                                   @Nullable Typer<?> neededType,
+                                   @Nullable Kind<?> neededType,
                                    @Nullable Object actualValue,
                                    @Nullable Throwable cause) {
         super(source, key, neededType, actualValue, cause);
@@ -46,7 +45,7 @@ public class KfgConcurrencyException extends KfgException {
 
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable String key,
-                                   @Nullable Typer<?> neededType, @Nullable Object actualValue) {
+                                   @Nullable Kind<?> neededType, @Nullable Object actualValue) {
         super(source, key, neededType, actualValue);
     }
 

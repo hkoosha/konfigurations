@@ -1,7 +1,6 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration;
 
-import io.koosha.konfiguration.KfgTypeException;
-import io.koosha.konfiguration.Typer;
+import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.testng.annotations.BeforeMethod;
@@ -42,7 +41,7 @@ public class SourceTest {
 
         @Override
         protected boolean allowNullInCollection_(@NotNull String key,
-                                                 @Nullable Typer<?> type,
+                                                 @Nullable Kind<?> type,
                                                  @NotNull Object collection) {
             return SourceTest.this.allowNullInCollection == null
                     ? super.allowNullInCollection_(key, type, collection)
@@ -50,9 +49,14 @@ public class SourceTest {
         }
 
         @Override
-        @Nullable
-        public KonfigurationManager8 manager() {
-            return null;
+        @NotNull
+        public Source updatedCopy() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public boolean hasUpdate() {
+            throw new UnsupportedOperationException();
         }
 
         @Override
@@ -62,18 +66,18 @@ public class SourceTest {
         }
 
         @Override
-        public boolean has(@NotNull String key, @Nullable Typer<?> type) {
+        public boolean has(@NotNull String key, @Nullable Kind<?> type) {
             return !MISSING.equals(key);
         }
 
         @Override
-        boolean isNull(@NotNull String key) {
+        protected boolean isNull(@NotNull String key) {
             return NULL.equals(key);
         }
 
         @Override
         @NotNull
-        Object bool0(@NotNull String key) {
+        protected Object bool0(@NotNull String key) {
             switch (key) {
                 case BOOL_T:
                     return true;
@@ -88,7 +92,7 @@ public class SourceTest {
 
         @Override
         @NotNull
-        Object char0(@NotNull String key) {
+        protected Object char0(@NotNull String key) {
             switch (key) {
                 case CHAR_A:
                     return 'a';
@@ -103,7 +107,7 @@ public class SourceTest {
 
         @Override
         @NotNull
-        Object string0(@NotNull String key) {
+        protected Object string0(@NotNull String key) {
             switch (key) {
                 case STRING_ABC:
                     return "abc";
@@ -116,7 +120,7 @@ public class SourceTest {
 
         @Override
         @NotNull
-        Number number0(@NotNull String key) {
+        protected Number number0(@NotNull String key) {
             final String value = key.split(":")[1];
             if (key.startsWith("byte"))
                 return Byte.valueOf(value);
@@ -135,31 +139,31 @@ public class SourceTest {
 
         @Override
         @NotNull
-        Number numberDouble0(@NotNull String key) {
+        protected Number numberDouble0(@NotNull String key) {
             return number0(key);
         }
 
         @NotNull
         @Override
-        List<?> list0(@NotNull final String key, @NotNull final Typer<? extends List<?>> type) {
+        protected List<?> list0(@NotNull final String key, @NotNull final Kind<? extends List<?>> type) {
             return listValue;
         }
 
         @Override
         @NotNull
-        Set<?> set0(@NotNull String key, @NotNull Typer<? extends Set<?>> type) {
+        protected Set<?> set0(@NotNull String key, @NotNull Kind<? extends Set<?>> type) {
             return setValue;
         }
 
         @Override
         @NotNull
-        Map<?, ?> map0(@NotNull String key, @NotNull Typer<? extends Map<?, ?>> type) {
+        protected Map<?, ?> map0(@NotNull String key, @NotNull Kind<? extends Map<?, ?>> type) {
             return mapValue;
         }
 
         @Override
         @NotNull
-        Object custom0(@NotNull String key, @NotNull Typer<?> type) {
+        protected Object custom0(@NotNull String key, @NotNull Kind<?> type) {
             return customValue;
         }
 
@@ -178,11 +182,6 @@ public class SourceTest {
     }
 
     // =========================================================================
-
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testGetManagerAndSetItToNull() {
-        this.source.getManagerAndSetItToNull();
-    }
 
     @Test(expectedExceptions = KfgAssertionException.class)
     public void testSubset() {
@@ -567,7 +566,8 @@ public class SourceTest {
         final List<String> value = Arrays.asList("a", null, "b", "c");
         this.listValue = value;
         this.allowNullInCollection = true;
-        assertEquals(this.source.list("any").v(), value);
+        assertEquals(this.source.list("any", new Kind<List<String>>() {
+        }).v(), value);
     }
 
     @Test
@@ -575,17 +575,20 @@ public class SourceTest {
         final List<String> value = Arrays.asList("a", null, "b", "c");
         this.listValue = value;
         this.allowNullInCollection = false;
-        assertEquals(this.source.list("any").v(), value);
+        assertEquals(this.source.list("any", new Kind<List<String>>() {
+        }).v(), value);
     }
 
     @Test
     public void testListNullValue() {
-        assertNull(this.source.list(NULL).v());
+        assertNull(this.source.list(NULL, new Kind<List<Object>>() {
+        }).v());
     }
 
     @Test(expectedExceptions = KfgAssertionException.class)
     public void testListMissingValue() {
-        this.source.list(MISSING).v();
+        this.source.list(MISSING, new Kind<List<Object>>() {
+        }).v();
     }
 
 }

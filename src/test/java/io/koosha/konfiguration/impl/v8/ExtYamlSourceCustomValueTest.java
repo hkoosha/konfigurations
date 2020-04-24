@@ -2,7 +2,7 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.DummyCustom;
 import io.koosha.konfiguration.DummyCustom2;
-import io.koosha.konfiguration.Typer;
+import io.koosha.konfiguration.type.Kind;
 import io.koosha.konfiguration.TestUtil;
 import org.testng.annotations.Test;
 
@@ -19,7 +19,7 @@ public class ExtYamlSourceCustomValueTest {
     public void testCustomValue() {
         final DummyCustom bang = kFactory().snakeYaml(
                 "yaml",
-                () -> "bang:\n  str : hello\n  i: 99").custom("bang", new Typer<DummyCustom>() {
+                () -> "bang:\n  str : hello\n  i: 99").custom("bang", new Kind<DummyCustom>() {
         }).vn();
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");
@@ -39,7 +39,7 @@ public class ExtYamlSourceCustomValueTest {
                         throw new RuntimeException(e);
                     }
                 })
-                                            .custom("bang", new Typer<DummyCustom2>() {
+                                            .custom("bang", new Kind<DummyCustom2>() {
                                             }).vn();
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");

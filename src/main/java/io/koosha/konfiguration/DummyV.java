@@ -1,5 +1,6 @@
 package io.koosha.konfiguration;
 
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -35,12 +36,12 @@ public final class DummyV<U> implements K<U> {
     private final boolean exists;
 
     @Nullable
-    private final Typer<U> type;
+    private final Kind<U> type;
 
     private DummyV(@NotNull final String key,
                    @Nullable final U v,
                    final boolean exists,
-                   @Nullable final Typer<U> type) {
+                   @Nullable final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         this.key = key;
         this.v = v;
@@ -62,7 +63,7 @@ public final class DummyV<U> implements K<U> {
      */
     @Override
     @Nullable
-    public Typer<U> type() {
+    public Kind<U> type() {
         return this.type;
     }
 
@@ -158,14 +159,14 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = " _ -> new")
-    public static <U> K<U> null_(@Nullable final Typer<U> type) {
+    public static <U> K<U> null_(@Nullable final Kind<U> type) {
         return null_(type, "");
     }
 
     @NotNull
     @Contract(pure = true,
             value = " _, _ -> new")
-    public static <U> K<U> null_(@Nullable final Typer<U> type,
+    public static <U> K<U> null_(@Nullable final Kind<U> type,
                                  @NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return of(null, type, key);
@@ -176,7 +177,7 @@ public final class DummyV<U> implements K<U> {
     @Contract(pure = true,
             value = " _, _ -> new")
     public static <U> K<U> of(@Nullable final U u,
-                              @Nullable final Typer<U> type) {
+                              @Nullable final Kind<U> type) {
         return of(u, type, "");
     }
 
@@ -184,7 +185,7 @@ public final class DummyV<U> implements K<U> {
     @Contract(pure = true,
             value = "_, _, _ -> new")
     public static <U> K<U> of(@Nullable final U u,
-                              @Nullable final Typer<U> type,
+                              @Nullable final Kind<U> type,
                               @NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return new DummyV<>(key, u, true, type);
@@ -194,14 +195,14 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = " _ -> new")
-    public static <U> K<U> missing(@Nullable final Typer<U> type) {
+    public static <U> K<U> missing(@Nullable final Kind<U> type) {
         return missing(type, "");
     }
 
     @NotNull
     @Contract(pure = true,
             value = " _, _ -> new")
-    public static <U> K<U> missing(@Nullable final Typer<U> type,
+    public static <U> K<U> missing(@Nullable final Kind<U> type,
                                    @NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return new DummyV<>(key, null, false, type);
@@ -213,7 +214,7 @@ public final class DummyV<U> implements K<U> {
             value = " _ -> new")
     public static K<Boolean> false_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(false, Typer.BOOL, key);
+        return of(false, Kind.BOOL, key);
     }
 
     @NotNull
@@ -221,7 +222,7 @@ public final class DummyV<U> implements K<U> {
             value = " _ -> new")
     public static K<Boolean> true_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(true, Typer.BOOL, key);
+        return of(true, Kind.BOOL, key);
     }
 
     @NotNull
@@ -265,7 +266,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Integer> mOne(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(-1, Typer.INT, key);
+        return of(-1, Kind.INT, key);
     }
 
     @NotNull
@@ -273,7 +274,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Integer> zero(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(0, Typer.INT, key);
+        return of(0, Kind.INT, key);
     }
 
     @NotNull
@@ -281,7 +282,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Integer> one(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(1, Typer.INT, key);
+        return of(1, Kind.INT, key);
     }
 
 
@@ -299,7 +300,7 @@ public final class DummyV<U> implements K<U> {
                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
         if (v == null)
-            return null_(Typer.BOOL);
+            return null_(Kind.BOOL);
         return v ? true_(key) : false_(key);
     }
 
@@ -307,7 +308,7 @@ public final class DummyV<U> implements K<U> {
     @Contract(pure = true,
             value = "-> new")
     public static K<Boolean> bool() {
-        return missing(Typer.BOOL);
+        return missing(Kind.BOOL);
     }
 
     @NotNull
@@ -315,7 +316,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Boolean> bool(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.BOOL, key);
+        return missing(Kind.BOOL, key);
     }
 
 
@@ -323,7 +324,7 @@ public final class DummyV<U> implements K<U> {
     @Contract(pure = true,
             value = "_ -> new")
     public static K<Character> char_(@Nullable final Character v) {
-        return of(v, Typer.CHAR);
+        return of(v, Kind.CHAR);
     }
 
     @NotNull
@@ -332,7 +333,7 @@ public final class DummyV<U> implements K<U> {
     public static K<Character> char_(@Nullable final Character v,
                                      @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(v, Typer.CHAR, key);
+        return of(v, Kind.CHAR, key);
     }
 
     @NotNull
@@ -347,7 +348,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Character> char_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.CHAR, key);
+        return missing(Kind.CHAR, key);
     }
 
 
@@ -364,7 +365,7 @@ public final class DummyV<U> implements K<U> {
     public static K<String> string(@Nullable final Object v,
                                    @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(String.valueOf(v), Typer.STRING, key);
+        return of(String.valueOf(v), Kind.STRING, key);
     }
 
     @NotNull
@@ -379,7 +380,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<String> stringMissing(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.STRING, key);
+        return missing(Kind.STRING, key);
     }
 
 
@@ -396,7 +397,7 @@ public final class DummyV<U> implements K<U> {
     public static K<Byte> byte_(@Nullable final Byte v,
                                 @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(v, Typer.BYTE, key);
+        return of(v, Kind.BYTE, key);
     }
 
     @NotNull
@@ -411,7 +412,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Byte> byte_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.BYTE, key);
+        return missing(Kind.BYTE, key);
     }
 
 
@@ -428,7 +429,7 @@ public final class DummyV<U> implements K<U> {
     public static K<Short> short_(final Short v,
                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(v, Typer.SHORT, key);
+        return of(v, Kind.SHORT, key);
     }
 
     @NotNull
@@ -443,7 +444,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Short> short_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.SHORT, key);
+        return missing(Kind.SHORT, key);
     }
 
 
@@ -460,7 +461,7 @@ public final class DummyV<U> implements K<U> {
     public static K<Integer> int_(final Integer v,
                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(v, Typer.INT, key);
+        return of(v, Kind.INT, key);
     }
 
     @NotNull
@@ -475,7 +476,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Integer> int_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.INT, key);
+        return missing(Kind.INT, key);
     }
 
 
@@ -492,7 +493,7 @@ public final class DummyV<U> implements K<U> {
     public static K<Long> long_(@Nullable final Long v,
                                 @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(v, Typer.LONG, key);
+        return of(v, Kind.LONG, key);
     }
 
     @NotNull
@@ -507,7 +508,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Long> long_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.LONG, key);
+        return missing(Kind.LONG, key);
     }
 
     @NotNull
@@ -524,7 +525,7 @@ public final class DummyV<U> implements K<U> {
     public static K<Float> float_(@Nullable final Float v,
                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(v, Typer.FLOAT, key);
+        return of(v, Kind.FLOAT, key);
     }
 
     @NotNull
@@ -539,7 +540,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Float> float_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.FLOAT, key);
+        return missing(Kind.FLOAT, key);
     }
 
 
@@ -556,7 +557,7 @@ public final class DummyV<U> implements K<U> {
     public static K<Double> double_(@Nullable final Double v,
                                     @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return of(v, Typer.DOUBLE, key);
+        return of(v, Kind.DOUBLE, key);
     }
 
     @NotNull
@@ -571,7 +572,7 @@ public final class DummyV<U> implements K<U> {
             value = "_ -> new")
     public static K<Double> double_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return missing(Typer.DOUBLE, key);
+        return missing(Kind.DOUBLE, key);
     }
 
     // =========================================================================
@@ -590,14 +591,14 @@ public final class DummyV<U> implements K<U> {
     public static <U> K<List<U>> list(@Nullable final List<U> v,
                                       @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return list(v, key, (Typer) Typer.UNKNOWN_LIST);
+        return list(v, key, (Kind) Kind.UNKNOWN_LIST);
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U> K<List<U>> list(@Nullable final List<U> v,
-                                      @Nullable final Typer<List<U>> type) {
+                                      @Nullable final Kind<List<U>> type) {
         return list(v, "", type);
     }
 
@@ -606,7 +607,7 @@ public final class DummyV<U> implements K<U> {
             value = "_, _, _ -> new")
     public static <U> K<List<U>> list(@Nullable final List<U> v,
                                       @NotNull final String key,
-                                      @Nullable final Typer<List<U>> type) {
+                                      @Nullable final Kind<List<U>> type) {
         Objects.requireNonNull(key, "key");
         return of(v, type, key);
     }
@@ -625,13 +626,13 @@ public final class DummyV<U> implements K<U> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<List<U>> list(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return list(key, (Typer) Typer.UNKNOWN_LIST);
+        return list(key, (Kind) Kind.UNKNOWN_LIST);
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    public static <U> K<List<U>> list(@Nullable final Typer<List<U>> type) {
+    public static <U> K<List<U>> list(@Nullable final Kind<List<U>> type) {
         return list("", type);
     }
 
@@ -639,7 +640,7 @@ public final class DummyV<U> implements K<U> {
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U> K<List<U>> list(@NotNull final String key,
-                                      @Nullable final Typer<List<U>> type) {
+                                      @Nullable final Kind<List<U>> type) {
         Objects.requireNonNull(key, "key");
         return missing(type, key);
     }
@@ -660,14 +661,14 @@ public final class DummyV<U> implements K<U> {
     public static <U> K<Set<U>> set(@Nullable final Set<U> v,
                                     @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return set(v, key, (Typer) Typer.UNKNOWN_SET);
+        return set(v, key, (Kind) Kind.UNKNOWN_SET);
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U> K<Set<U>> set(@Nullable final Set<U> v,
-                                    @Nullable final Typer<Set<U>> type) {
+                                    @Nullable final Kind<Set<U>> type) {
         return set(v, "", type);
     }
 
@@ -676,7 +677,7 @@ public final class DummyV<U> implements K<U> {
             value = "_, _, _ -> new")
     public static <U> K<Set<U>> set(@Nullable final Set<U> v,
                                     @NotNull final String key,
-                                    @Nullable final Typer<Set<U>> type) {
+                                    @Nullable final Kind<Set<U>> type) {
         Objects.requireNonNull(key, "key");
         return of(v, type, key);
     }
@@ -695,13 +696,13 @@ public final class DummyV<U> implements K<U> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<Set<U>> set(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return set(key, (Typer) Typer.UNKNOWN_SET);
+        return set(key, (Kind) Kind.UNKNOWN_SET);
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    public static <U> K<Set<U>> set(@Nullable final Typer<Set<U>> type) {
+    public static <U> K<Set<U>> set(@Nullable final Kind<Set<U>> type) {
         return set("", type);
     }
 
@@ -709,7 +710,7 @@ public final class DummyV<U> implements K<U> {
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U> K<Set<U>> set(@NotNull final String key,
-                                    @Nullable final Typer<Set<U>> type) {
+                                    @Nullable final Kind<Set<U>> type) {
         Objects.requireNonNull(key, "key");
         return missing(type, key);
     }
@@ -730,14 +731,14 @@ public final class DummyV<U> implements K<U> {
     public static <U> K<Collection<U>> collection(@Nullable final Collection<U> v,
                                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return collection(v, key, (Typer) Typer.UNKNOWN_COLLECTION);
+        return collection(v, key, (Kind) Kind.UNKNOWN_COLLECTION);
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U> K<Collection<U>> collection(@Nullable final Collection<U> v,
-                                                  @Nullable final Typer<Collection<U>> type) {
+                                                  @Nullable final Kind<Collection<U>> type) {
         return collection(v, "", type);
     }
 
@@ -746,7 +747,7 @@ public final class DummyV<U> implements K<U> {
             value = "_, _, _ -> new")
     public static <U> K<Collection<U>> collection(@Nullable final Collection<U> v,
                                                   @NotNull final String key,
-                                                  @Nullable final Typer<Collection<U>> type) {
+                                                  @Nullable final Kind<Collection<U>> type) {
         Objects.requireNonNull(key, "key");
         return of(v, type, key);
     }
@@ -765,13 +766,13 @@ public final class DummyV<U> implements K<U> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<Collection<U>> collection(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return collection(key, (Typer) Typer.UNKNOWN_COLLECTION);
+        return collection(key, (Kind) Kind.UNKNOWN_COLLECTION);
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    public static <U> K<Collection<U>> collection(@NotNull final Typer<Collection<U>> type) {
+    public static <U> K<Collection<U>> collection(@NotNull final Kind<Collection<U>> type) {
         return collection("", type);
     }
 
@@ -779,7 +780,7 @@ public final class DummyV<U> implements K<U> {
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U> K<Collection<U>> collection(@NotNull final String key,
-                                                  @Nullable final Typer<Collection<U>> type) {
+                                                  @Nullable final Kind<Collection<U>> type) {
         Objects.requireNonNull(key, "key");
         return missing(type, key);
     }
@@ -801,14 +802,14 @@ public final class DummyV<U> implements K<U> {
     public static <U, V> K<Map<U, V>> map(@Nullable final Map<U, V> v,
                                           @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return map(v, key, (Typer) Typer.UNKNOWN_MAP);
+        return map(v, key, (Kind) Kind.UNKNOWN_MAP);
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U, V> K<Map<U, V>> map(@Nullable final Map<U, V> v,
-                                          @Nullable final Typer<Map<U, V>> type) {
+                                          @Nullable final Kind<Map<U, V>> type) {
         return map(v, "", type);
     }
 
@@ -817,7 +818,7 @@ public final class DummyV<U> implements K<U> {
             value = "_, _, _ -> new")
     public static <U, V> K<Map<U, V>> map(@Nullable final Map<U, V> v,
                                           @NotNull final String key,
-                                          @Nullable final Typer<Map<U, V>> type) {
+                                          @Nullable final Kind<Map<U, V>> type) {
         Objects.requireNonNull(key, "key");
         return of(v, type, key);
     }
@@ -835,13 +836,13 @@ public final class DummyV<U> implements K<U> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U, V> K<Map<U, V>> map(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return map(key, (Typer) Typer.UNKNOWN_LIST);
+        return map(key, (Kind) Kind.UNKNOWN_LIST);
     }
 
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    public static <U, V> K<Map<U, V>> map(@Nullable final Typer<Map<U, V>> type) {
+    public static <U, V> K<Map<U, V>> map(@Nullable final Kind<Map<U, V>> type) {
         return map("", type);
     }
 
@@ -849,7 +850,7 @@ public final class DummyV<U> implements K<U> {
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U, V> K<Map<U, V>> map(@NotNull final String key,
-                                          @Nullable final Typer<Map<U, V>> type) {
+                                          @Nullable final Kind<Map<U, V>> type) {
         Objects.requireNonNull(key, "key");
         return missing(type, key);
     }

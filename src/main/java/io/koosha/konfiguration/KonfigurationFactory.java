@@ -2,6 +2,7 @@ package io.koosha.konfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.koosha.konfiguration.impl.v8.FactoryV8;
+import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -190,7 +191,7 @@ public interface KonfigurationFactory {
      *
      * @param name    name of created configuration.
      * @param storage konfig source.
-     * @param deser   deserializer in case {@link Konfiguration#custom(String, Typer)} is used.
+     * @param deser   deserializer in case {@link Konfiguration#custom(String, Kind)} is used.
      * @return a konfig source.
      * @throws NullPointerException if provided storage provider is null
      * @throws KfgSourceException   if the provided storage by provider is null
@@ -206,7 +207,7 @@ public interface KonfigurationFactory {
      * default object mapper provider.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * @param name name of created konfiguration.
@@ -229,7 +230,7 @@ public interface KonfigurationFactory {
      * Creates a {@link Konfiguration} with the given json string as source.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
@@ -254,7 +255,7 @@ public interface KonfigurationFactory {
      * mapper provider.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
@@ -264,7 +265,7 @@ public interface KonfigurationFactory {
      * @param objectMapper A {@link ObjectMapper} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
      *                     ust be able to deserialize custom types, so that
-     *                     {@link Konfiguration#custom(String, Typer)} works as well.
+     *                     {@link Konfiguration#custom(String, Kind)} works as well.
      * @return a konfig source.
      * @throws NullPointerException if any of its arguments are null.
      * @throws KfgSourceException   if jackson library is not in the classpath. it specifically looks
@@ -284,7 +285,7 @@ public interface KonfigurationFactory {
      * mapper provider.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * @param name         name of created konfiguration.
@@ -293,7 +294,7 @@ public interface KonfigurationFactory {
      * @param objectMapper A {@link ObjectMapper} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
      *                     ust be able to deserialize custom types, so that
-     *                     {@link Konfiguration#custom(String, Typer)} works as well.
+     *                     {@link Konfiguration#custom(String, Kind)} works as well.
      * @return a konfig source.
      * @throws NullPointerException if any of its arguments are null.
      * @throws KfgSourceException   if jackson library is not in the classpath. it specifically looks
@@ -312,7 +313,7 @@ public interface KonfigurationFactory {
      * Creates a {@link Konfiguration} with the given yaml string as source.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
@@ -337,7 +338,7 @@ public interface KonfigurationFactory {
      * mapper provider.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
@@ -347,7 +348,7 @@ public interface KonfigurationFactory {
      * @param objectMapper A {@link Yaml} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
      *                     ust be able to deserialize custom types, so that
-     *                     {@link Konfiguration#custom(String, Typer)} works as well.
+     *                     {@link Konfiguration#custom(String, Kind)} works as well.
      * @return a konfig source.
      * @throws NullPointerException if any of its arguments are null.
      * @throws KfgSourceException   if jackson library is not in the classpath. it specifically looks
@@ -367,7 +368,7 @@ public interface KonfigurationFactory {
      * default object mapper provider.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
@@ -393,7 +394,7 @@ public interface KonfigurationFactory {
      * mapper provider.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
@@ -404,7 +405,7 @@ public interface KonfigurationFactory {
      * @param objectMapper A {@link Yaml} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
      *                     ust be able to deserialize custom types, so that
-     *                     {@link Konfiguration#custom(String, Typer)} works as well.
+     *                     {@link Konfiguration#custom(String, Kind)} works as well.
      * @return a konfig source.
      * @throws NullPointerException if any of its arguments are null.
      * @throws KfgSourceException   if jackson library is not in the classpath. it specifically looks
@@ -424,7 +425,7 @@ public interface KonfigurationFactory {
      * mapper provider.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
@@ -450,7 +451,7 @@ public interface KonfigurationFactory {
      * mapper provider.
      * <p>
      * When reading a custom type, if you do not provide the actual requested
-     * type (instance of {@link Typer}) the source will act as if it does not
+     * type (instance of {@link Kind}) the source will act as if it does not
      * contain that key.
      *
      * <b>Important: the source will NEVER update. It's a const source.</b>
@@ -461,7 +462,7 @@ public interface KonfigurationFactory {
      * @param objectMapper A {@link Yaml} provider. Must always return
      *                     a valid non-null ObjectMapper, and if required, it
      *                     ust be able to deserialize custom types, so that
-     *                     {@link Konfiguration#custom(String, Typer)} works as well.
+     *                     {@link Konfiguration#custom(String, Kind)} works as well.
      * @return a konfig source.
      * @throws NullPointerException if any of its arguments are null.
      * @throws KfgSourceException   if jackson library is not in the classpath. it specifically looks

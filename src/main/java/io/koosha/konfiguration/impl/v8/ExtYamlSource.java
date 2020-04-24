@@ -1,8 +1,9 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.Typer;
+import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.ext.KfgSnakeYamlAssertionError;
 import io.koosha.konfiguration.ext.KfgSnakeYamlError;
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -31,7 +32,7 @@ import static java.util.stream.Collectors.toList;
 /**
  * Reads konfig from a yaml source (supplied as string).
  *
- * <p>for {@link #custom(String, Typer)} to work, the supplied yaml reader must be
+ * <p>for {@link #custom(String, Kind)} to work, the supplied yaml reader must be
  * configured to handle arbitrary types accordingly.
  *
  * <p>Thread safe and immutable.
@@ -303,32 +304,6 @@ final class ExtYamlSource extends Source {
     private final Map<String, ?> root;
 
     @NotNull
-    private final KonfigurationManager8 manager = new KonfigurationManager8() {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        @Contract(pure = true)
-        public boolean hasUpdate() {
-            final String newYaml = yaml.get();
-            return newYaml != null && newYaml.hashCode() != lastHash;
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        @Contract(pure = true,
-                value = "-> new")
-        public @NotNull Source _update() {
-            return this.hasUpdate()
-                    ? new ExtYamlSource(name(), yaml, mapper, unsafe)
-                    : ExtYamlSource.this;
-        }
-    };
-
-    @NotNull
     private final String name;
 
     /**
@@ -338,7 +313,7 @@ final class ExtYamlSource extends Source {
      *                     string.
      * @param mapper       {@link Yaml} provider. Must always return a valid non-null Yaml,
      *                     and if required, it must be able to deserialize custom types, so
-     *                     that {@link #custom(String, Typer)} works as well.
+     *                     that {@link #custom(String, Kind)} works as well.
      * @throws NullPointerException if any of its arguments are null.
      * @throws KfgSnakeYamlError    if org.yaml.snakeyaml library is not in the classpath. it
      *                              specifically looks for the class: "org.yaml.snakeyaml"
@@ -383,15 +358,6 @@ final class ExtYamlSource extends Source {
      */
     @NotNull
     @Override
-    public KonfigurationManager8 manager() {
-        return this.manager;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
-    @Override
     public String name() {
         return this.name;
     }
@@ -402,7 +368,7 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    Object bool0(@NotNull final String key) {
+    protected Object bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return get(key);
     }
@@ -412,7 +378,7 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    Object char0(@NotNull final String key) {
+    protected Object char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return get(key);
     }
@@ -422,7 +388,7 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    Object string0(@NotNull final String key) {
+    protected Object string0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return get(key);
     }
@@ -432,7 +398,7 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    Number number0(@NotNull final String key) {
+    protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return (Number) get(key);
     }
@@ -442,7 +408,7 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    Number numberDouble0(@NotNull final String key) {
+    protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return (Number) get(key);
     }
@@ -452,8 +418,8 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    List<?> list0(@NotNull final String key,
-                  @NotNull final Typer<? extends List<?>> type) {
+    protected List<?> list0(@NotNull final String key,
+                            @NotNull final Kind<? extends List<?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -469,8 +435,8 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    Set<?> set0(@NotNull final String key,
-                @NotNull final Typer<? extends Set<?>> type) {
+    protected Set<?> set0(@NotNull final String key,
+                          @NotNull final Kind<? extends Set<?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -486,8 +452,8 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    Map<?, ?> map0(@NotNull final String key,
-                   @NotNull final Typer<? extends Map<?, ?>> type) {
+    protected Map<?, ?> map0(@NotNull final String key,
+                             @NotNull final Kind<? extends Map<?, ?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -503,8 +469,8 @@ final class ExtYamlSource extends Source {
      */
     @Override
     @NotNull
-    Object custom0(@NotNull final String key,
-                   @NotNull final Typer<?> type) {
+    protected Object custom0(@NotNull final String key,
+                             @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -519,7 +485,7 @@ final class ExtYamlSource extends Source {
      * {@inheritDoc}
      */
     @Override
-    boolean isNull(@NotNull final String key) {
+    protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         try {
             return get(key) == null;
@@ -534,10 +500,10 @@ final class ExtYamlSource extends Source {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Typer<?> type) {
+                       @Nullable final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         try {
-            return Typer.matchesValue(type, get(key));
+            return Kind.matchesValue(type, get(key));
         }
         catch (final KfgSnakeYamlAssertionError e) {
             return false;
@@ -562,7 +528,7 @@ final class ExtYamlSource extends Source {
         throw new KfgSnakeYamlAssertionError(this.name(), "assertion error");
     }
 
-    private void ensureSafe(@Nullable final Typer<?> type) {
+    private void ensureSafe(@Nullable final Kind<?> type) {
         //        Constructor constructor = new Constructor(Customer.class);
         //        TypeDescription customTypeDescription = new TypeDescription(Customer.class);
         //        customTypeDescription.addPropertyParameters("contactDetails", Contact.class);
@@ -572,6 +538,29 @@ final class ExtYamlSource extends Source {
             return;
         if (type == null || type.isParametrized())
             throw new UnsupportedOperationException("yaml does not support parameterized yet.");
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Contract(pure = true)
+    public boolean hasUpdate() {
+        final String newYaml = yaml.get();
+        return newYaml != null && newYaml.hashCode() != lastHash;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Contract(pure = true,
+            value = "-> new")
+    public @NotNull Source updatedCopy() {
+        return this.hasUpdate()
+                ? new ExtYamlSource(name(), yaml, mapper, unsafe)
+                : ExtYamlSource.this;
     }
 
 }

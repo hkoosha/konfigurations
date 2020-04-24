@@ -1,13 +1,12 @@
 package io.koosha.konfiguration;
 
-import net.jcip.annotations.ThreadSafe;
+import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Exceptions regarding the source (backing storage), or as a wrapper around
  * exceptions thrown by the backing storage.
  */
-@ThreadSafe
 public class KfgSourceException extends KfgException {
 
     public KfgSourceException(@Nullable final String source,
@@ -24,7 +23,7 @@ public class KfgSourceException extends KfgException {
 
     public KfgSourceException(@Nullable final String source,
                               @Nullable final String key,
-                              @Nullable final Typer<?> neededType,
+                              @Nullable final Kind<?> neededType,
                               @Nullable final Object actualValue,
                               @Nullable final String message,
                               @Nullable final Throwable cause) {
@@ -33,7 +32,7 @@ public class KfgSourceException extends KfgException {
 
     public KfgSourceException(@Nullable final String source,
                               @Nullable final String key,
-                              @Nullable final Typer<?> neededType,
+                              @Nullable final Kind<?> neededType,
                               @Nullable final Object actualValue,
                               @Nullable final String message) {
         super(source, key, neededType, actualValue, message);
@@ -41,7 +40,7 @@ public class KfgSourceException extends KfgException {
 
     public KfgSourceException(@Nullable final String source,
                               @Nullable final String key,
-                              @Nullable final Typer<?> neededType,
+                              @Nullable final Kind<?> neededType,
                               @Nullable final Object actualValue,
                               @Nullable final Throwable cause) {
         super(source, key, neededType, actualValue, cause);
@@ -49,7 +48,7 @@ public class KfgSourceException extends KfgException {
 
     public KfgSourceException(@Nullable final String source,
                               @Nullable final String key,
-                              @Nullable final Typer<?> neededType,
+                              @Nullable final Kind<?> neededType,
                               @Nullable final Object actualValue) {
         super(source, key, neededType, actualValue);
     }

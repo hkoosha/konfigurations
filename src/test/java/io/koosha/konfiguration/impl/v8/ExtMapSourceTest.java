@@ -78,10 +78,10 @@ public class ExtMapSourceTest extends KonfigValueTestMixin {
     @Override
     protected void update() {
         this.map = this.map1;
-        this.k = ((KonfigurationManager8) this.k.manager())._update();
+        this.k.manager().updateNow();
     }
 
-    public Konfiguration k() {
+    protected Konfiguration k() {
         return this.k;
     }
 

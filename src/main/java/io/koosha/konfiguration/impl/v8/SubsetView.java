@@ -1,6 +1,7 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.*;
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -168,7 +169,7 @@ final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public <U> K<List<U>> list(@NotNull final String key,
-                               @Nullable final Typer<List<U>> type) {
+                               @Nullable final Kind<List<U>> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.list(key(key), type);
     }
@@ -180,7 +181,7 @@ final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public <U, V> K<Map<U, V>> map(@NotNull final String key,
-                                   @Nullable final Typer<Map<U, V>> type) {
+                                   @Nullable final Kind<Map<U, V>> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.map(key(key), type);
     }
@@ -192,7 +193,7 @@ final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public <U> K<Set<U>> set(@NotNull final String key,
-                             @Nullable final Typer<Set<U>> type) {
+                             @Nullable final Kind<Set<U>> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.set(key(key), type);
     }
@@ -204,7 +205,7 @@ final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public <U> K<U> custom(@NotNull final String key,
-                           @Nullable final Typer<U> type) {
+                           @Nullable final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.custom(key(key), type);
     }
@@ -215,7 +216,7 @@ final class SubsetView implements Konfiguration {
     @Contract(pure = true)
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Typer<?> type) {
+                       @Nullable final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         return wrapped.has(key(key), type);
     }
@@ -237,13 +238,12 @@ final class SubsetView implements Konfiguration {
      * {@inheritDoc}
      */
     @Contract(pure = true)
-    @NotNull
     @Override
-    public Konfiguration deregister(@NotNull final Handle observer,
-                                    @NotNull final String key) {
+    public void deregister(@NotNull final Handle observer,
+                           @NotNull final String key) {
         Objects.requireNonNull(observer, "observer");
         Objects.requireNonNull(key, "key");
-        return this.wrapped.deregister(observer, key(key));
+        this.wrapped.deregister(observer, key(key));
     }
 
     /**
@@ -251,8 +251,9 @@ final class SubsetView implements Konfiguration {
      */
     @Contract(pure = true)
     @Override
-    public @NotNull Handle register(@NotNull final KeyObserver observer,
-                                    @NotNull final String key) {
+    @NotNull
+    public Handle register(@NotNull final KeyObserver observer,
+                           @NotNull final String key) {
         Objects.requireNonNull(observer, "observer");
         Objects.requireNonNull(key, "key");
         return this.wrapped.register(observer, key(key));
@@ -284,17 +285,6 @@ final class SubsetView implements Konfiguration {
     @Override
     public KonfigurationManager manager() {
         throw new KfgIllegalStateException(this.name(), null, null, null, "manager is already taken out");
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Contract(pure = true,
-            value = "->null")
-    @Nullable
-    @Override
-    public KonfigurationManager getManagerAndSetItToNull() {
-        return null;
     }
 
     @Contract(pure = true,

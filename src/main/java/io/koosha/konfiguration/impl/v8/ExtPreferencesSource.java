@@ -2,6 +2,7 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.*;
 import io.koosha.konfiguration.ext.KfgPreferencesError;
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -18,7 +19,7 @@ import java.util.prefs.Preferences;
 /**
  * Reads konfig from a {@link Preferences} source.
  *
- * <p>for {@link #custom(String, Typer)} to work, the supplied deserializer
+ * <p>for {@link #custom(String, Kind)} to work, the supplied deserializer
  * must be configured to handle arbitrary types accordingly.
  *
  * <p><b>IMPORTANT</b> Does not coup too well with keys being added / removed
@@ -40,29 +41,6 @@ final class ExtPreferencesSource extends Source {
     @NotNull
     private final String name;
 
-    @NotNull
-    private final KonfigurationManager8 manager = new KonfigurationManager8() {
-
-        /**
-         * {@inheritDoc}
-         */
-        @Override
-        @Contract(pure = true)
-        public boolean hasUpdate() {
-            return lastHash != hashOf();
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        @NotNull
-        @Override
-        public Source _update() {
-            return ExtPreferencesSource.this;
-        }
-
-    };
-
     ExtPreferencesSource(@NotNull final String name,
                          @NotNull final Preferences preferences,
                          @Nullable final Deserializer deserializer) {
@@ -80,7 +58,7 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Object bool0(@NotNull final String key) {
+    protected Object bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return this.source.getBoolean(sane(key), false);
     }
@@ -90,11 +68,11 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Object char0(@NotNull final String key) {
+    protected Object char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         final String s = ((String) this.string0(sane(key)));
         if (s.length() != 1)
-            throw new KfgTypeException(this.name(), key, Typer.CHAR, s);
+            throw new KfgTypeException(this.name(), key, Kind.CHAR, s);
         return ((String) this.string0(sane(key))).charAt(0);
     }
 
@@ -103,7 +81,7 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Object string0(@NotNull final String key) {
+    protected Object string0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return this.source.get(sane(key), null);
     }
@@ -113,7 +91,7 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Number number0(@NotNull final String key) {
+    protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return this.source.getLong(sane(key), 0);
     }
@@ -123,7 +101,7 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Number numberDouble0(@NotNull final String key) {
+    protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return this.source.getDouble(sane(key), 0);
     }
@@ -133,8 +111,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    List<?> list0(@NotNull final String key,
-                  @NotNull final Typer<? extends List<?>> type) {
+    protected List<?> list0(@NotNull final String key,
+                            @NotNull final Kind<? extends List<?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -148,8 +126,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Set<?> set0(@NotNull final String key,
-                @NotNull final Typer<? extends Set<?>> type) {
+    protected Set<?> set0(@NotNull final String key,
+                          @NotNull final Kind<? extends Set<?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -163,8 +141,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Map<?, ?> map0(@NotNull final String key,
-                   @NotNull final Typer<? extends Map<?, ?>> type) {
+    protected Map<?, ?> map0(@NotNull final String key,
+                             @NotNull final Kind<? extends Map<?, ?>> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -178,8 +156,8 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     @NotNull
-    Object custom0(@NotNull final String key,
-                   @NotNull final Typer<?> type) {
+    protected Object custom0(@NotNull final String key,
+                             @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -192,7 +170,7 @@ final class ExtPreferencesSource extends Source {
      * {@inheritDoc}
      */
     @Override
-    boolean isNull(@NotNull final String key) {
+    protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return this.source.get(sane(key), null) == null;
     }
@@ -202,7 +180,7 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Typer<?> type) {
+                       @Nullable final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         try {
             return source.nodeExists(sane(key));
@@ -250,10 +228,19 @@ final class ExtPreferencesSource extends Source {
     /**
      * {@inheritDoc}
      */
+    @Override
+    @Contract(pure = true)
+    public boolean hasUpdate() {
+        return lastHash != hashOf();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @NotNull
     @Override
-    public KonfigurationManager8 manager() {
-        return this.manager;
+    public Source updatedCopy() {
+        return ExtPreferencesSource.this;
     }
 
 }

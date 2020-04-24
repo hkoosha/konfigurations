@@ -12,5 +12,5 @@ optimizable
 paranamer
 prefs
 snakeyaml
-typer
+kind
 updatable

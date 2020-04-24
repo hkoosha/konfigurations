@@ -1,12 +1,15 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.*;
+import io.koosha.konfiguration.Handle;
+import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.KonfigurationManager;
+import io.koosha.konfiguration.Source;
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
@@ -19,23 +22,11 @@ final class Kombiner_Manager implements KonfigurationManager {
     @NotNull
     private final Kombiner origin;
 
-    private final AtomicReference<Kombiner> kombiner;
-
     public Kombiner_Manager(@NotNull Kombiner kombiner) {
         Objects.requireNonNull(kombiner, "kombiner");
         this.origin = kombiner;
-        this.kombiner = new AtomicReference<>(kombiner);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean hasUpdate() {
-        if (this.kombiner.get() != null)
-            throw new KfgIllegalStateException(this.kombiner.get().name(), "getAndSetToNull() not called yet");
-        return origin.r(this::hasUpdate0);
-    }
 
     /**
      * {@inheritDoc}
@@ -45,18 +36,19 @@ final class Kombiner_Manager implements KonfigurationManager {
     @NotNull
     @Override
     public Map<String, Collection<Runnable>> update() {
-        if (this.kombiner.get() != null)
-            throw new KfgIllegalStateException(this.kombiner.get().name(), "getAndSetToNull() not called yet");
         return origin.r(this::update0);
     }
 
+
+    public boolean hasUpdate() {
+        return origin.r(this::hasUpdate0);
+    }
+
     private boolean hasUpdate0() {
-        //noinspection ConstantConditions
         return origin
                 .sources
-                .vs()
-                .map(Konfiguration::manager)
-                .anyMatch(KonfigurationManager::hasUpdate);
+                .stream()
+                .anyMatch(x -> ((Source) x).hasUpdate());
     }
 
     private Map<String, Collection<Runnable>> update0() {
@@ -64,15 +56,14 @@ final class Kombiner_Manager implements KonfigurationManager {
             return emptyMap();
 
         final Map<Handle, Konfiguration> newSources = origin.sources.copy();
-        //noinspection ConstantConditions
         newSources.entrySet().forEach(x -> x.setValue(
                 x.getValue() instanceof Source
-                        ? ((Source) x.getValue()).manager()._update()
+                        ? ((Source) x.getValue()).updatedCopy()
                         : x.getValue()
         ));
 
-        final Set<Typer<?>> updated = new HashSet<>();
-        final Map<Typer<?>, Object> newCache = origin.values.copy();
+        final Set<Kind<?>> updated = new HashSet<>();
+        final Map<Kind<?>, Object> newCache = origin.values.copy();
         origin.values.origForEach(q -> {
             final String key = requireNonNull(q.key(), "ket passed through kombiner is null");
 
@@ -100,10 +91,9 @@ final class Kombiner_Manager implements KonfigurationManager {
         });
 
         return origin.w(() -> {
-            //noinspection ConstantConditions
             final Map<String, Collection<Runnable>> result = origin
                     .sources
-                    .vs()
+                    .stream()
                     // External non-optimizable konfig sources.
                     .filter(target -> !(target instanceof Source))
                     .map(Konfiguration::manager)
@@ -131,10 +121,10 @@ final class Kombiner_Manager implements KonfigurationManager {
                         return m0;
                     });
 
-            for (final Typer<?> typer : updated)
+            for (final Kind<?> kind : updated)
                 //noinspection ConstantConditions
-                result.computeIfAbsent(typer.key(), (q_) -> new ArrayList<>())
-                      .addAll(this.origin.observers.get(typer.key()));
+                result.computeIfAbsent(kind.key(), (q_) -> new ArrayList<>())
+                      .addAll(this.origin.observers.get(kind.key()));
 
             origin.sources.replace(newSources);
             origin.values.replace(newCache);

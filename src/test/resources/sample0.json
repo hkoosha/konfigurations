@@ -9,7 +9,7 @@
         "a": 99,
         "c": 22
     },
-    "aSet": [1, 2, 1, 2],
+    "aSet": [1, 2],
     "aString": "hello world",
 
     "some": {

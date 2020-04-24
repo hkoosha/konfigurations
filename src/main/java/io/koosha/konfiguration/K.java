@@ -1,5 +1,6 @@
 package io.koosha.konfiguration;
 
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
@@ -91,7 +92,7 @@ public interface K<U> {
      */
     @Nullable
     @Contract(pure = true)
-    Typer<U> type();
+    Kind<U> type();
 
     /**
      * If the value denoted by {@link #key()} in the original source exists.

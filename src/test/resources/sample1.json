@@ -9,6 +9,6 @@
         "a": "b",
         "c": "e"
     },
-    "aSet": [3, 2, 1, 2],
+    "aSet": [3, 2, 1],
     "aString": "goodbye world"
 }

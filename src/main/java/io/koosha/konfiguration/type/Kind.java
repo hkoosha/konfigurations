@@ -1,5 +1,8 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.type;
 
+import io.koosha.konfiguration.KfgIllegalArgumentException;
+import io.koosha.konfiguration.KfgIllegalStateException;
+import io.koosha.konfiguration.KonfigurationFactory;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -7,6 +10,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -15,9 +19,10 @@ import java.util.*;
 @ThreadSafe
 @Immutable
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-public abstract class Typer<TYPE> {
+public abstract class Kind<TYPE> implements Serializable {
 
-    @ApiStatus.Experimental
+    private static final long serialVersionUID = 1;
+
     private static final boolean ALLOW_PARAMETRIZED = true;
 
     @Nullable
@@ -29,16 +34,16 @@ public abstract class Typer<TYPE> {
     @NotNull
     private final Class<TYPE> klass;
 
-    private Typer(@NotNull final Class<TYPE> type) {
+    private Kind(@NotNull final Class<TYPE> type) {
         Objects.requireNonNull(type, "type");
         this.key = null;
         this.pt = null;
         this.klass = type;
     }
 
-    private Typer(@Nullable final String key,
-                  @Nullable final ParameterizedType pt,
-                  @NotNull final Class<TYPE> klass) {
+    private Kind(@Nullable final String key,
+                 @Nullable final ParameterizedType pt,
+                 @NotNull final Class<TYPE> klass) {
         Objects.requireNonNull(klass, "klass");
         this.key = key;
         this.pt = pt;
@@ -46,9 +51,32 @@ public abstract class Typer<TYPE> {
     }
 
     @SuppressWarnings("unchecked")
-    protected Typer() {
-        final Type t = ((ParameterizedType) this.getClass().getGenericSuperclass())
-                .getActualTypeArguments()[0];
+    protected Kind() {
+        final Type t =
+                ((ParameterizedType) this.getClass().getGenericSuperclass())
+                        .getActualTypeArguments()[0];
+
+        checkIsClassOrParametrizedType(t, null);
+
+        if (t instanceof ParameterizedType) {
+            if (ALLOW_PARAMETRIZED)
+                throw new IllegalArgumentException("parametrized types are not supported in this version");
+            this.pt = (ParameterizedType) t;
+            this.klass = (Class<TYPE>) this.pt.getRawType();
+        }
+        else {
+            this.pt = null;
+            this.klass = (Class<TYPE>) t;
+        }
+
+        this.key = null;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Kind(final boolean dummy) {
+        final Type t =
+                ((ParameterizedType) this.getClass().getGenericSuperclass())
+                        .getActualTypeArguments()[0];
 
         checkIsClassOrParametrizedType(t, null);
 
@@ -63,6 +91,7 @@ public abstract class Typer<TYPE> {
 
         this.key = null;
     }
+
 
     /**
      * {@inheritDoc}
@@ -81,9 +110,9 @@ public abstract class Typer<TYPE> {
     public final boolean equals(final Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof Typer))
+        if (!(o instanceof Kind))
             return false;
-        final Typer<?> other = (Typer<?>) o;
+        final Kind<?> other = (Kind<?>) o;
         return Objects.equals(this.key, other.key)
                 && Objects.equals(this.pt, other.pt)
                 && Objects.equals(this.klass, other.klass);
@@ -124,21 +153,22 @@ public abstract class Typer<TYPE> {
 
     @Contract(pure = true)
     @NotNull
-    public final Typer<TYPE> withKey(@Nullable final String key) {
+    public final Kind<TYPE> withKey(@Nullable final String key) {
         return Objects.equals(this.key, key)
                 ? this
-                : new Typer<TYPE>(key, this.pt, this.klass) {
+                : new Kind<TYPE>(key, this.pt, this.klass) {
         };
     }
 
     // ---------------------------------
 
     @Contract(pure = true)
-    final boolean matchesType(@Nullable final Typer<?> other) {
+    final boolean matchesType(@Nullable final Kind<?> other) {
         if (other == null || other == this)
             return true;
         // TODO
-        return other.klass().isAssignableFrom(this.klass());
+        return Objects.equals(this.klass, other.klass)
+                && Objects.equals(this.pt, other.pt);
     }
 
     @Contract(pure = true)
@@ -150,19 +180,19 @@ public abstract class Typer<TYPE> {
     }
 
     @Contract(pure = true)
-    public static boolean matchesType(@Nullable final Typer<?> typer0,
-                                      @Nullable final Typer<?> typer1) {
-        if (typer0 == null || typer1 == null)
+    public static boolean matchesType(@Nullable final Kind<?> kind0,
+                                      @Nullable final Kind<?> kind1) {
+        if (kind0 == null || kind1 == null)
             return true;
-        return typer0.matchesType(typer1);
+        return kind0.matchesType(kind1);
     }
 
     @Contract(pure = true)
-    public static boolean matchesValue(@Nullable final Typer<?> typer0,
+    public static boolean matchesValue(@Nullable final Kind<?> kind0,
                                        @Nullable final Object value) {
-        if (typer0 == null || value == null)
+        if (kind0 == null || value == null)
             return true;
-        return typer0.matchesValue(value);
+        return kind0.matchesValue(value);
     }
 
     // ---------------------------------
@@ -179,6 +209,25 @@ public abstract class Typer<TYPE> {
         if (!this.isCollection())
             throw new KfgIllegalStateException(null, "type is not a collection");
         return this.pt == null ? null : this.pt.getActualTypeArguments()[0];
+    }
+
+    @Contract(pure = true)
+    @Nullable
+    public final Class<?> getCollectionContainedClass() {
+        if (!this.isCollection())
+            throw new KfgIllegalStateException(null, "type is not a collection");
+        try {
+            return this.pt == null ? null : (Class<?>) this.pt.getActualTypeArguments()[0];
+        }
+        catch (final ClassCastException cce) {
+            throw new KfgIllegalStateException(null, "collection contained type is not a concrete class");
+        }
+    }
+
+    public final boolean isUnknownCollection() {
+        if (!this.isCollection())
+            throw new KfgIllegalStateException(null, "type is not a collection");
+        return this.pt == null;
     }
 
     /**
@@ -298,28 +347,45 @@ public abstract class Typer<TYPE> {
      */
     @NotNull
     @Contract(value = "_ -> new", pure = true)
-    public static <U> Typer<U> of(@NotNull final Class<U> klass) {
+    public static <U> Kind<U> of(@NotNull Class<U> klass) {
         Objects.requireNonNull(klass, "klass");
-        if (!ALLOW_PARAMETRIZED && Typer.isParametrized(klass))
+        klass = box(klass);
+        if (!ALLOW_PARAMETRIZED && Kind.isParametrized(klass))
             throw new KfgIllegalArgumentException(
                     null, "parametrized types are not supported, klass=" + klass);
-        return new Typer<U>(klass) {
-        };
-    }
-
-    @Contract(value = "_ -> new", pure = true)
-    private static <U> Typer<U> unsafeOf(@NotNull final Class<U> klass) {
-        Objects.requireNonNull(klass, "klass");
-        return new Typer<U>(klass) {
+        return new Kind<U>(klass) {
         };
     }
 
     @SuppressWarnings("unchecked")
+    private static <U> Class<U> box(@NotNull final Class<U> klass) {
+        Class<?> c;
+        if (klass == byte.class)
+            c = Byte.class;
+        else if (klass == char.class)
+            c = Character.class;
+        else if (klass == short.class)
+            c = Short.class;
+        else if (klass == int.class)
+            c = Integer.class;
+        else if (klass == long.class)
+            c = Long.class;
+        else if (klass == float.class)
+            c = Float.class;
+        else if (klass == double.class)
+            c = Double.class;
+        else
+            c = klass;
+        return (Class<U>) c;
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
     @NotNull
     @Contract(value = "_ -> new", pure = true)
-    private static <U> Typer<U> of_(@NotNull final Class<?> klass) {
+    private static <U> Kind<U> of_(@NotNull final Class<?> klass) {
         Objects.requireNonNull(klass, "klass");
-        return (Typer<U>) of(klass);
+        return new Kind(klass) {
+        };
     }
 
     @Contract(pure = true)
@@ -353,70 +419,32 @@ public abstract class Typer<TYPE> {
 
     // =========================================================================
 
-    public static final Typer<Boolean> BOOL = of(Boolean.class);
-    public static final Typer<Character> CHAR = of(Character.class);
+    public static final Kind<Boolean> BOOL = of(Boolean.class);
+    public static final Kind<Character> CHAR = of(Character.class);
 
-    public static final Typer<Byte> BYTE = of(Byte.class);
-    public static final Typer<Short> SHORT = of(Short.class);
-    public static final Typer<Integer> INT = of(Integer.class);
-    public static final Typer<Long> LONG = of(Long.class);
-    public static final Typer<Float> FLOAT = of(Float.class);
-    public static final Typer<Double> DOUBLE = of(Double.class);
+    public static final Kind<Byte> BYTE = of(Byte.class);
+    public static final Kind<Short> SHORT = of(Short.class);
+    public static final Kind<Integer> INT = of(Integer.class);
+    public static final Kind<Long> LONG = of(Long.class);
+    public static final Kind<Float> FLOAT = of(Float.class);
+    public static final Kind<Double> DOUBLE = of(Double.class);
 
-    public static final Typer<String> STRING = of(String.class);
+    public static final Kind<String> STRING = of(String.class);
 
-    public static final Typer<Map<?, ?>> UNKNOWN_MAP = of_(Map.class);
-    public static final Typer<Set<?>> UNKNOWN_SET = of_(Set.class);
-    public static final Typer<List<?>> UNKNOWN_LIST = of_(List.class);
-    public static final Typer<Collection<?>> UNKNOWN_COLLECTION = of_(Collection.class);
+    public static final Kind<Map<?, ?>> UNKNOWN_MAP = of_(Map.class);
+    public static final Kind<Set<?>> UNKNOWN_SET = of_(Set.class);
+    public static final Kind<List<?>> UNKNOWN_LIST = of_(List.class);
+    public static final Kind<Collection<?>> UNKNOWN_COLLECTION = of_(Collection.class);
 
-    public static final Typer<Object> OBJECT = of_(Object.class);
-    public static final Typer<?> UNKNOWN = OBJECT;
-
-    public static final Typer<List<Byte>> LIST_BYTE = new Typer<List<Byte>>() {
+    public static final Kind<List<Integer>> LIST_INT = new Kind<List<Integer>>(false) {
     };
-
-    public static final Typer<List<Short>> LIST_SHORT = new Typer<List<Short>>() {
+    public static final Kind<Set<Integer>> SET_INT = new Kind<Set<Integer>>(false) {
     };
-    public static final Typer<List<Integer>> LIST_INT = new Typer<List<Integer>>() {
+    public static final Kind<Map<String, Integer>> MAP_STRING__INT = new Kind<Map<String, Integer>>(false) {
     };
-    public static final Typer<List<Long>> LIST_LONG = new Typer<List<Long>>() {
-    };
-    public static final Typer<List<Float>> LIST_FLOAT = new Typer<List<Float>>() {
-    };
-    public static final Typer<List<Double>> LIST_DOUBLE = new Typer<List<Double>>() {
-    };
-    public static final Typer<List<String>> LIST_STRING = new Typer<List<String>>() {
+    public static final Kind<Map<String, String>> MAP_STRING__STRING = new Kind<Map<String, String>>(false) {
     };
 
-    public static final Typer<Set<Byte>> SET_BYTE = new Typer<Set<Byte>>() {
-    };
-    public static final Typer<Set<Short>> SET_SHORT = new Typer<Set<Short>>() {
-    };
-    public static final Typer<Set<Integer>> SET_INT = new Typer<Set<Integer>>() {
-    };
-    public static final Typer<Set<Long>> SET_LONG = new Typer<Set<Long>>() {
-    };
-    public static final Typer<Set<Float>> SET_FLOAT = new Typer<Set<Float>>() {
-    };
-    public static final Typer<Set<Double>> SET_DOUBLE = new Typer<Set<Double>>() {
-    };
-    public static final Typer<Set<String>> SET_STRING = new Typer<Set<String>>() {
-    };
-
-    public static final Typer<Map<String, Short>> MAP_STRING__SHORT = new Typer<Map<String, Short>>() {
-    };
-    public static final Typer<Map<String, Integer>> MAP_STRING__INT = new Typer<Map<String, Integer>>() {
-    };
-    public static final Typer<Map<String, Long>> MAP_STRING__LONG = new Typer<Map<String, Long>>() {
-    };
-    public static final Typer<Map<String, Float>> MAP_STRING__FLOAT = new Typer<Map<String, Float>>() {
-    };
-    public static final Typer<Map<String, Double>> MAP_STRING__DOUBLE = new Typer<Map<String, Double>>() {
-    };
-    public static final Typer<Map<String, String>> MAP_STRING__STRING = new Typer<Map<String, String>>() {
-    };
-
-    public static final Typer<?> _VOID = of_(Void.class);
+    public static final Kind<?> _VOID = of_(Void.class);
 
 }

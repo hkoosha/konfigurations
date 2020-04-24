@@ -1,5 +1,6 @@
 package io.koosha.konfiguration;
 
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
 
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 @FunctionalInterface
 public interface Deserializer {
 
-    <T> T deserialize(@NotNull byte[] bytes, @NotNull Typer<T> typer);
+    <T> T deserialize(@NotNull byte[] bytes,
+                      @NotNull Kind<T> kind);
 
 }

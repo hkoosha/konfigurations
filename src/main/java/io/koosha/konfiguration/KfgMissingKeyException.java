@@ -1,9 +1,10 @@
 package io.koosha.konfiguration;
 
-import net.jcip.annotations.ThreadSafe;
+import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Nullable;
 
-@ThreadSafe
+import static java.lang.String.format;
+
 public class KfgMissingKeyException extends KfgException {
 
     public KfgMissingKeyException(@Nullable final String source,
@@ -19,8 +20,19 @@ public class KfgMissingKeyException extends KfgException {
 
     public KfgMissingKeyException(@Nullable final String source,
                                   @Nullable final String key,
-                                  @Nullable final Typer<?> type) {
+                                  @Nullable final Kind<?> type) {
         super(source, key, type, null);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return format("%s(key=%s, neededType=%s)",
+                      this.getClass().getName(),
+                      this.key(),
+                      this.neededType());
     }
 
 }

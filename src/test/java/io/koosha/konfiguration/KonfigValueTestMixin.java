@@ -1,5 +1,6 @@
 package io.koosha.konfiguration;
 
+import io.koosha.konfiguration.type.Kind;
 import org.testng.annotations.Test;
 
 import java.util.HashMap;
@@ -15,8 +16,6 @@ import static org.testng.Assert.assertEquals;
  */
 @SuppressWarnings("RedundantThrows")
 public abstract class KonfigValueTestMixin {
-
-    private static final String ERR_MSG_TEMPLATE = "required type=.*, but found=.* for key=.*";
 
     protected abstract Konfiguration k();
 
@@ -60,12 +59,12 @@ public abstract class KonfigValueTestMixin {
 
     @Test
     public void testList() throws Exception {
-        final List<Integer> before = this.k().list("aIntList", Typer.LIST_INT).v();
+        final List<Integer> before = this.k().list("aIntList", Kind.LIST_INT).v();
         assertEquals(before, asList(1, 0, 2));
 
         this.update();
 
-        List<Integer> after = this.k().list("aIntList", Typer.LIST_INT).v();
+        List<Integer> after = this.k().list("aIntList", Kind.LIST_INT).v();
         assertEquals(after, asList(2, 2));
     }
 
@@ -80,114 +79,94 @@ public abstract class KonfigValueTestMixin {
         after.put("a", "b");
         after.put("c", "e");
 
-        assertEquals(this.k().map("aMap", Typer.MAP_STRING__INT).v(), before);
+        assertEquals(this.k().map("aMap", Kind.MAP_STRING__INT).v(), before);
         this.update();
-        assertEquals(this.k().map("aMap", Typer.MAP_STRING__STRING).v(), after);
+        assertEquals(this.k().map("aMap", Kind.MAP_STRING__STRING).v(), after);
     }
 
     @Test
     public void testSet() throws Exception {
-        assertEquals(this.k().set("aSet", Typer.SET_INT).v(), new HashSet<>(asList(1, 2)));
+        assertEquals(this.k().set("aSet", Kind.SET_INT).v(), new HashSet<>(asList(1, 2)));
         this.update();
-        assertEquals(this.k().set("aSet", Typer.SET_INT).v(), new HashSet<>(asList(1, 2, 3)));
+        assertEquals(this.k().set("aSet", Kind.SET_INT).v(), new HashSet<>(asList(1, 2, 3)));
     }
 
 
     // BAD CASES
 
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadInt0() throws Exception {
-        this.k().int_("aBool");
+        this.k().int_("aBool").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadInt1() throws Exception {
-        this.k().int_("aLong");
+        this.k().int_("aLong").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadInt2() throws Exception {
-        this.k().int_("aString");
+        this.k().int_("aString").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadInt3() throws Exception {
-        this.k().int_("aDouble");
+        this.k().int_("aDouble").v();
     }
 
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadDouble0() throws Exception {
-        this.k().double_("aBool");
+        this.k().double_("aBool").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadDouble1() throws Exception {
-        this.k().double_("aLong");
+        this.k().double_("aLong").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadDouble() throws Exception {
-        this.k().double_("aString");
+        this.k().double_("aString").v();
     }
 
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadLong0() throws Exception {
-        this.k().long_("aBool");
+        this.k().long_("aBool").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadLong1() throws Exception {
-        this.k().long_("aString");
+        this.k().long_("aString").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadLong2() throws Exception {
-        this.k().long_("aDouble");
+        this.k().long_("aDouble").v();
     }
 
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadString0() throws Exception {
-        this.k().string("aInt");
+        this.k().string("aInt").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadString1() throws Exception {
-        this.k().string("aBool");
+        this.k().string("aBool").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadString2() throws Exception {
-        this.k().string("aIntList");
+        this.k().string("aIntList").v();
     }
 
 
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
+    @Test(expectedExceptions = KfgTypeException.class)
     public void testBadList0() throws Exception {
-        this.k().list("aInt", Typer.LIST_INT);
-    }
-
-    @Test(expectedExceptions = KfgTypeException.class,
-          expectedExceptionsMessageRegExp = ERR_MSG_TEMPLATE)
-    public void testBadList1() throws Exception {
-        this.k().list("aString", Typer.LIST_STRING);
+        this.k().list("aInt", Kind.LIST_INT).v();
     }
 
 }

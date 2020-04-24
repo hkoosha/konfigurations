@@ -1,5 +1,6 @@
 package io.koosha.konfiguration;
 
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -114,45 +115,6 @@ public interface Konfiguration {
 
 
     /**
-     * Get a list of konfiguration value.
-     *
-     * @param key unique key of the konfiguration being requested.
-     * @return konfiguration value wrapper for the requested key.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    @NotNull
-    default K<List<?>> list(@NotNull final String key) {
-        return (K) list(key, (Typer) Typer.UNKNOWN_LIST);
-    }
-
-    /**
-     * Get a map of U to V konfiguration value.
-     *
-     * @param key unique key of the konfiguration being requested.
-     * @return konfiguration value wrapper for the requested key.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-
-    @NotNull
-    default K<Map<?, ?>> map(@NotNull final String key) {
-        return (K) map(key, (Typer) Typer.UNKNOWN_MAP);
-    }
-
-    /**
-     * Get a set of konfiguration value.
-     *
-     * @param key unique key of the konfiguration being requested.
-     * @return konfiguration value wrapper for the requested key.
-     */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-
-    @NotNull
-    default K<Set<?>> set(@NotNull final String key) {
-        return (K) set(key, (Typer) Typer.UNKNOWN_SET);
-    }
-
-
-    /**
      * Get a list of U konfiguration value.
      *
      * @param key  unique key of the konfiguration being requested.
@@ -162,7 +124,7 @@ public interface Konfiguration {
      */
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U> K<List<U>> list(String key, @Nullable Typer<List<U>> type);
+    <U> K<List<U>> list(String key, @Nullable Kind<List<U>> type);
 
     /**
      * Get a map of U to V konfiguration value.
@@ -175,7 +137,7 @@ public interface Konfiguration {
      */
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U, V> K<Map<U, V>> map(@NotNull String key, @Nullable Typer<Map<U, V>> type);
+    <U, V> K<Map<U, V>> map(@NotNull String key, @Nullable Kind<Map<U, V>> type);
 
     /**
      * Get a set of konfiguration value.
@@ -187,29 +149,8 @@ public interface Konfiguration {
      */
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U> K<Set<U>> set(@NotNull String key, @Nullable Typer<Set<U>> type);
+    <U> K<Set<U>> set(@NotNull String key, @Nullable Kind<Set<U>> type);
 
-
-    /**
-     * Get a custom object, type depends on underlying sources.
-     *
-     * <p><b>Important:</b> the underlying konfiguration source must support
-     * this!
-     *
-     * <p><b>Important:</b> this method must <em>NOT</em> be used to obtain
-     * maps, lists or sets. Use the corresponding methods
-     * {@link #map(String, Typer)}, {@link #list(String, Typer)} and
-     * {@link #set(String, Typer)}.
-     *
-     * @param key unique key of the konfiguration being requested.
-     * @param <U> generic type of the returned konfig value.
-     * @return konfiguration value wrapper for the requested key.
-     */
-    @NotNull
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    default <U> K<U> custom(@NotNull final String key) {
-        throw new UnsupportedOperationException();
-    }
 
     /**
      * Get a custom object of type Q konfiguration value.
@@ -219,8 +160,8 @@ public interface Konfiguration {
      *
      * <p><b>Important:</b> this method must <em>NOT</em> be used to obtain
      * maps, lists or sets. Use the corresponding methods
-     * {@link #map(String, Typer)}, {@link #list(String, Typer)} and
-     * {@link #set(String, Typer)}.
+     * {@link #map(String, Kind)}, {@link #list(String, Kind)} and
+     * {@link #set(String, Kind)}.
      *
      * @param key  unique key of the konfiguration being requested.
      * @param type type object of the requested value.
@@ -229,7 +170,7 @@ public interface Konfiguration {
      */
     @NotNull
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U> K<U> custom(String key, @Nullable Typer<U> type);
+    <U> K<U> custom(String key, @Nullable Kind<U> type);
 
 
     // =========================================================================
@@ -243,7 +184,7 @@ public interface Konfiguration {
      */
     @Contract(pure = true)
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    boolean has(@NotNull String key, @Nullable Typer<?> type);
+    boolean has(@NotNull String key, @Nullable Kind<?> type);
 
     /**
      * Get a subset view of this konfiguration representing all the values under
@@ -253,6 +194,7 @@ public interface Konfiguration {
      *            limited.
      * @return a konfiguration whose scope is limited to the supplied key.
      */
+    @SuppressWarnings("UnusedReturnValue")
     @NotNull
     @Contract(pure = true)
     Konfiguration subset(@NotNull String key);
@@ -343,24 +285,20 @@ public interface Konfiguration {
      *
      * @param key      the key to deregister from.
      * @param observer handle returned by one of register methods.
-     * @return this.
      */
-    @NotNull
     @Contract(mutates = "this")
-    Konfiguration deregister(@NotNull Handle observer,
-                             @NotNull String key);
+    void deregister(@NotNull Handle observer,
+                    @NotNull String key);
 
     /**
      * Deregister a previously registered listener of a key, from <em>ALL</em>
      * keys.
      *
      * @param observer handle returned by one of register methods.
-     * @return this.
      */
-    @NotNull
     @Contract(mutates = "this")
-    default Konfiguration deregister(@NotNull Handle observer) {
-        return this.deregister(observer, KeyObserver.LISTEN_TO_ALL);
+    default void deregister(@NotNull Handle observer) {
+        this.deregister(observer, KeyObserver.LISTEN_TO_ALL);
     }
 
 
@@ -378,27 +316,13 @@ public interface Konfiguration {
     /**
      * Manager object associated with this konfiguration.
      * <p>
-     * Returns null if {@link #getManagerAndSetItToNull()} has been called
-     * previously.
+     * Throws exception if this method has been called previously.
      *
-     * @return manager associated with this konfiguration or null if
-     * {@link #getManagerAndSetItToNull()} has been called previously.
-     * @see #getManagerAndSetItToNull()
+     * @return manager associated with this konfiguration.
+     * @throws IllegalStateException if this method is called for a second time
+     *                               or more.
      */
-    @Contract(pure = true)
-    KonfigurationManager manager();
-
-    /**
-     * Manager object associated with this konfiguration.
-     * <p>
-     * Returns null if this method has been called previously.
-     *
-     * @return manager associated with this konfiguration or null if this
-     * method has been called previously.
-     * @see #getManagerAndSetItToNull()
-     */
-    @Nullable
     @Contract(mutates = "this")
-    KonfigurationManager getManagerAndSetItToNull();
+    KonfigurationManager manager() throws IllegalStateException;
 
 }

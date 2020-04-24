@@ -1,6 +1,8 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.*;
+import io.koosha.konfiguration.K;
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -22,11 +24,11 @@ final class Kombiner_K<U> implements K<U> {
     private final String key;
 
     @NotNull
-    private final Typer<U> type;
+    private final Kind<U> type;
 
     public Kombiner_K(@NotNull final Kombiner origin,
                       @NotNull final String key,
-                      @NotNull final Typer<U> type) {
+                      @NotNull final Kind<U> type) {
         Objects.requireNonNull(origin, "origin");
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
@@ -51,7 +53,7 @@ final class Kombiner_K<U> implements K<U> {
      */
     @Override
     @NotNull
-    public Typer<U> type() {
+    public Kind<U> type() {
         return this.type;
     }
 

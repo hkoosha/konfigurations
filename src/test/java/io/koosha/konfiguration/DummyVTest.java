@@ -1,5 +1,6 @@
 package io.koosha.konfiguration;
 
+import io.koosha.konfiguration.type.Kind;
 import org.testng.annotations.Test;
 
 import java.util.*;
@@ -17,13 +18,12 @@ public class DummyVTest {
     @Test
     public void testRegister() throws Exception {
         final K<?> dummyV = DummyV.string(key);
-        assertSame(dummyV.register(k -> {
-        }), dummyV);
+        assertEquals(dummyV.register(k -> { }).id(), -1L);
     }
 
     @Test
     public void testGetKey() throws Exception {
-        final K<?> dummyV = DummyV.string(key);
+        final K<?> dummyV = DummyV.string("", key);
         assertSame(dummyV.key(), key);
     }
 
@@ -114,8 +114,8 @@ public class DummyVTest {
 
     @Test
     public void testNull_() throws Exception {
-        assertNull(DummyV.null_(Typer._VOID).v());
-        assertNull(DummyV.null_(Typer._VOID).v(null));
+        assertNull(DummyV.null_(Kind._VOID).v());
+        assertNull(DummyV.null_(Kind._VOID).v(null));
     }
 
 }

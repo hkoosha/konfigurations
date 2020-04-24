@@ -1,7 +1,7 @@
 package io.koosha.konfiguration.ext;
 
 import io.koosha.konfiguration.KfgSourceException;
-import io.koosha.konfiguration.Typer;
+import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Nullable;
 
 public final class KfgJacksonError extends KfgSourceException {
@@ -19,7 +19,7 @@ public final class KfgJacksonError extends KfgSourceException {
 
     public KfgJacksonError(@Nullable final String source,
                            @Nullable final String key,
-                           @Nullable final Typer<?> neededType,
+                           @Nullable final Kind<?> neededType,
                            @Nullable final Object actualValue,
                            @Nullable final String message,
                            @Nullable final Throwable cause) {
@@ -28,7 +28,7 @@ public final class KfgJacksonError extends KfgSourceException {
 
     public KfgJacksonError(@Nullable final String source,
                            @Nullable final String key,
-                           @Nullable final Typer<?> neededType,
+                           @Nullable final Kind<?> neededType,
                            @Nullable final Object actualValue,
                            @Nullable final String message) {
         super(source, key, neededType, actualValue, message);
@@ -36,7 +36,7 @@ public final class KfgJacksonError extends KfgSourceException {
 
     public KfgJacksonError(@Nullable final String source,
                            @Nullable final String key,
-                           @Nullable final Typer<?> neededType,
+                           @Nullable final Kind<?> neededType,
                            @Nullable final Object actualValue,
                            @Nullable final Throwable cause) {
         super(source, key, neededType, actualValue, cause);
@@ -44,7 +44,7 @@ public final class KfgJacksonError extends KfgSourceException {
 
     public KfgJacksonError(@Nullable final String source,
                            @Nullable final String key,
-                           @Nullable final Typer<?> neededType,
+                           @Nullable final Kind<?> neededType,
                            @Nullable final Object actualValue) {
         super(source, key, neededType, actualValue);
     }

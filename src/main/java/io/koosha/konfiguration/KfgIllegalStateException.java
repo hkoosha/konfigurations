@@ -1,12 +1,11 @@
 package io.koosha.konfiguration;
 
-import net.jcip.annotations.ThreadSafe;
+import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static io.koosha.konfiguration.KfgException.toStringOf;
 
-@ThreadSafe
 public class KfgIllegalStateException extends IllegalStateException {
 
     @Nullable
@@ -16,7 +15,7 @@ public class KfgIllegalStateException extends IllegalStateException {
     private final String key;
 
     @Nullable
-    private final Typer<?> neededType;
+    private final Kind<?> neededType;
 
     @Nullable
     private final String actualValue;
@@ -35,7 +34,7 @@ public class KfgIllegalStateException extends IllegalStateException {
 
     public KfgIllegalStateException(@Nullable final String source,
                                     @Nullable final String key,
-                                    @Nullable final Typer<?> neededType,
+                                    @Nullable final Kind<?> neededType,
                                     @Nullable final Object actualValue,
                                     final String message) {
         super(message);
@@ -47,7 +46,7 @@ public class KfgIllegalStateException extends IllegalStateException {
 
     public KfgIllegalStateException(@Nullable final String source,
                                     @Nullable final String key,
-                                    @Nullable final Typer<?> neededType,
+                                    @Nullable final Kind<?> neededType,
                                     @Nullable final Object actualValue,
                                     final String message,
                                     final Throwable cause) {
@@ -60,7 +59,7 @@ public class KfgIllegalStateException extends IllegalStateException {
 
     public KfgIllegalStateException(@NotNull final String source,
                                     @Nullable final String key,
-                                    @Nullable final Typer<?> neededType,
+                                    @Nullable final Kind<?> neededType,
                                     @Nullable final Object actualValue) {
         this.source = source;
         this.key = key;
@@ -79,7 +78,7 @@ public class KfgIllegalStateException extends IllegalStateException {
     }
 
     @Nullable
-    public Typer<?> getNeededType() {
+    public Kind<?> getNeededType() {
         return this.neededType;
     }
 

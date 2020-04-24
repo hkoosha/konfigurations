@@ -3,6 +3,7 @@ package io.koosha.konfiguration.impl.v8;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.KonfigurationManager;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -24,11 +25,13 @@ public final class ZZKonfigurationKombinerTest {
             : singletonMap("xxx", (Object) 99);
 
     private Konfiguration k;
+    private KonfigurationManager man;
 
     @BeforeMethod
     public void setup() {
         this.flag.set(true);
         this.k = kFactory().kombine("def", kFactory().map("map", sup));
+        this.man = k.manager();
     }
 
     @Test
@@ -52,8 +55,8 @@ public final class ZZKonfigurationKombinerTest {
         assertEquals(k.int_("xxx").v(), (Integer) 12);
 
         flag.set(!flag.get());
-        assertTrue(k.manager().updateNow());
-        assertFalse(k.manager().updateNow());
+        assertTrue(this.man.updateNow());
+        assertFalse(this.man.updateNow());
 
         assertEquals(k.int_("xxx").v(), (Integer) 99);
     }
