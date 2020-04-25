@@ -256,23 +256,20 @@ public abstract class Source implements Konfiguration {
     @Override
     @NotNull
     public final <U> K<List<U>> list(@NotNull final String key,
-                                     @Nullable Kind<List<U>> type) {
+                                     @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
 
         if (!this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
-        if (type == null) {
-            @SuppressWarnings({"unchecked", "rawtypes"}) final Kind<List<U>> t = (Kind) Kind.UNKNOWN_LIST;
-            type = t;
-        }
+        final Kind<List<U>> listKind = type.asList();
 
         if (this.isNull(key))
-            return null_(key, type);
+            return null_(key, listKind);
 
         final List<?> v = this.list0(key, type);
         this.checkCollectionType(key, type, v);
-        return this.k(key, type, v);
+        return this.k(key, listKind, v);
     }
 
     /**
@@ -281,19 +278,16 @@ public abstract class Source implements Konfiguration {
     @Override
     @NotNull
     public final <U> K<Set<U>> set(@NotNull final String key,
-                                   @Nullable Kind<Set<U>> type) {
+                                   @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
 
         if (!this.has(key, type))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
-        if (type == null) {
-            @SuppressWarnings({"unchecked", "rawtypes"}) final Kind<Set<U>> t = (Kind) Kind.UNKNOWN_SET;
-            type = t;
-        }
+        final Kind<Set<U>> setKind = type.asSet();
 
         if (this.isNull(key))
-            return null_(key, type);
+            return null_(key, setKind);
 
         final Object v = this.set0(key, type);
 
@@ -307,7 +301,7 @@ public abstract class Source implements Konfiguration {
 
         this.checkCollectionType(key, type, vv);
 
-        return this.k(key, type, vv);
+        return this.k(key, setKind, vv);
     }
 
     /**
@@ -316,21 +310,17 @@ public abstract class Source implements Konfiguration {
     @Override
     @NotNull
     public final <U, V> K<Map<U, V>> map(@NotNull final String key,
-                                         @Nullable Kind<Map<U, V>> type) {
+                                         @NotNull final Kind<U> keyType,
+                                         @NotNull final Kind<V> valueType) {
         Objects.requireNonNull(key, "key");
 
         if (!this.has(key, type))
-            throw new KfgAssertionException(this.name(), key, type, null, "missing key");
-
-        if (type == null) {
-            @SuppressWarnings({"unchecked", "rawtypes"}) final Kind<Map<U, V>> t = (Kind) Kind.UNKNOWN_MAP;
-            type = t;
-        }
+            throw new KfgAssertionException(this.name(), key, null, null, "missing key");
 
         if (this.isNull(key))
             return null_(key, type);
 
-        final Object v = this.map0(key, type);
+        final Object v = this.map0(key, keyType, valueType);
 
         final Map<?, ?> vv;
         try {
@@ -352,7 +342,7 @@ public abstract class Source implements Konfiguration {
     @Override
     @NotNull
     public final <U> K<U> custom(@NotNull final String key,
-                                 @Nullable final Kind<U> type) {
+                                 @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -384,11 +374,11 @@ public abstract class Source implements Konfiguration {
 
         @SuppressWarnings("rawtypes") final Kind raw = type;
         if (type.isList())
-            return (K<U>) list(key, raw);
+            return (K<U>) list(key, );
         if (type.isMap())
-            return (K<U>) map(key, raw);
+            return (K<U>) map(key, raw.getMapKeyType(), raw.getMapValueType());
         if (type.isSet())
-            return (K<U>) set(key, raw);
+            return (K<U>) set(key, );
 
         final Object v;
         v = this.custom0(key, type);
@@ -427,15 +417,16 @@ public abstract class Source implements Konfiguration {
 
     @NotNull
     protected abstract List<?> list0(@NotNull String key,
-                                     @NotNull Kind<? extends List<?>> type);
+                                     @NotNull Kind<?> type);
 
     @NotNull
     protected abstract Set<?> set0(@NotNull final String key,
-                                   @NotNull Kind<? extends Set<?>> type);
+                                   @NotNull Kind<?> type);
 
     @NotNull
     protected abstract Map<?, ?> map0(@NotNull final String key,
-                                      @NotNull Kind<? extends Map<?, ?>> type);
+                                      @NotNull Kind<?> keyType,
+                                      @NotNull Kind<?> mapType);
 
     @NotNull
     protected abstract Object custom0(@NotNull String key,
@@ -480,16 +471,21 @@ public abstract class Source implements Konfiguration {
             if (!(value instanceof Map))
                 throw new KfgIllegalStateException(this.name(), key, neededType, value, "expecting a map");
 
+            final Class<?> keyKlass = (Class<?>) neededType.getMapKeyType();
+            final Class<?> valueKlass = (Class<?>) neededType.getMapValueType();
+
             for (final Object o : ((Map<?, ?>) value).values()) {
-                if (o != null)
+                if (o != null) {
                     try {
                         checkType(neededType, key, o);
                     }
                     catch (KfgTypeException k) {
                         throw new KfgTypeException(this.name(), key, neededType, value);
                     }
-                else if (!allowNullInCollection_(key, neededType, value))
+                }
+                else if (!allowNullInCollection_(key, neededType, value)) {
                     throw new KfgTypeNullException(this.name(), key, neededType);
+                }
             }
 
             for (final Object o : ((Map<?, ?>) value).keySet()) {
@@ -508,10 +504,10 @@ public abstract class Source implements Konfiguration {
             if (!(value instanceof Collection))
                 throw new KfgIllegalStateException(this.name(), key, neededType, value, "expecting a collection");
 
+            final Class<?> klass = (Class<?>) neededType.getCollectionContainedType();
             for (final Object o : (Collection<?>) value) {
                 if (o != null) {
-                    //noinspection ConstantConditions
-                    if (!neededType.getCollectionContainedClass().isAssignableFrom(o.getClass())) {
+                    if (!klass.isAssignableFrom(o.getClass())) {
                         throw new KfgTypeException(this.name(), key, neededType, value);
                     }
                 }

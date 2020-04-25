@@ -57,41 +57,6 @@ public abstract class KonfigValueTestMixin {
         assertEquals(this.k().string("aString").v(), "goodbye world");
     }
 
-    @Test
-    public void testList() throws Exception {
-        final List<Integer> before = this.k().list("aIntList", Kind.LIST_INT).v();
-        assertEquals(before, asList(1, 0, 2));
-
-        this.update();
-
-        List<Integer> after = this.k().list("aIntList", Kind.LIST_INT).v();
-        assertEquals(after, asList(2, 2));
-    }
-
-    @Test
-    public void testMap() throws Exception {
-        // Not wise to change type, but it can happen.
-
-        final Map<String, Integer> before = new HashMap<>(2);
-        final Map<String, String> after = new HashMap<>(2);
-        before.put("a", 99);
-        before.put("c", 22);
-        after.put("a", "b");
-        after.put("c", "e");
-
-        assertEquals(this.k().map("aMap", Kind.MAP_STRING__INT).v(), before);
-        this.update();
-        assertEquals(this.k().map("aMap", Kind.MAP_STRING__STRING).v(), after);
-    }
-
-    @Test
-    public void testSet() throws Exception {
-        assertEquals(this.k().set("aSet", Kind.SET_INT).v(), new HashSet<>(asList(1, 2)));
-        this.update();
-        assertEquals(this.k().set("aSet", Kind.SET_INT).v(), new HashSet<>(asList(1, 2, 3)));
-    }
-
-
     // BAD CASES
 
 

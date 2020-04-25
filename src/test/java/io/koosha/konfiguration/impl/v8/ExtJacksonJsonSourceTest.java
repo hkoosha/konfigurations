@@ -1,7 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgAssertionException;
-import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
 import org.testng.annotations.BeforeClass;
@@ -58,7 +57,7 @@ public class ExtJacksonJsonSourceTest {
         this.k = (ExtJacksonJsonSource) this.k.updatedCopy();
     }
 
-    private Source k() {
+    private ExtJacksonJsonSource k() {
         return this.k;
     }
 
@@ -122,24 +121,8 @@ public class ExtJacksonJsonSourceTest {
     }
 
     @Test
-    public void testMap() throws Exception {
-        // Not wise to change type, but it can happen.
-
-        final Map<String, Integer> before = new HashMap<>(2);
-        final Map<String, String> after = new HashMap<>(2);
-        before.put("a", 99);
-        before.put("c", 22);
-        after.put("a", "b");
-        after.put("c", "e");
-
-        assertEquals(this.k().map("aMap", Kind.MAP_STRING__INT).v(), before);
-        this.update();
-        assertEquals(this.k().map("aMap", Kind.MAP_STRING__STRING).v(), after);
-    }
-
-    @Test
     public void testSet() throws Exception {
-        assertEquals(this.k().set("aSet", Kind.SET_INT).v(), new HashSet<>(asList(1, 2)));
+        assertEquals(this.k().set("aSet", Kind.set(int.class)).v(), new HashSet<>(asList(1, 2)));
         this.update();
         assertEquals(this.k().set("aSet", Kind.SET_INT).v(), new HashSet<>(asList(1, 2, 3)));
     }
@@ -189,7 +172,6 @@ public class ExtJacksonJsonSourceTest {
                 {"some"},
         };
     }
-
 
 
     @Test(expectedExceptions = KfgAssertionException.class,

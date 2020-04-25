@@ -1,7 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.*;
-import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -47,22 +46,22 @@ final class Kombiner implements Konfiguration {
 
         this.name = name;
 
-        final Map<Handle, Konfiguration> s = new HashMap<>();
+        final Map<Handle, Konfiguration> newSources = new HashMap<>();
         sources.stream()
-               .peek(k -> {
-                   if (k == null)
+               .peek(source -> {
+                   if (source == null)
                        throw new KfgIllegalArgumentException(
                                name, "null in config sources");
-                   if (k instanceof SubsetView)
+                   if (source instanceof SubsetView)
                        throw new KfgIllegalArgumentException(
-                               name, "can not kombine a " + k.getClass().getName() + " konfiguration.");
+                               name, "can not kombine a " + source.getClass().getName() + " konfiguration.");
                })
-               .flatMap(k ->// Unwrap.
-                                k instanceof Kombiner
-                                        ? ((Kombiner) k).sources.stream()
-                                        : Stream.of(k))
-               .forEach(x -> s.put(new HandleImpl(), x));
-        if (s.isEmpty())
+               .flatMap(source ->// Unwrap.
+                                source instanceof Kombiner
+                                        ? ((Kombiner) source).sources.stream()
+                                        : Stream.of(source))
+               .forEach(source -> newSources.put(new HandleImpl(), source));
+        if (newSources.isEmpty())
             throw new KfgIllegalArgumentException(name, "no source given");
 
         this._lock = new Kombiner_Lock(name, lockWaitTimeMillis, fairLock);
@@ -71,7 +70,7 @@ final class Kombiner implements Konfiguration {
         this.values = new Kombiner_Values(this);
         this.sources = new Kombiner_Sources(this);
 
-        this.sources.replace(s);
+        this.sources.replace(newSources);
     }
 
     @Contract(pure = true)
@@ -247,7 +246,7 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     @NotNull
-    public <U> K<U> custom(final String key,
+    public <U> K<U> custom(@NotNull final String key,
                            @Nullable final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         return this.values.k(key, type);

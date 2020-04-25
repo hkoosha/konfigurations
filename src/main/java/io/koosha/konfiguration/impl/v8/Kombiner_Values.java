@@ -2,8 +2,8 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.KfgMissingKeyException;
-import io.koosha.konfiguration.type.Kind;
 import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
@@ -30,22 +30,21 @@ final class Kombiner_Values {
         this.origin = origin;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes", "RedundantCast"})
     <U> K<U> k(@NotNull final String key,
-               @Nullable final Kind<U> type) {
+               @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
-        this.issue(key, type);
-        return new Kombiner_K<>(this.origin, key, type == null ? (Kind) Kind._VOID : type);
+        this.issuedKeys.add(((Kind<?>) type).withKey(key));
+        return new Kombiner_K<>(this.origin, key, type);
     }
 
     @Nullable
     @SuppressWarnings("unchecked")
     <U> U v(@NotNull final String key,
-            @Nullable final Kind<?> type,
+            @NotNull final Kind<?> type,
             @SuppressWarnings("SameParameterValue") @Nullable final U def,
             @SuppressWarnings("SameParameterValue") final boolean mustExist) {
         Objects.requireNonNull(key, "key");
-        final Kind<?> t = type == null ? Kind._VOID.withKey(key) : type.withKey(key);
+        final Kind<?> t = type.withKey(key);
 
         return this.origin.r(() -> {
             if (cache.containsKey(t))
@@ -68,7 +67,7 @@ final class Kombiner_Values {
                 .findFirst();
         if (!find.isPresent() && mustExist)
             throw new KfgMissingKeyException(this.origin.name(), keyStr, key);
-        this.issue(keyStr, key);
+        this.issuedKeys.add(key.withKey(keyStr));
         if (!find.isPresent())
             return def;
         final Object value = find.get().custom(keyStr, key).v();
@@ -79,12 +78,6 @@ final class Kombiner_Values {
     boolean has(@NotNull final Kind<?> t) {
         Objects.requireNonNull(t.key());
         return this.cache.containsKey(t);
-    }
-
-    private void issue(@NotNull final String key,
-                       @Nullable final Kind<?> kind) {
-        Objects.requireNonNull(key, "key");
-        this.issuedKeys.add(kind == null ? Kind._VOID.withKey(key) : kind.withKey(key));
     }
 
 

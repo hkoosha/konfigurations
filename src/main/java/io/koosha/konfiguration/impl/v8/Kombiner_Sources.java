@@ -1,8 +1,8 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Handle;
-import io.koosha.konfiguration.type.Kind;
 import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -21,8 +21,7 @@ final class Kombiner_Sources {
     @NotNull
     private final Kombiner origin;
 
-    private final Map<Handle, Konfiguration> sources
-            = new HashMap<>();
+    private final Map<Handle, Konfiguration> sources = new HashMap<>();
 
     boolean has(@NotNull final String key,
                 @Nullable final Kind<?> type) {

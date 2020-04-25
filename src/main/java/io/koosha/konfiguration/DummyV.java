@@ -587,11 +587,10 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<List<U>> list(@Nullable final List<U> v,
                                       @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return list(v, key, (Kind) Kind.UNKNOWN_LIST);
+        return list(v, key, null);
     }
 
     @NotNull
@@ -623,10 +622,9 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<List<U>> list(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return list(key, (Kind) Kind.UNKNOWN_LIST);
+        return list(key, null);
     }
 
     @NotNull
@@ -657,11 +655,10 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<Set<U>> set(@Nullable final Set<U> v,
                                     @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return set(v, key, (Kind) Kind.UNKNOWN_SET);
+        return set(v, key, null);
     }
 
     @NotNull
@@ -693,10 +690,9 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<Set<U>> set(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return set(key, (Kind) Kind.UNKNOWN_SET);
+        return set(key, null);
     }
 
     @NotNull
@@ -727,11 +723,10 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<Collection<U>> collection(@Nullable final Collection<U> v,
                                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return collection(v, key, (Kind) Kind.UNKNOWN_COLLECTION);
+        return collection(v, key, null);
     }
 
     @NotNull
@@ -763,10 +758,9 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U> K<Collection<U>> collection(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return collection(key, (Kind) Kind.UNKNOWN_COLLECTION);
+        return collection(key, null);
     }
 
     @NotNull
@@ -795,14 +789,13 @@ public final class DummyV<U> implements K<U> {
         return map(v, "");
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @NotNull
     @Contract(pure = true,
             value = "_, _ -> new")
     public static <U, V> K<Map<U, V>> map(@Nullable final Map<U, V> v,
                                           @NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return map(v, key, (Kind) Kind.UNKNOWN_MAP);
+        return map(v, key, null);
     }
 
     @NotNull
@@ -833,10 +826,9 @@ public final class DummyV<U> implements K<U> {
     @NotNull
     @Contract(pure = true,
             value = "_ -> new")
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public static <U, V> K<Map<U, V>> map(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return map(key, (Kind) Kind.UNKNOWN_LIST);
+        return map(key, null);
     }
 
     @NotNull
