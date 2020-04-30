@@ -14,12 +14,23 @@ import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.Constructor;
 import org.yaml.snakeyaml.error.YAMLException;
-import org.yaml.snakeyaml.nodes.*;
+import org.yaml.snakeyaml.nodes.MappingNode;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.NodeId;
+import org.yaml.snakeyaml.nodes.ScalarNode;
+import org.yaml.snakeyaml.nodes.SequenceNode;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import java.beans.ConstructorProperties;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -419,7 +430,7 @@ final class ExtYamlSource extends Source {
     @Override
     @NotNull
     protected List<?> list0(@NotNull final String key,
-                            @NotNull final Kind<? extends List<?>> type) {
+                            @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -427,7 +438,7 @@ final class ExtYamlSource extends Source {
         final Object g = this.get(key);
         final Yaml mapper = this.mapper.get();
         final String yamlAgain = mapper.dump(g);
-        return mapper.loadAs(yamlAgain, type.klass());
+        return (List<?>) mapper.loadAs(yamlAgain, type.klass());
     }
 
     /**
@@ -436,7 +447,7 @@ final class ExtYamlSource extends Source {
     @Override
     @NotNull
     protected Set<?> set0(@NotNull final String key,
-                          @NotNull final Kind<? extends Set<?>> type) {
+                          @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         this.ensureSafe(type);
@@ -444,24 +455,7 @@ final class ExtYamlSource extends Source {
         final Object g = this.get(key);
         final Yaml mapper = this.mapper.get();
         final String yamlAgain = mapper.dump(g);
-        return mapper.loadAs(yamlAgain, type.klass());
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    protected Map<?, ?> map0(@NotNull final String key,
-                             @NotNull final Kind<? extends Map<?, ?>> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-        this.ensureSafe(type);
-
-        final Object g = this.get(key);
-        final Yaml mapper = this.mapper.get();
-        final String yamlAgain = mapper.dump(g);
-        return mapper.loadAs(yamlAgain, type.klass());
+        return (Set<?>) mapper.loadAs(yamlAgain, type.klass());
     }
 
     /**
@@ -503,7 +497,7 @@ final class ExtYamlSource extends Source {
                        @Nullable final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         try {
-            return Kind.matchesValue(type, get(key));
+            throw new UnsupportedOperationException();
         }
         catch (final KfgSnakeYamlAssertionError e) {
             return false;

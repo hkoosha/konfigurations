@@ -146,61 +146,10 @@ public interface KonfigurationFactory {
     Konfiguration map(@NotNull String name,
                       @NotNull Map<String, ?> storage);
 
-    /**
-     * Creates a {@link Konfiguration} with the given backing store.
-     * <p>
-     * Important: {@link Supplier#get()} might be called multiple times in a
-     * short period (once call to see if it's changed and if so, one mode call
-     * to get the new values afterward.
-     *
-     * @param name    name of the created source.
-     * @param storage konfig source.
-     * @return a konfig source.
-     * @throws NullPointerException if provided storage provider is null
-     * @throws KfgSourceException   if the provided storage by provider is null
-     */
-    @NotNull
-    @Contract(value = "_, _ -> new",
-            pure = true)
-    Konfiguration mapWithNested(@NotNull String name,
-                                @NotNull Supplier<Map<String, ?>> storage);
-
-    /**
-     * Creates a {@link Konfiguration} with the given backing store.
-     *
-     * <b>Important: the source will NEVER update. It's a const source.</b>
-     *
-     * @param name    name of the created source.
-     * @param storage konfig source.
-     * @return a konfig source.
-     * @throws NullPointerException if storage is null.
-     */
-    @NotNull
-    @Contract(value = "_, _ -> new",
-            pure = true)
-    Konfiguration mapWithNested(@NotNull String name,
-                                @NotNull Map<String, ?> storage);
-
     @NotNull
     @Contract("_, _ -> new")
     Konfiguration preferences(@NotNull String name,
                               @NotNull Preferences storage);
-
-    /**
-     * Creates a {@link Konfiguration} with the given backing store.
-     *
-     * @param name    name of created configuration.
-     * @param storage konfig source.
-     * @param deser   deserializer in case {@link Konfiguration#custom(String, Kind)} is used.
-     * @return a konfig source.
-     * @throws NullPointerException if provided storage provider is null
-     * @throws KfgSourceException   if the provided storage by provider is null
-     */
-    @NotNull
-    @Contract("_, _, _ -> new")
-    Konfiguration preferences(@NotNull String name,
-                              @NotNull Preferences storage,
-                              @NotNull Deserializer deser);
 
     /**
      * Creates a {@link Konfiguration} with the given json provider and a

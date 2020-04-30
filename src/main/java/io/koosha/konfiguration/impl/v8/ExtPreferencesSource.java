@@ -1,17 +1,21 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.*;
-import io.koosha.konfiguration.ext.KfgPreferencesError;
+import io.koosha.konfiguration.KfgIllegalStateException;
+import io.koosha.konfiguration.KfgSourceException;
+import io.koosha.konfiguration.KfgTypeException;
+import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.NodeChangeListener;
 import java.util.prefs.Preferences;
@@ -34,7 +38,6 @@ import java.util.prefs.Preferences;
 @ThreadSafe
 final class ExtPreferencesSource extends Source {
 
-    private final Deserializer deser;
     private final Preferences source;
     private final int lastHash;
 
@@ -42,14 +45,12 @@ final class ExtPreferencesSource extends Source {
     private final String name;
 
     ExtPreferencesSource(@NotNull final String name,
-                         @NotNull final Preferences preferences,
-                         @Nullable final Deserializer deserializer) {
+                         @NotNull final Preferences preferences) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(preferences, "preferences");
 
         this.name = name;
         this.source = preferences;
-        this.deser = deserializer;
         this.lastHash = hashOf();
     }
 
@@ -112,13 +113,8 @@ final class ExtPreferencesSource extends Source {
     @Override
     @NotNull
     protected List<?> list0(@NotNull final String key,
-                            @NotNull final Kind<? extends List<?>> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-
-        if (this.deser == null)
-            throw new KfgPreferencesError(this.name(), "deserializer not set");
-        return this.deser.deserialize(this.source.getByteArray(sane(key), new byte[0]), type);
+                            @NotNull final Kind<?> type) {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -127,28 +123,8 @@ final class ExtPreferencesSource extends Source {
     @Override
     @NotNull
     protected Set<?> set0(@NotNull final String key,
-                          @NotNull final Kind<? extends Set<?>> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-
-        if (this.deser == null)
-            throw new KfgPreferencesError(this.name(), "deserializer not set");
-        return this.deser.deserialize(this.source.getByteArray(sane(key), new byte[0]), type);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    protected Map<?, ?> map0(@NotNull final String key,
-                             @NotNull final Kind<? extends Map<?, ?>> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-
-        if (this.deser == null)
-            throw new KfgPreferencesError(this.name(), "deserializer not set");
-        return this.deser.deserialize(this.source.getByteArray(sane(key), new byte[0]), type);
+                          @NotNull final Kind<?> type) {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -158,12 +134,7 @@ final class ExtPreferencesSource extends Source {
     @NotNull
     protected Object custom0(@NotNull final String key,
                              @NotNull final Kind<?> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-
-        if (this.deser == null)
-            throw new KfgPreferencesError(this.name(), "deserializer not set");
-        return this.deser.deserialize(this.source.getByteArray(sane(key), new byte[0]), type);
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -172,7 +143,8 @@ final class ExtPreferencesSource extends Source {
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.source.get(sane(key), null) == null;
+        return this.source.get(sane(key), null) == null
+                && this.source.get(sane(key), "") == null;
     }
 
     /**
@@ -180,14 +152,51 @@ final class ExtPreferencesSource extends Source {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Kind<?> type) {
+                       @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
         try {
-            return source.nodeExists(sane(key));
+            if (!source.nodeExists(sane(key)))
+                return false;
         }
         catch (Throwable e) {
             throw new KfgSourceException(this.name(), key, null, null, "error checking existence of key", e);
         }
+
+        try {
+            if (type.isChar()) {
+                this.char0(key);
+                return true;
+            }
+            if (type.isBool()) {
+                this.bool0(key);
+                return true;
+            }
+            if (type.isShort()) {
+                return ((long) this.number0(key).shortValue()) == this.number0(key).longValue();
+            }
+            if (type.isInt()) {
+                return ((long) this.number0(key).intValue()) == this.number0(key).longValue();
+            }
+            if (type.isLong()) {
+                this.number0(key).longValue();
+                return true;
+            }
+            if (type.isFloat()) {
+                // Shaky
+                return this.numberDouble0(key).doubleValue() >= Float.MIN_VALUE
+                        && this.numberDouble0(key).doubleValue() <= Float.MAX_VALUE;
+            }
+            if (type.isDouble()) {
+                this.numberDouble0(key);
+                return true;
+            }
+        }
+        catch (final KfgTypeException k) {
+            return false;
+        }
+        return false;
     }
 
     private String sane(@NotNull final String key) {

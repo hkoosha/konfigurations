@@ -7,7 +7,6 @@ import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +23,7 @@ final class Kombiner_Sources {
     private final Map<Handle, Konfiguration> sources = new HashMap<>();
 
     boolean has(@NotNull final String key,
-                @Nullable final Kind<?> type) {
+                @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         return this.sources
                 .values()

@@ -1,7 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.koosha.konfiguration.Deserializer;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationFactory;
 import net.jcip.annotations.Immutable;
@@ -12,7 +11,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 
@@ -128,7 +132,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                              @NotNull final Supplier<Map<String, ?>> storage) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(storage, "storage");
-        final ExtMapSource k = new ExtMapSource(name, storage, false);
+        final ExtMapSource k = new ExtMapSource(name, storage);
         return kombine(name, k);
     }
 
@@ -147,37 +151,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return map(name, () -> copy);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract(value = "_, _ -> new",
-            pure = true)
-    public Konfiguration mapWithNested(@NotNull final String name,
-                                       @NotNull final Supplier<Map<String, ?>> storage) {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(storage, "storage");
-        final ExtMapSource k = new ExtMapSource(name, storage, true);
-        return kombine(name, k);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract(value = "_, _ -> new",
-            pure = true)
-    public Konfiguration mapWithNested(@NotNull final String name,
-                                       @NotNull final Map<String, ?> storage) {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(storage, "storage");
-        final Map<String, ?> copy = unmodifiableMap(new HashMap<>(storage));
-        return mapWithNested(name, () -> copy);
-    }
-
-
     // ============================================================ PREFERENCES
 
     /**
@@ -190,25 +163,9 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final Preferences storage) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(storage, "storage");
-        final Konfiguration k = new ExtPreferencesSource(name, storage, null);
+        final Konfiguration k = new ExtPreferencesSource(name, storage);
         return kombine(name, k);
     }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_, _, _ -> new")
-    public Konfiguration preferences(@NotNull final String name,
-                                     @NotNull final Preferences storage,
-                                     @NotNull final Deserializer deser) {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(storage, "storage");
-        final Konfiguration k = new ExtPreferencesSource(name, storage, deser);
-        return kombine(name, k);
-    }
-
 
     // ================================================================ JACKSON
 

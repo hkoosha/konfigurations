@@ -141,7 +141,7 @@ public interface K<U> {
      * @see #v()
      */
     @Nullable
-    default U v(@Nullable U defaultValue) {
+    default U v(@Nullable final U defaultValue) {
         // Operation is not atomic.
         try {
             return this.exists() ? this.v() : defaultValue;

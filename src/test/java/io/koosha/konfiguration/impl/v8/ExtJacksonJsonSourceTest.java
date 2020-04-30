@@ -11,13 +11,13 @@ import org.testng.annotations.Test;
 import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import static java.util.Arrays.asList;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
 public class ExtJacksonJsonSourceTest {
@@ -111,12 +111,14 @@ public class ExtJacksonJsonSourceTest {
 
     @Test
     public void testList() throws Exception {
-        final List<Integer> before = this.k().list("aIntList", Kind.LIST_INT).v();
+        final List<Integer> before = this.k().list("aIntList", new Kind<Integer>() {
+        }).v();
         assertEquals(before, asList(1, 0, 2));
 
         this.update();
 
-        List<Integer> after = this.k().list("aIntList", Kind.LIST_INT).v();
+        List<Integer> after = this.k().list("aIntList", new Kind<Integer>() {
+        }).v();
         assertEquals(after, asList(2, 2));
     }
 
@@ -124,7 +126,7 @@ public class ExtJacksonJsonSourceTest {
     public void testSet() throws Exception {
         assertEquals(this.k().set("aSet", Kind.set(int.class)).v(), new HashSet<>(asList(1, 2)));
         this.update();
-        assertEquals(this.k().set("aSet", Kind.SET_INT).v(), new HashSet<>(asList(1, 2, 3)));
+        assertEquals(this.k().set("aSet", Kind.set(int.class)).v(), new HashSet<>(asList(1, 2, 3)));
     }
 
 

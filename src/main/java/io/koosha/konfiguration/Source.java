@@ -5,7 +5,10 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Special version of {@link Konfiguration}, intended to go into a Kombiner.
@@ -259,7 +262,7 @@ public abstract class Source implements Konfiguration {
                                      @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
 
-        if (!this.has(key, type))
+        if (!this.has(key, type.asList()))
             throw new KfgAssertionException(this.name(), key, type, null, "missing key");
 
         final Kind<List<U>> listKind = type.asList();
@@ -268,7 +271,9 @@ public abstract class Source implements Konfiguration {
             return null_(key, listKind);
 
         final List<?> v = this.list0(key, type);
+
         this.checkCollectionType(key, type, v);
+
         return this.k(key, listKind, v);
     }
 
@@ -302,37 +307,6 @@ public abstract class Source implements Konfiguration {
         this.checkCollectionType(key, type, vv);
 
         return this.k(key, setKind, vv);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    public final <U, V> K<Map<U, V>> map(@NotNull final String key,
-                                         @NotNull final Kind<U> keyType,
-                                         @NotNull final Kind<V> valueType) {
-        Objects.requireNonNull(key, "key");
-
-        if (!this.has(key, type))
-            throw new KfgAssertionException(this.name(), key, null, null, "missing key");
-
-        if (this.isNull(key))
-            return null_(key, type);
-
-        final Object v = this.map0(key, keyType, valueType);
-
-        final Map<?, ?> vv;
-        try {
-            vv = (Map<?, ?>) v;
-        }
-        catch (final ClassCastException cce) {
-            throw new KfgTypeException(this.name(), key, type, v);
-        }
-
-        this.checkCollectionType(key, type, vv);
-
-        return this.k(key, type, vv);
     }
 
     /**
@@ -372,19 +346,12 @@ public abstract class Source implements Konfiguration {
         if (type.isFloat())
             return (K<U>) double_(key);
 
-        @SuppressWarnings("rawtypes") final Kind raw = type;
         if (type.isList())
-            return (K<U>) list(key, );
-        if (type.isMap())
-            return (K<U>) map(key, raw.getMapKeyType(), raw.getMapValueType());
+            return (K<U>) list(key, type.getCollectionContainedKind());
         if (type.isSet())
-            return (K<U>) set(key, );
+            return (K<U>) set(key, type.getCollectionContainedKind());
 
-        final Object v;
-        v = this.custom0(key, type);
-        this.checkType(type, key, v);
-
-        return this.k(key, type, v);
+        return this.k(key, type, this.custom0(key, type));
     }
 
     // =========================================================================
@@ -424,11 +391,6 @@ public abstract class Source implements Konfiguration {
                                    @NotNull Kind<?> type);
 
     @NotNull
-    protected abstract Map<?, ?> map0(@NotNull final String key,
-                                      @NotNull Kind<?> keyType,
-                                      @NotNull Kind<?> mapType);
-
-    @NotNull
     protected abstract Object custom0(@NotNull String key,
                                       @NotNull Kind<?> type);
 
@@ -436,7 +398,7 @@ public abstract class Source implements Konfiguration {
      * Handle the case where value in a collection is null
      *
      * @param key        the config key who's collection has a null.
-     * @param collection the map, list or set collection in question.
+     * @param collection the list or set in question.
      * @param type       type of requested konfig.
      * @return true if it's ok to have null values.
      */
@@ -448,78 +410,6 @@ public abstract class Source implements Konfiguration {
 
 
     // =========================================================================
-
-    private void checkType(@NotNull final Kind<?> neededType,
-                           @NotNull final String key,
-                           @NotNull final Object value) {
-        Objects.requireNonNull(neededType, "neededType");
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(value, "value");
-
-        if (!Kind.matchesValue(neededType, value))
-            throw new KfgTypeException(this.name(), key, neededType, value);
-    }
-
-    private void checkCollectionType0(@NotNull final String key,
-                                      @NotNull final Kind<?> neededType,
-                                      @NotNull final Object value) {
-        Objects.requireNonNull(neededType, "neededType");
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(value, "value");
-
-        if (neededType.isMap()) {
-            if (!(value instanceof Map))
-                throw new KfgIllegalStateException(this.name(), key, neededType, value, "expecting a map");
-
-            final Class<?> keyKlass = (Class<?>) neededType.getMapKeyType();
-            final Class<?> valueKlass = (Class<?>) neededType.getMapValueType();
-
-            for (final Object o : ((Map<?, ?>) value).values()) {
-                if (o != null) {
-                    try {
-                        checkType(neededType, key, o);
-                    }
-                    catch (KfgTypeException k) {
-                        throw new KfgTypeException(this.name(), key, neededType, value);
-                    }
-                }
-                else if (!allowNullInCollection_(key, neededType, value)) {
-                    throw new KfgTypeNullException(this.name(), key, neededType);
-                }
-            }
-
-            for (final Object o : ((Map<?, ?>) value).keySet()) {
-                if (o != null)
-                    try {
-                        checkType(neededType, key, o);
-                    }
-                    catch (KfgTypeException k) {
-                        throw new KfgTypeException(this.name(), key, neededType, value);
-                    }
-                else if (!allowNullInCollection_(key, neededType, value))
-                    throw new KfgTypeNullException(this.name(), key, neededType);
-            }
-        }
-        else if (neededType.isCollection()) {
-            if (!(value instanceof Collection))
-                throw new KfgIllegalStateException(this.name(), key, neededType, value, "expecting a collection");
-
-            final Class<?> klass = (Class<?>) neededType.getCollectionContainedType();
-            for (final Object o : (Collection<?>) value) {
-                if (o != null) {
-                    if (!klass.isAssignableFrom(o.getClass())) {
-                        throw new KfgTypeException(this.name(), key, neededType, value);
-                    }
-                }
-                else if (!allowNullInCollection_(key, neededType, value)) {
-                    throw new KfgTypeNullException(this.name(), key, neededType);
-                }
-            }
-        }
-        else {
-            throw new KfgAssertionException(this.name(), key, null, value, "needed map or collection");
-        }
-    }
 
     @Contract(pure = true, value = "null -> null")
     @Nullable
@@ -607,10 +497,11 @@ public abstract class Source implements Konfiguration {
      */
     @NotNull
     private <U> K<U> null_(@NotNull final String key,
-                           @Nullable final Kind<U> type) {
+                           @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         return k(key, type, null);
     }
+
 
     /**
      * Make sure the value is of the requested type.
@@ -627,7 +518,25 @@ public abstract class Source implements Konfiguration {
         Objects.requireNonNull(neededType, "neededType");
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(value, "value");
-        checkCollectionType0(key, neededType, value);
+
+        if (!neededType.isCollection()) {
+            throw new KfgAssertionException(this.name(), key, null, value, "needed map or collection");
+        }
+
+        if (!(value instanceof Collection))
+            throw new KfgIllegalStateException(this.name(), key, neededType, value, "expecting a collection");
+
+        final Class<?> klass = (Class<?>) neededType.getCollectionContainedType();
+        for (final Object o : (Collection<?>) value) {
+            if (o != null) {
+                if (!klass.isAssignableFrom(o.getClass())) {
+                    throw new KfgTypeException(this.name(), key, neededType, value);
+                }
+            }
+            else if (!allowNullInCollection_(key, neededType, value)) {
+                throw new KfgTypeNullException(this.name(), key, neededType);
+            }
+        }
     }
 
 

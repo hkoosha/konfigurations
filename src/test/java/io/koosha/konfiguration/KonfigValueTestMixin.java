@@ -129,9 +129,4 @@ public abstract class KonfigValueTestMixin {
     }
 
 
-    @Test(expectedExceptions = KfgTypeException.class)
-    public void testBadList0() throws Exception {
-        this.k().list("aInt", Kind.LIST_INT).v();
-    }
-
 }

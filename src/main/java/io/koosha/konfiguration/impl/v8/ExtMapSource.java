@@ -8,25 +8,23 @@ import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
-import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
 @ApiStatus.Internal
 final class ExtMapSource extends Source {
 
-    private static final Pattern DOT = Pattern.compile(Pattern.quote("."));
-
     private final Supplier<Map<String, ?>> map;
     private final Map<String, ?> root;
     private final int lastHash;
-    private final boolean enableNestedMap;
 
     @NotNull
     private final String name;
@@ -36,49 +34,29 @@ final class ExtMapSource extends Source {
     private Object node(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        if (!this.root.containsKey(key)) {
-            if (enableNestedMap) {
-                final List<String> parts = asList(DOT.split(key));
-                Object m = this.root.get(parts.get(0));
-                int i = 0;
-                while (i++ < parts.size() && m instanceof Map) {
-                    final String newKey = String.join(".", parts.subList(i, parts.size()));
-                    final Map<?, ?> mm = (Map<?, ?>) m;
-                    if (mm.containsKey(newKey))
-                        return mm.get(newKey);
-                    m = mm.get(parts.get(1));
-                }
-            }
+        if (!this.root.containsKey(key))
             throw new KfgIllegalStateException(this.name(), "missing key: " + key);
-        }
-
-        if (this.root.get(key) == null)
-            throw new KfgIllegalStateException(this.name(), "null key: " + key);
 
         return this.root.get(key);
     }
 
-    private <T> T checkMapType(@Nullable final Kind<?> required,
-                               @NotNull final String key) {
-        Objects.requireNonNull(key, "key");
-
+    private <T> T check(@NotNull final Kind<?> required,
+                        @NotNull final String key) {
         final Object value = node(key);
-        if (!Kind.matchesValue(required, value))
+        if (!required.klass().isAssignableFrom(value.getClass()))
             throw new KfgTypeException(this.name(), key, required, value);
         @SuppressWarnings("unchecked") final T t = (T) value;
         return t;
     }
 
     ExtMapSource(@NotNull final String name,
-                 @NotNull final Supplier<Map<String, ?>> mapSupplier,
-                 final boolean enableNestedMap) {
+                 @NotNull final Supplier<Map<String, ?>> mapSupplier) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(mapSupplier, "mapSupplier");
 
         this.name = name;
         this.map = mapSupplier;
         this.root = new HashMap<>(mapSupplier.get());
-        this.enableNestedMap = enableNestedMap;
         this.lastHash = this.root.hashCode();
         requireNonNull(this.map.get(), "supplied map is null");
     }
@@ -90,7 +68,7 @@ final class ExtMapSource extends Source {
     @NotNull
     protected Boolean bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return checkMapType(Kind.BOOL, key);
+        return check(Kind.BOOL, key);
     }
 
     /**
@@ -100,7 +78,7 @@ final class ExtMapSource extends Source {
     @NotNull
     protected Character char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return checkMapType(Kind.CHAR, key);
+        return check(Kind.CHAR, key);
     }
 
     /**
@@ -112,11 +90,11 @@ final class ExtMapSource extends Source {
         Objects.requireNonNull(key, "key");
 
         try {
-            return checkMapType(Kind.STRING, key);
+            return check(Kind.STRING, key);
         }
         catch (KfgTypeException k0) {
             try {
-                return this.checkMapType(Kind.CHAR, key).toString();
+                return this.check(Kind.CHAR, key).toString();
             }
             catch (KfgTypeException k1) {
                 throw k0;
@@ -136,7 +114,7 @@ final class ExtMapSource extends Source {
         if (n instanceof Long || n instanceof Integer ||
                 n instanceof Short || n instanceof Byte)
             return ((Number) n).longValue();
-        return checkMapType(Kind.LONG, key);
+        return check(Kind.LONG, key);
     }
 
     /**
@@ -152,7 +130,7 @@ final class ExtMapSource extends Source {
                 n instanceof Short || n instanceof Byte ||
                 n instanceof Double || n instanceof Float)
             return ((Number) n).doubleValue();
-        return checkMapType(Kind.LONG, key);
+        return check(Kind.LONG, key);
     }
 
     /**
@@ -161,9 +139,9 @@ final class ExtMapSource extends Source {
     @NotNull
     @Override
     protected List<?> list0(@NotNull final String key,
-                            @NotNull final Kind<? extends List<?>> type) {
+                            @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
-        return checkMapType(type, key);
+        return check(type, key);
     }
 
     /**
@@ -172,22 +150,10 @@ final class ExtMapSource extends Source {
     @NotNull
     @Override
     protected Set<?> set0(@NotNull final String key,
-                          @NotNull final Kind<? extends Set<?>> type) {
+                          @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        return checkMapType(type, key);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    protected Map<?, ?> map0(@NotNull final String key,
-                             @NotNull final Kind<? extends Map<?, ?>> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-        return checkMapType(type, key);
+        return check(type, key);
     }
 
     /**
@@ -199,7 +165,7 @@ final class ExtMapSource extends Source {
                              @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        return checkMapType(type, key);
+        return check(type, key);
     }
 
     /**
@@ -208,7 +174,7 @@ final class ExtMapSource extends Source {
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.root.get(key) == null;
+        return this.root.containsKey(key) && this.root.get(key) == null;
     }
 
     /**
@@ -216,11 +182,13 @@ final class ExtMapSource extends Source {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Kind<?> type) {
+                       @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
-        return this.root.containsKey(key);
+        Objects.requireNonNull(type, "type");
+        return this.root.containsKey(key) &&
+                this.root.get(key) != null &&
+                type.klass().isAssignableFrom(this.root.get(key).getClass());
     }
-
 
     /**
      * {@inheritDoc}
@@ -251,7 +219,7 @@ final class ExtMapSource extends Source {
     @Override
     public Source updatedCopy() {
         return this.hasUpdate()
-                ? new ExtMapSource(name(), map, enableNestedMap)
+                ? new ExtMapSource(name(), map)
                 : ExtMapSource.this;
     }
 

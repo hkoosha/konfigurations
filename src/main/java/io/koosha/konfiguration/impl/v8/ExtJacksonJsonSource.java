@@ -3,13 +3,17 @@ package io.koosha.konfiguration.impl.v8;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import io.koosha.konfiguration.*;
+import io.koosha.konfiguration.KfgMissingKeyException;
+import io.koosha.konfiguration.KfgSourceException;
+import io.koosha.konfiguration.KfgTypeException;
+import io.koosha.konfiguration.KfgTypeNullException;
+import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.ext.KfgJacksonError;
 import io.koosha.konfiguration.type.Kind;
 import jdk.nashorn.internal.ir.annotations.Immutable;
@@ -20,8 +24,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -42,12 +46,14 @@ import static java.util.Objects.requireNonNull;
 @ApiStatus.Internal
 final class ExtJacksonJsonSource extends Source {
 
+    private static final String DOT_PATTERN = Pattern.quote(".");
+
     @Contract(pure = true,
             value = "->new")
     @NotNull
     static ObjectMapper defaultJacksonObjectMapper() {
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         return mapper;
     }
 
@@ -56,8 +62,6 @@ final class ExtJacksonJsonSource extends Source {
     private final String lastJson;
     private final JsonNode root;
     private final Object LOCK = new Object();
-
-    private static final String DOT_PATTERN = Pattern.quote(".");
 
     @NotNull
     private final String name;
@@ -105,6 +109,24 @@ final class ExtJacksonJsonSource extends Source {
             throw new KfgTypeNullException(this.name(), key, required);
         return node;
     }
+
+    private boolean typeMatches(@NotNull final Kind<?> type,
+                                @NotNull final JsonNode node) {
+
+        return type.isNull() && node.isNull()
+                || type.isBool() && node.isBoolean()
+                || type.isChar() && node.isTextual() && node.asText().length() == 1
+                || type.isString() && node.isTextual()
+                || type.isByte() && node.isShort() && node.asInt() <= Byte.MAX_VALUE && Byte.MIN_VALUE <= node.asInt()
+                || type.isShort() && node.isShort()
+                || type.isInt() && node.isInt()
+                || type.isLong() && node.isLong()
+                || type.isFloat() && node.isFloat()
+                || type.isDouble() && node.isDouble()
+                || type.isList() && node.isArray()
+                || type.isSet() && node.isArray();
+    }
+
 
     /**
      * Creates an instance with a with the given json
@@ -303,35 +325,6 @@ final class ExtJacksonJsonSource extends Source {
      */
     @Override
     @NotNull
-    protected Map<?, ?> map0(@NotNull final String key,
-                             @NotNull final Kind<?> keyType,
-                             @NotNull final Kind<?> valueType) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(keyType, "keyType");
-        Objects.requireNonNull(valueType, "valueType");
-
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            checkJsonType(at.isObject(), type, at, key);
-            final ObjectMapper reader = this.mapperSupplier.get();
-            final MapType javaType = reader
-                    .getTypeFactory()
-                    .constructMapType(Map.class, String.class, type.klass());
-
-            try {
-                return reader.readValue(at.traverse(), javaType);
-            }
-            catch (final IOException e) {
-                throw new KfgTypeException(this.name(), key, type, '?', "type mismatch", e);
-            }
-        }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
     protected Object custom0(@NotNull final String key,
                              @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
@@ -344,14 +337,16 @@ final class ExtJacksonJsonSource extends Source {
 
             Object ret;
             try {
-                ret = reader.readValue(traverse, type.klass());
+                ret = reader.readValue(traverse, new TypeReference<Object>() {
+                    @Override
+                    public Type getType() {
+                        return type.type();
+                    }
+                });
             }
             catch (final IOException e) {
                 throw new KfgTypeException(this.name(), key, type, null, "jackson error", e);
             }
-
-            if (!this.typeMatches(type, node))
-                throw new KfgTypeException(this.name(), key, type, node.toString());
 
             return ret;
         }
@@ -396,23 +391,6 @@ final class ExtJacksonJsonSource extends Source {
                 return false;
             }
         }
-    }
-
-    private boolean typeMatches(@NotNull final Kind<?> type,
-                                @NotNull final JsonNode node) {
-
-        return type.isNull() && node.isNull()
-                || type.isBool() && node.isBoolean()
-                || type.isChar() && node.isTextual() && node.asText().length() == 1
-                || type.isString() && node.isTextual()
-                || type.isByte() && node.isShort() && node.asInt() <= Byte.MAX_VALUE && Byte.MIN_VALUE <= node.asInt()
-                || type.isShort() && node.isShort()
-                || type.isInt() && node.isInt()
-                || type.isLong() && node.isLong()
-                || type.isFloat() && node.isFloat()
-                || type.isDouble() && node.isDouble()
-                || type.isList() && node.isArray()
-                || type.isSet() && node.isArray();
     }
 
 

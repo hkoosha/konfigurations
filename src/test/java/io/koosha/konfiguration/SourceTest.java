@@ -145,20 +145,15 @@ public class SourceTest {
 
         @NotNull
         @Override
-        protected List<?> list0(@NotNull final String key, @NotNull final Kind<? extends List<?>> type) {
+        protected List<?> list0(@NotNull final String key,
+                                @NotNull final Kind<?> type) {
             return listValue;
         }
 
         @Override
         @NotNull
-        protected Set<?> set0(@NotNull String key, @NotNull Kind<? extends Set<?>> type) {
+        protected Set<?> set0(@NotNull String key, @NotNull Kind<?> type) {
             return setValue;
-        }
-
-        @Override
-        @NotNull
-        protected Map<?, ?> map0(@NotNull String key, @NotNull Kind<? extends Map<?, ?>> type) {
-            return mapValue;
         }
 
         @Override

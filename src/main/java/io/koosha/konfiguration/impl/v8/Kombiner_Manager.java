@@ -9,7 +9,14 @@ import net.jcip.annotations.NotThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
@@ -22,7 +29,7 @@ final class Kombiner_Manager implements KonfigurationManager {
     @NotNull
     private final Kombiner origin;
 
-    public Kombiner_Manager(@NotNull Kombiner kombiner) {
+    public Kombiner_Manager(@NotNull final Kombiner kombiner) {
         Objects.requireNonNull(kombiner, "kombiner");
         this.origin = kombiner;
     }
@@ -64,7 +71,7 @@ final class Kombiner_Manager implements KonfigurationManager {
 
         final Set<Kind<?>> updated = new HashSet<>();
         final Map<Kind<?>, Object> newCache = origin.values.copy();
-        origin.values.origForEach(q -> {
+        origin.values.issuedKeys.forEach(q -> {
             final String key = requireNonNull(q.key(), "ket passed through kombiner is null");
 
             final Optional<Konfiguration> first = newSources
@@ -73,13 +80,13 @@ final class Kombiner_Manager implements KonfigurationManager {
                     .filter(x -> x.has(key, q))
                     .findFirst();
 
-            final Object newV = first.map(konfiguration ->
-                                                  konfiguration.custom(q.key(), q)).orElse(null);
+            final Object newV = first
+                    .map(konfiguration -> konfiguration.custom(q.key(), q))
+                    .orElse(null);
 
-            final Object oldV =
-                    origin.has(q.key(), q)
-                            ? origin.values.v_(q, null, true)
-                            : null;
+            final Object oldV = origin.has(q.key(), q)
+                    ? origin.values.v_(q)
+                    : null;
 
             // Went missing or came into existence.
             if (origin.values.has(q) != first.isPresent()

@@ -5,10 +5,8 @@ import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,6 +25,8 @@ public interface Konfiguration {
      *
      * @return latest konfiguration factory.
      */
+    @NotNull
+    @Contract(pure = true)
     static KonfigurationFactory kFactory() {
         return KonfigurationFactory.getInstanceV8();
     }
@@ -57,7 +57,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    K<Character> char_(String key);
+    K<Character> char_(@NotNull String key);
 
     /**
      * Get a short konfiguration value.
@@ -66,7 +66,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    K<Short> short_(String key);
+    K<Short> short_(@NotNull String key);
 
     /**
      * Get an int konfiguration value.
@@ -75,7 +75,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    K<Integer> int_(String key);
+    K<Integer> int_(@NotNull String key);
 
     /**
      * Get a long konfiguration value.
@@ -84,7 +84,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    K<Long> long_(String key);
+    K<Long> long_(@NotNull String key);
 
     /**
      * Get a float konfiguration value.
@@ -93,7 +93,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    K<Float> float_(String key);
+    K<Float> float_(@NotNull String key);
 
     /**
      * Get a double konfiguration value.
@@ -102,7 +102,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    K<Double> double_(String key);
+    K<Double> double_(@NotNull String key);
 
     /**
      * Get a string konfiguration value.
@@ -111,7 +111,7 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    K<String> string(String key);
+    K<String> string(@NotNull String key);
 
 
     /**
@@ -128,22 +128,6 @@ public interface Konfiguration {
                         @NotNull Kind<U> type);
 
     /**
-     * Get a map of U to V konfiguration value.
-     *
-     * @param key       unique key of the konfiguration being requested.
-     * @param keyType   type of map key
-     * @param valueType type of map value
-     * @param <U>       generic type of map, the key type.
-     * @param <V>       generic type of map, the value type.
-     * @return konfiguration value wrapper for the requested key.
-     */
-    @NotNull
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
-    <U, V> K<Map<U, V>> map(@NotNull String key,
-                            @NotNull Kind<U> keyType,
-                            @NotNull Kind<V> valueType);
-
-    /**
      * Get a set of konfiguration value.
      *
      * @param key  unique key of the konfiguration being requested.
@@ -156,7 +140,6 @@ public interface Konfiguration {
     <U> K<Set<U>> set(@NotNull String key,
                       @NotNull Kind<U> type);
 
-
     /**
      * Get a custom object of type Q konfiguration value.
      *
@@ -165,8 +148,7 @@ public interface Konfiguration {
      *
      * <p><b>Important:</b> this method must <em>NOT</em> be used to obtain
      * maps, lists or sets. Use the corresponding methods
-     * {@link #map(String, Kind, Kind)}, {@link #list(String, Kind)} and
-     * {@link #set(String, Kind)}.
+     * {@link #list(String, Kind)} and * {@link #set(String, Kind)}.
      *
      * @param key  unique key of the konfiguration being requested.
      * @param type type object of the requested value.
@@ -191,7 +173,7 @@ public interface Konfiguration {
     @Contract(pure = true)
     @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     boolean has(@NotNull String key,
-                @Nullable Kind<?> type);
+                @NotNull Kind<?> type);
 
     /**
      * Get a subset view of this konfiguration representing all the values under
@@ -304,7 +286,7 @@ public interface Konfiguration {
      * @param observer handle returned by one of register methods.
      */
     @Contract(mutates = "this")
-    default void deregister(@NotNull Handle observer) {
+    default void deregister(@NotNull final Handle observer) {
         this.deregister(observer, KeyObserver.LISTEN_TO_ALL);
     }
 

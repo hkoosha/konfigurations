@@ -1,6 +1,12 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.*;
+import io.koosha.konfiguration.Handle;
+import io.koosha.konfiguration.K;
+import io.koosha.konfiguration.KeyObserver;
+import io.koosha.konfiguration.KfgIllegalArgumentException;
+import io.koosha.konfiguration.KfgIllegalStateException;
+import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -8,7 +14,12 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -22,17 +33,13 @@ final class Kombiner implements Konfiguration {
     @NotNull
     private final String name;
 
-    @NotNull
-    final Kombiner_Sources sources;
+    @NotNull final Kombiner_Sources sources;
 
-    @NotNull
-    final Kombiner_Lock _lock;
+    @NotNull final Kombiner_Lock _lock;
 
-    @NotNull
-    final Kombiner_Observers observers;
+    @NotNull final Kombiner_Observers observers;
 
-    @NotNull
-    final Kombiner_Values values;
+    @NotNull final Kombiner_Values values;
 
     @Nullable
     private volatile KonfigurationManager man;
@@ -214,20 +221,9 @@ final class Kombiner implements Konfiguration {
     @Override
     @NotNull
     public <U> K<List<U>> list(@NotNull final String key,
-                               @Nullable final Kind<List<U>> type) {
+                               @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, type);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    public <U, V> K<Map<U, V>> map(@NotNull final String key,
-                                   @Nullable final Kind<Map<U, V>> type) {
-        Objects.requireNonNull(key, "key");
-        return this.values.k(key, type);
+        return this.values.k(key, type.asList());
     }
 
     /**
@@ -236,9 +232,9 @@ final class Kombiner implements Konfiguration {
     @Override
     @NotNull
     public <U> K<Set<U>> set(@NotNull final String key,
-                             @Nullable final Kind<Set<U>> type) {
+                             @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, type);
+        return this.values.k(key, type.asSet());
     }
 
     /**
@@ -247,7 +243,7 @@ final class Kombiner implements Konfiguration {
     @Override
     @NotNull
     public <U> K<U> custom(@NotNull final String key,
-                           @Nullable final Kind<U> type) {
+                           @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         return this.values.k(key, type);
     }
@@ -257,10 +253,10 @@ final class Kombiner implements Konfiguration {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Kind<?> type) {
+                       @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(key, "key");
-        final Kind<?> t = type == null ? Kind._VOID.withKey(key) : type.withKey(key);
+        final Kind<?> t = type.withKey(key);
         return r(() -> this.values.has(t) || this.sources.has(key, type));
     }
 

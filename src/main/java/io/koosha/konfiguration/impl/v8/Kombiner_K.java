@@ -64,7 +64,7 @@ final class Kombiner_K<U> implements K<U> {
     @Override
     @Nullable
     public U v() {
-        return this.origin.values.v(key, this.type, null, true);
+        return this.origin.values.v(key, this.type);
     }
 
     /**

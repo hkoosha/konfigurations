@@ -12,7 +12,10 @@ import org.jetbrains.annotations.Nullable;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 @SuppressWarnings("unused")
 @ThreadSafe
@@ -31,7 +34,6 @@ public abstract class Kind<TYPE> implements Serializable {
     private Kind(@Nullable final String key,
                  @Nullable final Type t) {
         Objects.requireNonNull(t, "type");
-        checkIsClassOrParametrizedType(t, null);
         this.key = key;
         this.type = t;
     }
@@ -50,7 +52,6 @@ public abstract class Kind<TYPE> implements Serializable {
                         .getActualTypeArguments()[0];
 
         checkIsClassOrParametrizedType(t, null);
-
         this.key = key;
         this.type = t;
     }
@@ -98,53 +99,64 @@ public abstract class Kind<TYPE> implements Serializable {
 
     // ---------------------------------
 
-    /**
-     * If Q represents a collection, get type argument of the collection.
-     *
-     * @return type argument of the collection represented by Q instance.
-     * @throws KfgIllegalStateException if Q does not represent a collection.
-     */
     @Contract(pure = true)
-    @NotNull
     public final Type getCollectionContainedType() {
         if (!this.isCollection() || !this.isParametrized())
             throw new KfgIllegalStateException(null, this.key, null, null, "is not a collection or collection type is not known");
         return this.parametrized().getActualTypeArguments()[0];
     }
 
-    /**
-     * If Q represents a map, get type argument of the map's key.
-     *
-     * @return type argument of the map's key represented by Q instance.
-     * @throws KfgIllegalStateException if Q does not represent a map.
-     */
     @Contract(pure = true)
-    @Nullable
+    public final Kind<?> getCollectionContainedKind() {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @Contract(pure = true)
     public final Type getMapKeyType() {
         if (!this.isMap() || !this.isParametrized())
             throw new KfgIllegalStateException(null, this.key, null, null, "is not a map or map type is not known");
         return this.parametrized().getActualTypeArguments()[0];
     }
 
-    /**
-     * If Q represents a map, get type argument of the map's value.
-     *
-     * @return type argument of the map's value represented by Q instance.
-     * @throws KfgIllegalStateException if Q does not represent a map.
-     */
     @Contract(pure = true)
-    @Nullable
     public final Type getMapValueType() {
         if (!this.isMap() || !this.isParametrized())
             throw new KfgIllegalStateException(null, this.key, null, null, "is not a map or map type is not known");
         return this.parametrized().getActualTypeArguments()[1];
     }
 
-    public final Kind<List<TYPE>> getAsListTypeFromSetType() {
-        return new Kind<List<TYPE>>(this.key, new PatametrizedTypeImpl(
-                this.parametrized().getActualTypeArguments(), Set.class, null)) {
+    @Contract(pure = true)
+    @NotNull
+    public final Kind<?> getMapKeyKind() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public final Kind<?> getMapValueKind() {
+        throw new UnsupportedOperationException();
+    }
+
+
+    @NotNull
+    @Contract(pure = true, value = "->new")
+    public final Kind<List<TYPE>> asList() {
+        return new Kind<List<TYPE>>(
+                new ParameterizedTypeImpl(
+                        new Type[]{this.type}, List.class, null)) {
         };
     }
+
+    @NotNull
+    @Contract(pure = true, value = "->new")
+    public final Kind<Set<TYPE>> asSet() {
+        return new Kind<Set<TYPE>>(
+                new ParameterizedTypeImpl(
+                        new Type[]{this.type}, Set.class, null)) {
+        };
+    }
+
 
     // ---------------------------------
 
@@ -269,20 +281,6 @@ public abstract class Kind<TYPE> implements Serializable {
 
     // =========================================================================
 
-    @Contract(pure = true)
-    public static boolean matchesValue(@Nullable final Kind<?> kind0,
-                                       @Nullable final Object value) {
-        if (kind0 == null || value == null)
-            return true;
-
-        if (!kind0.klass().isAssignableFrom(value.getClass()))
-            return false;
-        if (!kind0.isParametrized())
-            return true;
-    }
-
-    // ---------------------------------
-
 
     /**
      * Factory method.
@@ -312,6 +310,8 @@ public abstract class Kind<TYPE> implements Serializable {
             klass = (Class<U>) Float.class;
         else if (klass == double.class)
             klass = (Class<U>) Double.class;
+        else if (klass == void.class)
+            klass = (Class<U>) Void.class;
         return new Kind<U>(klass) {
         };
     }
@@ -329,6 +329,13 @@ public abstract class Kind<TYPE> implements Serializable {
 
     public static <K, V> Kind<Map<K, V>> map(@NotNull final Class<K> k,
                                              @NotNull final Class<V> v) {
+        Objects.requireNonNull(k, "k (map key type)");
+        Objects.requireNonNull(v, "v (map value type)");
+        throw new UnsupportedOperationException();
+    }
+
+    public static <K, V> Kind<Map<K, V>> map(@NotNull final Kind<K> k,
+                                             @NotNull final Kind<V> v) {
         Objects.requireNonNull(k, "k (map key type)");
         Objects.requireNonNull(v, "v (map value type)");
         throw new UnsupportedOperationException();
@@ -384,82 +391,6 @@ public abstract class Kind<TYPE> implements Serializable {
     public static final Kind<Float> FLOAT = of(Float.class);
     public static final Kind<Double> DOUBLE = of(Double.class);
     public static final Kind<String> STRING = of(String.class);
-    public static final Kind<?> _VOID = of_(Void.class);
-
-    public static final Kind<List<Integer>> LIST_INT = new Kind<List<Integer>>() {
-    };
-    public static final Kind<Set<Integer>> SET_INT = new Kind<Set<Integer>>() {
-    };
-
-    public final Kind<List<TYPE>> asList() {
-
-    }
-
-    public final Kind<Set<TYPE>> asSet() {
-
-    }
-
-    // =========================================================================
-
-    private static final class PatametrizedTypeImpl implements ParameterizedType {
-
-        private final Type[] actualTypeArguments;
-        private final Type rawType;
-        private final Type ownerType;
-
-        private PatametrizedTypeImpl(@NotNull final Type[] actualTypeArguments,
-                                     @NotNull final Type rawType,
-                                     final Type ownerType) {
-            Objects.requireNonNull(actualTypeArguments);
-            Objects.requireNonNull(rawType);
-            this.actualTypeArguments = actualTypeArguments;
-            this.rawType = rawType;
-            this.ownerType = ownerType;
-        }
-
-        @Contract(pure = true)
-        @NotNull
-        @Override
-        public Type[] getActualTypeArguments() {
-            return this.actualTypeArguments.clone();
-        }
-
-        @Contract(pure = true)
-        @NotNull
-        @Override
-        public Type getRawType() {
-            return this.rawType;
-        }
-
-        @Contract(pure = true)
-        @Nullable
-        @Override
-        public Type getOwnerType() {
-            return this.ownerType;
-        }
-
-        @Contract(pure = true)
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(this.actualTypeArguments)
-                    ^ Objects.hashCode(this.ownerType)
-                    ^ Objects.hashCode(this.rawType);
-        }
-
-        @Contract(pure = true)
-        @Override
-        public boolean equals(final Object obj) {
-            if (obj == this)
-                return true;
-            if (obj == null)
-                return false;
-            if (!(obj instanceof Kind.PatametrizedTypeImpl))
-                return false;
-            final PatametrizedTypeImpl other = (PatametrizedTypeImpl) obj;
-            return Objects.equals(other.ownerType, this.ownerType)
-                    && Objects.equals(other.rawType, this.rawType)
-                    && Arrays.equals(this.actualTypeArguments, other.actualTypeArguments);
-        }
-    }
+    public static final Kind<?> _VOID = of(Void.class);
 
 }
