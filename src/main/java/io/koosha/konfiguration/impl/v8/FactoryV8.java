@@ -267,7 +267,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                                    @NotNull final Supplier<String> yaml) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
-        final ExtYamlSource k = new ExtYamlSource(name, yaml, ExtYamlSource.defaultYamlSupplier::get, false);
+        final ExtYamlSource k = new ExtYamlSource(name, yaml, ExtYamlSource.defaultYamlSupplier::get);
         return kombine(name, k);
     }
 
@@ -283,39 +283,7 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        final ExtYamlSource k = new ExtYamlSource(name, yaml, objectMapper, false);
-        return kombine(name, k);
-    }
-
-    // ============================================================= Experimental
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_, _ -> new")
-    public Konfiguration snakeYaml_Unsafe(@NotNull final String name,
-                                          @NotNull final Supplier<String> yaml) {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(yaml, "yaml");
-        return snakeYaml_Unsafe(name, yaml, ExtYamlSource.defaultYamlSupplier::get);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @NotNull
-    @Contract("_, _, _ -> new")
-    public Konfiguration snakeYaml_Unsafe(@NotNull final String name,
-                                          @NotNull final Supplier<String> yaml,
-                                          @NotNull final Supplier<Yaml> objectMapper) {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(yaml, "yaml");
-        Objects.requireNonNull(objectMapper, "objectMapper");
-        final ExtYamlSource k = new ExtYamlSource(name, yaml, objectMapper, true);
+        final ExtYamlSource k = new ExtYamlSource(name, yaml, objectMapper);
         return kombine(name, k);
     }
 

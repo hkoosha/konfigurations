@@ -1,8 +1,8 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.DummyCustom;
 import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.TestUtil;
 import io.koosha.konfiguration.type.Kind;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -12,9 +12,9 @@ import java.util.Collections;
 import static io.koosha.konfiguration.Konfiguration.kFactory;
 
 @SuppressWarnings("WeakerAccess")
-public class ZZKonfigurationKombinerCustomValueTest {
+public class KonfigurationKombinerCustomValueTest {
 
-    final DummyCustom value = new DummyCustom();
+    final TestUtil.DummyCustom value = new TestUtil.DummyCustom();
 
     final String key = "theKey";
 
@@ -25,7 +25,7 @@ public class ZZKonfigurationKombinerCustomValueTest {
 
     @Test
     public void testCustomValue() {
-        K<DummyCustom> custom = k.custom(key, Kind.of(DummyCustom.class));
+        K<TestUtil.DummyCustom> custom = k.custom(key, Kind.of(TestUtil.DummyCustom.class));
         Assert.assertSame(custom.v(), value);
     }
 

@@ -5,6 +5,7 @@ import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.KeyObserver;
 import io.koosha.konfiguration.KfgIllegalArgumentException;
 import io.koosha.konfiguration.KfgIllegalStateException;
+import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.type.Kind;
@@ -16,9 +17,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -39,10 +42,11 @@ final class Kombiner implements Konfiguration {
 
     @NotNull final Kombiner_Observers observers;
 
-    @NotNull final Kombiner_Values values;
-
     @Nullable
     private volatile KonfigurationManager man;
+
+    final Set<Kind<?>> issuedKeys = new HashSet<>();
+    private final Map<Kind<?>, ? super Object> cache = new HashMap<>();
 
     Kombiner(@NotNull final String name,
              @NotNull final Collection<Konfiguration> sources,
@@ -65,7 +69,7 @@ final class Kombiner implements Konfiguration {
                })
                .flatMap(source ->// Unwrap.
                                 source instanceof Kombiner
-                                        ? ((Kombiner) source).sources.stream()
+                                        ? ((Kombiner) source).sources.sourcesStream()
                                         : Stream.of(source))
                .forEach(source -> newSources.put(new HandleImpl(), source));
         if (newSources.isEmpty())
@@ -74,25 +78,81 @@ final class Kombiner implements Konfiguration {
         this._lock = new Kombiner_Lock(name, lockWaitTimeMillis, fairLock);
         this.observers = new Kombiner_Observers(this.name);
         this.man = new Kombiner_Manager(this);
-        this.values = new Kombiner_Values(this);
         this.sources = new Kombiner_Sources(this);
 
-        this.sources.replace(newSources);
-    }
-
-    @Contract(pure = true)
-    Kombiner_Lock lock() {
-        return this._lock;
+        this.sources.replaceSources(newSources);
     }
 
     <T> T r(@NotNull final Supplier<T> func) {
         Objects.requireNonNull(func, "func");
-        return lock().doReadLocked(func);
+        return _lock.doReadLocked(func);
     }
 
     <T> T w(@NotNull final Supplier<T> func) {
         Objects.requireNonNull(func, "func");
-        return lock().doWriteLocked(func);
+        return _lock.doWriteLocked(func);
+    }
+
+    // =========================================================================
+
+    <U> K<U> k(@NotNull final String key,
+               @NotNull final Kind<U> type) {
+        Objects.requireNonNull(type, "type");
+        final Kind<?> withKey = ((Kind<?>) type).withKey(key);
+        this.w(() -> {
+            this.issuedKeys.add(withKey);
+            return null;
+        });
+        return new Kombiner_K<>(this, key, type);
+    }
+
+    @Nullable
+    @SuppressWarnings("unchecked")
+    <U> U getCachedValueOrIssueIt(@NotNull final String key,
+                                  @NotNull final Kind<U> type) {
+        Objects.requireNonNull(key, "key");
+
+        final Kind<U> t = type.withKey(key);
+
+        return this.r(() -> {
+            if (cache.containsKey(t))
+                return ((U) cache.get(t));
+            return this.w(() -> (U) this.issueValue(t));
+        });
+    }
+
+    // @NotThreadSafe
+    @Nullable
+    Object issueValue(@NotNull final Kind<?> key) {
+        final String keyStr = key.key();
+        Objects.requireNonNull(keyStr, "key passed through kombiner is null");
+        final Optional<Konfiguration> find = this
+                .sources
+                .sourcesStream()
+                .filter(source -> source.has(keyStr, key))
+                .findFirst();
+        if (!find.isPresent())
+            throw new KfgMissingKeyException(this.name(), keyStr, key);
+        this.issuedKeys.add(key.withKey(keyStr));
+        final Object value = find.get().custom(keyStr, key).v();
+        this.cache.put(key, value);
+        return value;
+    }
+
+    boolean hasInCache(@NotNull final Kind<?> t) {
+        Objects.requireNonNull(t.key());
+        return this.cache.containsKey(t);
+    }
+
+    @NotNull
+    Map<Kind<?>, Object> cacheCopy() {
+        return new HashMap<>(this.cache);
+    }
+
+    void replaceCache(@NotNull final Map<Kind<?>, Object> copy) {
+        Objects.requireNonNull(copy, "copy");
+        this.cache.clear();
+        this.cache.putAll(copy);
     }
 
     // =========================================================================
@@ -114,7 +174,7 @@ final class Kombiner implements Konfiguration {
     @Override
     @NotNull
     public KonfigurationManager manager() {
-        return w(() -> {
+        return this.w(() -> {
             final KonfigurationManager m = this.man;
             if (m == null)
                 throw new KfgIllegalStateException(this.name(), null, null, null, "manager is already taken out");
@@ -132,7 +192,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Boolean> bool(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.BOOL);
+        return this.k(key, Kind.BOOL);
     }
 
     /**
@@ -142,7 +202,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Byte> byte_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.BYTE);
+        return this.k(key, Kind.BYTE);
     }
 
     /**
@@ -152,7 +212,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Character> char_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.CHAR);
+        return this.k(key, Kind.CHAR);
     }
 
     /**
@@ -162,7 +222,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Short> short_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.SHORT);
+        return this.k(key, Kind.SHORT);
     }
 
     /**
@@ -172,7 +232,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Integer> int_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.INT);
+        return this.k(key, Kind.INT);
     }
 
     /**
@@ -182,7 +242,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Long> long_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.LONG);
+        return this.k(key, Kind.LONG);
     }
 
     /**
@@ -192,7 +252,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Float> float_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.FLOAT);
+        return this.k(key, Kind.FLOAT);
     }
 
     /**
@@ -202,7 +262,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<Double> double_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.DOUBLE);
+        return this.k(key, Kind.DOUBLE);
     }
 
     /**
@@ -212,7 +272,7 @@ final class Kombiner implements Konfiguration {
     @NotNull
     public K<String> string(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, Kind.STRING);
+        return this.k(key, Kind.STRING);
     }
 
     /**
@@ -223,7 +283,7 @@ final class Kombiner implements Konfiguration {
     public <U> K<List<U>> list(@NotNull final String key,
                                @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, type.asList());
+        return this.k(key, type.asList());
     }
 
     /**
@@ -234,7 +294,7 @@ final class Kombiner implements Konfiguration {
     public <U> K<Set<U>> set(@NotNull final String key,
                              @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, type.asSet());
+        return this.k(key, type.asSet());
     }
 
     /**
@@ -245,7 +305,7 @@ final class Kombiner implements Konfiguration {
     public <U> K<U> custom(@NotNull final String key,
                            @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
-        return this.values.k(key, type);
+        return this.k(key, type);
     }
 
     /**
@@ -257,7 +317,7 @@ final class Kombiner implements Konfiguration {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(key, "key");
         final Kind<?> t = type.withKey(key);
-        return r(() -> this.values.has(t) || this.sources.has(key, type));
+        return r(() -> this.hasInCache(t) || this.sources.has(key, type));
     }
 
     // =========================================================================

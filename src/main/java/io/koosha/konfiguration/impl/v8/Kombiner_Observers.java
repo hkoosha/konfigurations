@@ -138,7 +138,7 @@ final class Kombiner_Observers {
 
         @Override
         public int hashCode() {
-            return 59 + this.handle.hashCode();
+            return 59 * this.handle.hashCode();
         }
 
     }

@@ -1,7 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgMissingKeyException;
-import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import org.testng.annotations.BeforeMethod;
@@ -13,16 +12,18 @@ import java.util.function.Supplier;
 
 import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static java.util.Collections.singletonMap;
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
-public final class ZZKonfigurationKombinerTest {
+public final class KonfigurationKombinerTest {
 
     private final AtomicBoolean flag = new AtomicBoolean(true);
 
     private final Supplier<Map<String, ?>> sup = () -> flag.get()
-            ? singletonMap("xxx", (Object) 12)
-            : singletonMap("xxx", (Object) 99);
+            ? singletonMap("xxx", 12)
+            : singletonMap("xxx", 99);
 
     private Konfiguration k;
     private KonfigurationManager man;
@@ -36,17 +37,17 @@ public final class ZZKonfigurationKombinerTest {
 
     @Test
     public void testV1() throws Exception {
-        assertEquals(k.int_("xxx").v(), (Integer) 12);
+        assertEquals((Object) k.int_("xxx").v(), 12);
 
         flag.set(!flag.get());
-        k.manager().updateNow();
+        this.man.updateNow();
 
-        assertEquals(k.int_("xxx").v(), (Integer) 99);
+        assertEquals((Object) k.int_("xxx").v(), 99);
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testV3() throws Exception {
-        k.string("xxx");
+        k.string("xxx").v();
     }
 
 

@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static java.util.Collections.singletonMap;
 
-public class ZZMissingKeyTest {
+public class KonfigurationMissingKeyTest {
 
     private boolean returnFourTaee = true;
 
@@ -28,12 +28,12 @@ public class ZZMissingKeyTest {
     }
 
     @Test
-    public void testMissingKeyNotRaisedUntilVIsNotCalled() {
+    public void testMissingKeyNotRaisedUntilValueIsNotCalled() {
         k.string("i.do.not.exist");
     }
 
     @Test(expectedExceptions = KfgMissingKeyException.class)
-    public void testMissingKey() {
+    public void testMissingKeyThrowsException() {
         k.string("i.do.not.exist").v();
     }
 

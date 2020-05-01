@@ -1,8 +1,11 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgAssertionException;
+import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
@@ -21,6 +24,8 @@ import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
 public class ExtJacksonJsonSourceTest {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ExtJacksonJsonSourceTest.class);
 
     static String SAMPLE_0;
     static String SAMPLE_1;
@@ -111,31 +116,30 @@ public class ExtJacksonJsonSourceTest {
 
     @Test
     public void testList() throws Exception {
-        final List<Integer> before = this.k().list("aIntList", new Kind<Integer>() {
-        }).v();
+        final List<Integer> before = this.k().list("aIntList", Kind.INT).v();
         assertEquals(before, asList(1, 0, 2));
 
         this.update();
 
-        List<Integer> after = this.k().list("aIntList", new Kind<Integer>() {
-        }).v();
+        List<Integer> after = this.k().list("aIntList", Kind.INT).v();
         assertEquals(after, asList(2, 2));
     }
 
     @Test
     public void testSet() throws Exception {
-        assertEquals(this.k().set("aSet", Kind.set(int.class)).v(), new HashSet<>(asList(1, 2)));
+        assertEquals(this.k().set("aSet", Kind.INT).v(), new HashSet<>(asList(1, 2)));
         this.update();
-        assertEquals(this.k().set("aSet", Kind.set(int.class)).v(), new HashSet<>(asList(1, 2, 3)));
+        assertEquals(this.k().set("aSet", Kind.INT).v(), new HashSet<>(asList(1, 2, 3)));
     }
 
 
     // BAD CASES
 
-    @Test(expectedExceptions = KfgAssertionException.class,
+    @Test(expectedExceptions = KfgTypeException.class,
             dataProvider = "testBadIntDataProvider")
     public void testBadInt(@NotNull final String konfigKey) throws Exception {
         this.k().int_(konfigKey).v();
+        LOG.error("testBadInt: {} did not fail", konfigKey);
     }
 
     @DataProvider
@@ -158,16 +162,17 @@ public class ExtJacksonJsonSourceTest {
             dataProvider = "testBadDoubleDataProvider")
     public void testBadDouble(@NotNull final String konfigKey) throws Exception {
         this.k().double_(konfigKey).v();
+        LOG.error("testBadDouble: {} did not fail", konfigKey);
     }
 
     @DataProvider
     public static Object[][] testBadDoubleDataProvider() {
         return new Object[][]{
                 {"aString"},
-                {"aInt"},
+                // {"aInt"},
                 {"aBool"},
                 {"aIntList"},
-                {"aLong"},
+                // {"aLong"},
                 // {"aDouble"},
                 {"aMap"},
                 {"aSet"},

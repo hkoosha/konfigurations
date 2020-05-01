@@ -26,7 +26,7 @@ public abstract class Source implements Konfiguration {
         final Kind<Boolean> kind = Kind.BOOL;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return this.null_(key, kind);
@@ -49,7 +49,7 @@ public abstract class Source implements Konfiguration {
         final Kind<Character> kind = Kind.CHAR;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return this.null_(key, kind);
@@ -85,7 +85,7 @@ public abstract class Source implements Konfiguration {
         final Kind<String> kind = Kind.STRING;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return null_(key, kind);
@@ -114,7 +114,7 @@ public abstract class Source implements Konfiguration {
         final Kind<Byte> kind = Kind.BYTE;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return null_(key, kind);
@@ -139,7 +139,7 @@ public abstract class Source implements Konfiguration {
         final Kind<Short> kind = Kind.SHORT;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return null_(key, kind);
@@ -164,7 +164,7 @@ public abstract class Source implements Konfiguration {
         final Kind<Integer> kind = Kind.INT;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return null_(key, kind);
@@ -189,7 +189,7 @@ public abstract class Source implements Konfiguration {
         final Kind<Long> kind = Kind.LONG;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return null_(key, kind);
@@ -214,7 +214,7 @@ public abstract class Source implements Konfiguration {
         final Kind<Float> kind = Kind.FLOAT;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return null_(key, kind);
@@ -239,7 +239,7 @@ public abstract class Source implements Konfiguration {
         final Kind<Double> kind = Kind.DOUBLE;
 
         if (!this.has(key, kind))
-            throw new KfgAssertionException(this.name(), key, kind, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
             return null_(key, kind);
@@ -263,7 +263,7 @@ public abstract class Source implements Konfiguration {
         Objects.requireNonNull(key, "key");
 
         if (!this.has(key, type.asList()))
-            throw new KfgAssertionException(this.name(), key, type, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, type);
 
         final Kind<List<U>> listKind = type.asList();
 
@@ -286,8 +286,8 @@ public abstract class Source implements Konfiguration {
                                    @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
 
-        if (!this.has(key, type))
-            throw new KfgAssertionException(this.name(), key, type, null, "missing key");
+        if (!this.has(key, type.asSet()))
+            throw new KfgMissingKeyException(this.name(), key, type);
 
         final Kind<Set<U>> setKind = type.asSet();
 
@@ -321,7 +321,7 @@ public abstract class Source implements Konfiguration {
         Objects.requireNonNull(type, "type");
 
         if (!this.has(key, type))
-            throw new KfgAssertionException(this.name(), key, type, null, "missing key");
+            throw new KfgMissingKeyException(this.name(), key, type);
 
         if (this.isNull(key))
             return null_(key, type);
@@ -393,20 +393,6 @@ public abstract class Source implements Konfiguration {
     @NotNull
     protected abstract Object custom0(@NotNull String key,
                                       @NotNull Kind<?> type);
-
-    /**
-     * Handle the case where value in a collection is null
-     *
-     * @param key        the config key who's collection has a null.
-     * @param collection the list or set in question.
-     * @param type       type of requested konfig.
-     * @return true if it's ok to have null values.
-     */
-    protected boolean allowNullInCollection_(@NotNull final String key,
-                                             @Nullable final Kind<?> type,
-                                             @NotNull final Object collection) {
-        return true;
-    }
 
 
     // =========================================================================
@@ -519,24 +505,12 @@ public abstract class Source implements Konfiguration {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(value, "value");
 
-        if (!neededType.isCollection()) {
-            throw new KfgAssertionException(this.name(), key, null, value, "needed map or collection");
-        }
-
         if (!(value instanceof Collection))
-            throw new KfgIllegalStateException(this.name(), key, neededType, value, "expecting a collection");
+            throw new KfgIllegalStateException(this.name(), key, neededType.asList(), value, "expecting a collection");
 
-        final Class<?> klass = (Class<?>) neededType.getCollectionContainedType();
-        for (final Object o : (Collection<?>) value) {
-            if (o != null) {
-                if (!klass.isAssignableFrom(o.getClass())) {
-                    throw new KfgTypeException(this.name(), key, neededType, value);
-                }
-            }
-            else if (!allowNullInCollection_(key, neededType, value)) {
-                throw new KfgTypeNullException(this.name(), key, neededType);
-            }
-        }
+        for (final Object o : (Collection<?>) value)
+            if (o != null && !neededType.klass().isAssignableFrom(o.getClass()))
+                throw new KfgTypeException(this.name(), key, neededType, value);
     }
 
 

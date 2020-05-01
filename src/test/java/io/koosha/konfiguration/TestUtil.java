@@ -2,6 +2,7 @@ package io.koosha.konfiguration;
 
 import org.jetbrains.annotations.ApiStatus;
 
+import java.beans.ConstructorProperties;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,6 +31,59 @@ public final class TestUtil {
             map.put(rest[i], rest[i + 1]);
         }
         return map;
+    }
+
+    /**
+     * A dummy custom value object, used to test de/serialization frameworks.
+     * <p>
+     * All fields are final here, only constructor can be utilized.
+     */
+    @SuppressWarnings({"WeakerAccess", "unused"})
+    public static final class DummyCustom2 {
+
+        public final String str;
+        public final Map<String, String> olf;
+        public final int i;
+        public final String again;
+
+        @ConstructorProperties({"str", "again", "olf", "i"})
+        public DummyCustom2(final String str, final String again, final Map<String, String> olf, final int i) {
+            this.str = str;
+            this.olf = olf;
+            this.i = i;
+            this.again = again;
+        }
+
+        @ConstructorProperties({"again", "olf", "i", "str"})
+        public DummyCustom2(final String again, final Map<String, String> olf, final int i, final String str) {
+            this(str, again, olf, i);
+        }
+
+    }
+
+    /**
+     * A dummy custom value object, used to test de/serialization frameworks.
+     */
+    @SuppressWarnings({"FieldCanBeLocal", "WeakerAccess", "unused"})
+    public static final class DummyCustom {
+
+        public String str;
+        public int i;
+
+        public DummyCustom() {
+            this("", 0);
+        }
+
+        @ConstructorProperties({"str", "i"})
+        public DummyCustom(final String str, final int i) {
+            this.str = str;
+            this.i = i;
+        }
+
+        public String concat() {
+            return this.str + " ::: " + this.i;
+        }
+
     }
 
 }

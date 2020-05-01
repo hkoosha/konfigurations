@@ -1,7 +1,9 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.*;
+import io.koosha.konfiguration.Handle;
 import io.koosha.konfiguration.K;
+import io.koosha.konfiguration.KeyObserver;
+import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -64,7 +66,7 @@ final class Kombiner_K<U> implements K<U> {
     @Override
     @Nullable
     public U v() {
-        return this.origin.values.v(key, this.type);
+        return this.origin.getCachedValueOrIssueIt(key, this.type);
     }
 
     /**
@@ -148,7 +150,7 @@ final class Kombiner_K<U> implements K<U> {
             return format("K(%s=%s)", this.key, this.v());
         }
         catch (final Exception e) {
-            return format("K(%s)::error", this.key);
+            return format("K(error::%s)", this.key);
         }
     }
 

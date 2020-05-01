@@ -39,12 +39,12 @@ final class Kombiner_Sources {
 
     @Contract(pure = true)
     @NotNull
-    Stream<Konfiguration> stream() {
+    Stream<Konfiguration> sourcesStream() {
         return sources.values().stream();
     }
 
     @Contract(mutates = "this")
-    void replace(@NotNull final Map<Handle, Konfiguration> s) {
+    void replaceSources(@NotNull final Map<Handle, Konfiguration> s) {
         Objects.requireNonNull(s, "origin");
         this.sources.clear();
         this.sources.putAll(s);
@@ -52,7 +52,7 @@ final class Kombiner_Sources {
 
     @Contract(pure = true)
     @NotNull
-    Map<Handle, Konfiguration> copy() {
+    Map<Handle, Konfiguration> sourcesCopy() {
         return new HashMap<>(this.sources);
     }
 

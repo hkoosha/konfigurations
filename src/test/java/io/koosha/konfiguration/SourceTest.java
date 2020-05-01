@@ -8,7 +8,6 @@ import org.testng.annotations.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import static org.testng.Assert.assertEquals;
@@ -31,22 +30,11 @@ public class SourceTest {
 
     private static final String STRING_ABC = "stringAbc";
 
-    private Boolean allowNullInCollection = null;
     private List<?> listValue = null;
     private Set<?> setValue = null;
-    private Map<?, ?> mapValue = null;
     private Object customValue = null;
 
     class ExtSampleSource extends Source {
-
-        @Override
-        protected boolean allowNullInCollection_(@NotNull String key,
-                                                 @Nullable Kind<?> type,
-                                                 @NotNull Object collection) {
-            return SourceTest.this.allowNullInCollection == null
-                    ? super.allowNullInCollection_(key, type, collection)
-                    : SourceTest.this.allowNullInCollection;
-        }
 
         @Override
         @NotNull
@@ -168,10 +156,8 @@ public class SourceTest {
 
     @BeforeMethod
     public void setup() {
-        allowNullInCollection = null;
         listValue = null;
         setValue = null;
-        mapValue = null;
         customValue = null;
         this.source = new ExtSampleSource();
     }
@@ -179,43 +165,43 @@ public class SourceTest {
     // =========================================================================
 
     @Test(expectedExceptions = KfgAssertionException.class)
-    public void testSubset() {
+    public void testSubsetIsNotSupported() {
         this.source.subset("");
     }
 
     @Test(expectedExceptions = KfgAssertionException.class)
-    public void testRegisterSoft() {
+    public void testRegisterSoftIsNotSupported() {
         this.source.registerSoft(key -> {
         });
     }
 
     @Test(expectedExceptions = KfgAssertionException.class)
-    public void testRegisterSoft1() {
+    public void testRegisterSoft1IsNotSupported() {
         this.source.registerSoft(key -> {
         }, "");
     }
 
     @Test(expectedExceptions = KfgAssertionException.class)
-    public void testRegister() {
+    public void testRegisterIsNotSupported() {
         this.source.register(key -> {
         });
     }
 
     @Test(expectedExceptions = KfgAssertionException.class)
-    public void testRegister1() {
+    public void testRegister1IsNotSupported() {
         this.source.register(key -> {
         }, "");
     }
 
     @Test(expectedExceptions = KfgAssertionException.class)
-    public void testDeRegister() {
+    public void testDeRegisterIsNotSupported() {
         this.source.deregister(() -> {
             throw new RuntimeException("shouldn't be called");
         });
     }
 
     @Test(expectedExceptions = KfgAssertionException.class)
-    public void testDeRegister1() {
+    public void testDeRegister1IsNotSupported() {
         this.source.deregister(() -> {
             throw new RuntimeException("shouldn't be called");
         }, "");
@@ -234,7 +220,7 @@ public class SourceTest {
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testBoolInvalidValue() {
+    public void testBoolInvalidValueThrowsException() {
         this.source.bool(INVALID).v();
     }
 
@@ -243,8 +229,8 @@ public class SourceTest {
         assertNull(this.source.bool(NULL).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testBoolMissingValue() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testBoolMissingValueThrowsException() {
         this.source.bool(MISSING).v();
     }
 
@@ -261,7 +247,7 @@ public class SourceTest {
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testCharInvalidValue() {
+    public void testCharInvalidValueThrowsException() {
         this.source.char_(INVALID).v();
     }
 
@@ -270,8 +256,8 @@ public class SourceTest {
         assertNull(this.source.char_(NULL).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testCharMissingValue() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testCharMissingValueThrowsException() {
         this.source.char_(MISSING).v();
     }
 
@@ -283,12 +269,12 @@ public class SourceTest {
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testStringValueBadString() {
+    public void testStringValueBadStringThrowsException() {
         this.source.string(INVALID).v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testStringInvalidValue() {
+    public void testStringInvalidValueThrowsException() {
         this.source.string(INVALID).v();
     }
 
@@ -297,8 +283,8 @@ public class SourceTest {
         assertNull(this.source.string(NULL).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testStringMissingValue() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testStringMissingValueThrowsException() {
         this.source.string(MISSING).v();
     }
 
@@ -326,37 +312,37 @@ public class SourceTest {
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testByteBadValue0() {
+    public void testByteBadValue0ThrowsException() {
         this.source.byte_("short:300").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testByteBadValue1() {
+    public void testByteBadValue1ThrowsException() {
         this.source.byte_("int:300").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testByteBadValue2() {
+    public void testByteBadValue2ThrowsException() {
         this.source.byte_("long:300").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testByteBadValue3() {
+    public void testByteBadValue3ThrowsException() {
         this.source.byte_("short:-300").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testByteBadValue4() {
+    public void testByteBadValue4ThrowsException() {
         this.source.byte_("int:-300").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testByteBadValue5() {
+    public void testByteBadValue5ThrowsException() {
         this.source.byte_("long:-300").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testByteBadValue6() {
+    public void testByteBadValue6ThrowsException() {
         this.source.int_("double:9.9").v();
     }
 
@@ -365,8 +351,8 @@ public class SourceTest {
         assertNull(this.source.byte_(NULL).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testByteMissingValue() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testByteMissingValueThrowsException() {
         this.source.byte_(MISSING).v();
     }
 
@@ -397,27 +383,27 @@ public class SourceTest {
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testShortBadValue0() {
+    public void testShortBadValue0ThrowsException() {
         this.source.short_("int:33000").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testShortBadValue1() {
+    public void testShortBadValue1ThrowsException() {
         this.source.short_("long:33000").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testShortBadValue2() {
+    public void testShortBadValue2ThrowsException() {
         this.source.short_("int:-33000").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testShortBadValue3() {
+    public void testShortBadValue3ThrowsException() {
         this.source.short_("long:-33000").v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testShortBadValue4() {
+    public void testShortBadValue4ThrowsException() {
         this.source.int_("double:9.9").v();
     }
 
@@ -426,8 +412,8 @@ public class SourceTest {
         assertNull(this.source.short_(NULL).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testShortMissingValue() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testShortMissingValueThrowsException() {
         this.source.short_(MISSING).v();
     }
 
@@ -455,17 +441,17 @@ public class SourceTest {
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testIntBadValue0() {
+    public void testIntBadValue0ThrowsException() {
         this.source.int_("long:" + Long.MAX_VALUE).v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testIntBadValue1() {
+    public void testIntBadValue1ThrowsException() {
         this.source.int_("long:" + Long.MIN_VALUE).v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testIntBadValue2() {
+    public void testIntBadValue2ThrowsException() {
         this.source.int_("double:9.9").v();
     }
 
@@ -474,8 +460,8 @@ public class SourceTest {
         assertNull(this.source.int_(NULL).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testIntMissingValue() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testIntMissingValueThrowsException() {
         this.source.int_(MISSING).v();
     }
 
@@ -500,7 +486,7 @@ public class SourceTest {
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testLongBadValue0() {
+    public void testLongBadValue0ThrowsException() {
         this.source.long_("double:" + 9.9).v();
     }
 
@@ -509,8 +495,8 @@ public class SourceTest {
         assertNull(this.source.long_(NULL).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testLongMissingValue() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testLongMissingValueThrowsException() {
         this.source.long_(MISSING).v();
     }
 
@@ -535,12 +521,12 @@ public class SourceTest {
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testFloatBadValue0() {
+    public void testFloatBadValue0ThrowsException() {
         this.source.int_("double:" + Double.MAX_VALUE).v();
     }
 
     @Test(expectedExceptions = KfgTypeException.class)
-    public void testFloatBadValue1() {
+    public void testFloatBadValue1ThrowsException() {
         this.source.int_("double:" + Double.MIN_VALUE).v();
     }
 
@@ -549,40 +535,29 @@ public class SourceTest {
         assertNull(this.source.int_(NULL).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testFloatMissingValue() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testFloatMissingValueThrowsException() {
         this.source.int_(MISSING).v();
     }
 
     // --------------------------------- LIST
 
     @Test
-    public void testListWithNullAllowed() {
+    public void testList() {
         final List<String> value = Arrays.asList("a", null, "b", "c");
         this.listValue = value;
-        this.allowNullInCollection = true;
-        assertEquals(this.source.list("any", new Kind<List<String>>() {
-        }).v(), value);
-    }
-
-    @Test
-    public void testListWithNullNotAllowed() {
-        final List<String> value = Arrays.asList("a", null, "b", "c");
-        this.listValue = value;
-        this.allowNullInCollection = false;
-        assertEquals(this.source.list("any", new Kind<List<String>>() {
-        }).v(), value);
+        assertEquals(this.source.list("any", Kind.STRING).v(), value);
     }
 
     @Test
     public void testListNullValue() {
-        assertNull(this.source.list(NULL, new Kind<List<Object>>() {
+        assertNull(this.source.list(NULL, new Kind<Object>() {
         }).v());
     }
 
-    @Test(expectedExceptions = KfgAssertionException.class)
-    public void testListMissingValue() {
-        this.source.list(MISSING, new Kind<List<Object>>() {
+    @Test(expectedExceptions = KfgMissingKeyException.class)
+    public void testListMissingValueThrowsException() {
+        this.source.list(MISSING, new Kind<Object>() {
         }).v();
     }
 

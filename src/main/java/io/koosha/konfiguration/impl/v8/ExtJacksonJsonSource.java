@@ -289,8 +289,7 @@ final class ExtJacksonJsonSource extends Source {
 
         final ObjectMapper reader = this.mapperSupplier.get();
         final TypeFactory tf = reader.getTypeFactory();
-        final Class<?> cInnerType = (Class<?>) type.getCollectionContainedType();
-        final JavaType ct = tf.constructSimpleType(cInnerType, new JavaType[0]);
+        final JavaType ct = tf.constructSimpleType(type.klass(), new JavaType[0]);
         final CollectionType javaType = tf.constructCollectionType(List.class, ct);
 
         final List<?> asList;

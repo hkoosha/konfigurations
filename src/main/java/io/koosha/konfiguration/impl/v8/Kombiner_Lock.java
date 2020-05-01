@@ -37,7 +37,7 @@ final class Kombiner_Lock {
             throw new KfgIllegalStateException(name, "wait time must be gte 0: " + lockWaitTimeMillis);
         this.name = name;
         this.lockWaitTimeMillis = lockWaitTimeMillis;
-        LOCK = new ReentrantReadWriteLock(fair);
+        this.LOCK = new ReentrantReadWriteLock(fair);
     }
 
     private void acquire(@NotNull final Lock lock) {
@@ -65,7 +65,7 @@ final class Kombiner_Lock {
 
         Lock lock = null;
         try {
-            lock = LOCK.readLock();
+            lock = this.LOCK.readLock();
             acquire(lock);
             return func.get();
         }
@@ -79,7 +79,7 @@ final class Kombiner_Lock {
 
         Lock lock = null;
         try {
-            lock = LOCK.readLock();
+            lock = this.LOCK.readLock();
             acquire(lock);
             return func.get();
         }

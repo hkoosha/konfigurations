@@ -319,26 +319,15 @@ public abstract class Kind<TYPE> implements Serializable {
 
     public static <U> Kind<Set<U>> set(@NotNull final Class<U> u) {
         Objects.requireNonNull(u, "u (set type)");
-        throw new UnsupportedOperationException();
+        Objects.requireNonNull(u, "u (list type)");
+        return new Kind<U>(u) {
+        }.asSet();
     }
 
     public static <U> Kind<List<U>> list(@NotNull final Class<U> u) {
         Objects.requireNonNull(u, "u (list type)");
-        throw new UnsupportedOperationException();
-    }
-
-    public static <K, V> Kind<Map<K, V>> map(@NotNull final Class<K> k,
-                                             @NotNull final Class<V> v) {
-        Objects.requireNonNull(k, "k (map key type)");
-        Objects.requireNonNull(v, "v (map value type)");
-        throw new UnsupportedOperationException();
-    }
-
-    public static <K, V> Kind<Map<K, V>> map(@NotNull final Kind<K> k,
-                                             @NotNull final Kind<V> v) {
-        Objects.requireNonNull(k, "k (map key type)");
-        Objects.requireNonNull(v, "v (map value type)");
-        throw new UnsupportedOperationException();
+        return new Kind<U>(u) {
+        }.asList();
     }
 
 

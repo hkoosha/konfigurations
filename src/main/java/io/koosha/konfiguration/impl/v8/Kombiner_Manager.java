@@ -34,7 +34,6 @@ final class Kombiner_Manager implements KonfigurationManager {
         this.origin = kombiner;
     }
 
-
     /**
      * {@inheritDoc}
      *
@@ -43,101 +42,98 @@ final class Kombiner_Manager implements KonfigurationManager {
     @NotNull
     @Override
     public Map<String, Collection<Runnable>> update() {
-        return origin.r(this::update0);
+        return this.origin.r(() -> {
+            if (this.origin.sources
+                    .sourcesStream()
+                    .noneMatch(x -> ((Source) x).hasUpdate()))
+                return emptyMap();
+
+            final Map<Handle, Konfiguration> newSources = this.origin.sources.sourcesCopy();
+            newSources.entrySet().forEach(x -> x.setValue(((Source) x.getValue()).updatedCopy()));
+
+            final Set<Kind<?>> updated = new HashSet<>();
+            final Map<Kind<?>, Object> newCache = this.origin.cacheCopy();
+            this.origin.issuedKeys.forEach(q -> {
+                final String key = requireNonNull(
+                        q.key(), "ket passed through kombiner is null");
+
+                final Optional<Konfiguration> first = newSources
+                        .values()
+                        .stream()
+                        .filter(x -> x.has(key, q))
+                        .findFirst();
+
+                final Object newV = first
+                        .map(konfiguration -> konfiguration.custom(q.key(), q).v())
+                        .orElse(null);
+
+                final Object oldV = this.origin.has(q.key(), q)
+                        ? this.origin.issueValue(q)
+                        : null;
+
+                // Went missing or came into existence.
+                if (this.origin.hasInCache(q) != first.isPresent()
+                        || !Objects.equals(newV, oldV))
+                    updated.add(q);
+
+                if (first.isPresent())
+                    newCache.put(q, newV);
+            });
+
+            return this.origin.w(() -> {
+                final Map<String, Collection<Runnable>> result = this
+                        .origin
+                        .sources
+                        .sourcesStream()
+                        // External non-optimizable konfig sources.
+                        .filter(target -> !(target instanceof Source))
+                        .map(Konfiguration::manager)
+                        .map(KonfigurationManager::update)
+                        .peek(x -> x.entrySet().forEach(e -> e.setValue(
+                                // just to wrap!
+                                e.getValue().stream().map(r -> {
+                                    Objects.requireNonNull(r, "runnable");
+                                    //noinspection Convert2Lambda,Anonymous2MethodRef
+                                    return new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            r.run();
+                                        }
+                                    };
+                                })
+                                 .collect(toList())
+                        )))
+                        .reduce(new HashMap<>(), (m0, m1) -> {
+                            m1.forEach((m1k, m1c) -> m0.computeIfAbsent(
+                                    m1k, m1k_ -> new ArrayList<>()).addAll(m1c));
+                            return m0;
+                        });
+
+                for (final Kind<?> kind : updated)
+                    //noinspection ConstantConditions
+                    result.computeIfAbsent(kind.key(), (q_) -> new ArrayList<>())
+                          .addAll(this.origin.observers.get(kind.key()));
+
+                this.origin.sources.replaceSources(newSources);
+                this.origin.replaceCache(newCache);
+
+                return result;
+            });
+        });
     }
 
-
+    /**
+     * {@inheritDoc}
+     *
+     * @return
+     */
+    @Override
     public boolean hasUpdate() {
-        return origin.r(this::hasUpdate0);
-    }
-
-    private boolean hasUpdate0() {
-        return origin
+        return this.origin.r(() -> this
+                .origin
                 .sources
-                .stream()
-                .anyMatch(x -> ((Source) x).hasUpdate());
-    }
-
-    private Map<String, Collection<Runnable>> update0() {
-        if (!this.hasUpdate0())
-            return emptyMap();
-
-        final Map<Handle, Konfiguration> newSources = origin.sources.copy();
-        newSources.entrySet().forEach(x -> x.setValue(
-                x.getValue() instanceof Source
-                        ? ((Source) x.getValue()).updatedCopy()
-                        : x.getValue()
-        ));
-
-        final Set<Kind<?>> updated = new HashSet<>();
-        final Map<Kind<?>, Object> newCache = origin.values.copy();
-        origin.values.issuedKeys.forEach(q -> {
-            final String key = requireNonNull(q.key(), "ket passed through kombiner is null");
-
-            final Optional<Konfiguration> first = newSources
-                    .values()
-                    .stream()
-                    .filter(x -> x.has(key, q))
-                    .findFirst();
-
-            final Object newV = first
-                    .map(konfiguration -> konfiguration.custom(q.key(), q))
-                    .orElse(null);
-
-            final Object oldV = origin.has(q.key(), q)
-                    ? origin.values.v_(q)
-                    : null;
-
-            // Went missing or came into existence.
-            if (origin.values.has(q) != first.isPresent()
-                    || !Objects.equals(newV, oldV))
-                updated.add(q);
-
-            if (first.isPresent())
-                newCache.put(q, newV);
-        });
-
-        return origin.w(() -> {
-            final Map<String, Collection<Runnable>> result = origin
-                    .sources
-                    .stream()
-                    // External non-optimizable konfig sources.
-                    .filter(target -> !(target instanceof Source))
-                    .map(Konfiguration::manager)
-                    .map(KonfigurationManager::update)
-                    .peek(x -> x.entrySet().forEach(e -> e.setValue(
-                            // just to wrap!
-                            e.getValue().stream().map(r -> {
-                                Objects.requireNonNull(r, "runnable");
-                                // We can not be sure if given runnable is safe
-                                // to be put in a map // So we create a plain
-                                // object wrapping it.
-                                //noinspection Convert2Lambda,Anonymous2MethodRef
-                                return new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        r.run();
-                                    }
-                                };
-                            })
-                             .collect(toList())
-                    )))
-                    .reduce(new HashMap<>(), (m0, m1) -> {
-                        m1.forEach((m1k, m1c) -> m0.computeIfAbsent(
-                                m1k, m1k_ -> new ArrayList<>()).addAll(m1c));
-                        return m0;
-                    });
-
-            for (final Kind<?> kind : updated)
-                //noinspection ConstantConditions
-                result.computeIfAbsent(kind.key(), (q_) -> new ArrayList<>())
-                      .addAll(this.origin.observers.get(kind.key()));
-
-            origin.sources.replace(newSources);
-            origin.values.replace(newCache);
-
-            return result;
-        });
+                .sourcesStream()
+                .anyMatch(x -> ((Source) x).hasUpdate()));
     }
 
 }

@@ -55,7 +55,6 @@ import static java.util.stream.Collectors.toList;
 final class ExtYamlSource extends Source {
 
     private static final Pattern DOT = Pattern.compile(Pattern.quote("."));
-    private final boolean unsafe;
 
     static final class ByConstructorConstructor<A extends Annotation> extends Constructor {
 
@@ -84,9 +83,9 @@ final class ExtYamlSource extends Source {
                     })
                     .collect(toList());
             if (constructors.isEmpty())
-                throw new KfgSnakeYamlError(null, "no constructor with ConstructorProperties is liable");
+                throw new KfgSnakeYamlError(null, "no constructor with ConstructorProperties is liable for:" + cArgsByName);
             if (constructors.size() > 1)
-                throw new KfgSnakeYamlError(null, "multiple constructor with ConstructorProperties are liable");
+                throw new KfgSnakeYamlError(null, "multiple constructor with ConstructorProperties are liable for: " + cArgsByName);
             return constructors.get(0);
         }
 
@@ -334,8 +333,7 @@ final class ExtYamlSource extends Source {
      */
     ExtYamlSource(@NotNull final String name,
                   @NotNull final Supplier<String> yamlSupplier,
-                  @NotNull final Supplier<Yaml> mapper,
-                  final boolean unsafe) {
+                  @NotNull final Supplier<Yaml> mapper) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yamlSupplier, "yamlSupplier");
         Objects.requireNonNull(mapper, "mapper");
@@ -343,7 +341,6 @@ final class ExtYamlSource extends Source {
         this.name = name;
         this.yaml = yamlSupplier;
         this.mapper = mapper;
-        this.unsafe = unsafe;
 
         // Check early, so we 're not fooled with a dummy object reader.
         try {
@@ -531,7 +528,7 @@ final class ExtYamlSource extends Source {
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-                ? new ExtYamlSource(name(), yaml, mapper, unsafe)
+                ? new ExtYamlSource(name(), yaml, mapper)
                 : ExtYamlSource.this;
     }
 
