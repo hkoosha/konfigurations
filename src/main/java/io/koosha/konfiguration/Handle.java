@@ -11,4 +11,11 @@ public interface Handle {
 
     long id();
 
+
+    @Override
+    boolean equals(Object other);
+
+    @Override
+    int hashCode();
+
 }

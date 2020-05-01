@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
+import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.ext.KfgSnakeYamlAssertionError;
 import io.koosha.konfiguration.ext.KfgSnakeYamlError;
@@ -9,7 +10,6 @@ import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -27,6 +27,7 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -306,12 +307,13 @@ final class ExtYamlSource extends Source {
             (Function<? super ConstructorProperties, String[]>) ConstructorProperties::value
     );
 
-    static final ThreadLocal<Yaml> defaultYamlSupplier = ThreadLocal.withInitial(() -> new Yaml(defaultBaseConstructor));
+    static final ThreadLocal<Yaml> defaultYamlSupplier =
+            ThreadLocal.withInitial(() -> new Yaml(defaultBaseConstructor));
 
     private final Supplier<Yaml> mapper;
     private final Supplier<String> yaml;
 
-    private final int lastHash;
+    private final String lastYaml;
     private final Map<String, ?> root;
 
     @NotNull
@@ -356,7 +358,7 @@ final class ExtYamlSource extends Source {
 
         final String newYaml = this.yaml.get();
         requireNonNull(newYaml, "supplied storage is null");
-        this.lastHash = newYaml.hashCode();
+        this.lastYaml = newYaml;
 
         final Yaml newMapper = mapper.get();
         requireNonNull(newMapper, "supplied mapper is null");
@@ -433,12 +435,12 @@ final class ExtYamlSource extends Source {
                             @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        this.ensureSafe(type);
 
         final Object g = this.get(key);
         final Yaml mapper = this.mapper.get();
         final String yamlAgain = mapper.dump(g);
-        return (List<?>) mapper.loadAs(yamlAgain, type.klass());
+        final List<?> asList = (List<?>) mapper.loadAs(yamlAgain, type.klass());
+        return Collections.unmodifiableList(asList);
     }
 
     /**
@@ -450,12 +452,12 @@ final class ExtYamlSource extends Source {
                           @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        this.ensureSafe(type);
 
-        final Object g = this.get(key);
-        final Yaml mapper = this.mapper.get();
-        final String yamlAgain = mapper.dump(g);
-        return (Set<?>) mapper.loadAs(yamlAgain, type.klass());
+        final List<?> asList = this.list0(key, type);
+        final HashSet<?> asSet = new HashSet<>(asList);
+        if (asSet.size() != asList.size())
+            throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
+        return Collections.unmodifiableSet(asSet);
     }
 
     /**
@@ -467,7 +469,11 @@ final class ExtYamlSource extends Source {
                              @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        this.ensureSafe(type);
+
+        if (type.isParametrized())
+            throw new KfgSnakeYamlAssertionError(
+                    this.name, key, type, null,
+                    "parametrized type are not supported by yaml source");
 
         final Object g = this.get(key);
         final Yaml mapper = this.mapper.get();
@@ -494,15 +500,41 @@ final class ExtYamlSource extends Source {
      */
     @Override
     public boolean has(@NotNull final String key,
-                       @Nullable final Kind<?> type) {
+                       @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
+        if (type.isParametrized())
+            return false;
         try {
-            throw new UnsupportedOperationException();
+            this.custom0(key, type);
+            return true;
         }
-        catch (final KfgSnakeYamlAssertionError e) {
+        catch (Exception e) {
             return false;
         }
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Contract(pure = true)
+    public boolean hasUpdate() {
+        final String newYaml = yaml.get();
+        return newYaml != null && !Objects.equals(newYaml, lastYaml);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    @Contract(pure = true, value = "-> new")
+    @NotNull
+    public Source updatedCopy() {
+        return this.hasUpdate()
+                ? new ExtYamlSource(name(), yaml, mapper, unsafe)
+                : ExtYamlSource.this;
+    }
+
 
     private Object get(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -520,41 +552,6 @@ final class ExtYamlSource extends Source {
             node = (Map<?, ?>) n;
         }
         throw new KfgSnakeYamlAssertionError(this.name(), "assertion error");
-    }
-
-    private void ensureSafe(@Nullable final Kind<?> type) {
-        //        Constructor constructor = new Constructor(Customer.class);
-        //        TypeDescription customTypeDescription = new TypeDescription(Customer.class);
-        //        customTypeDescription.addPropertyParameters("contactDetails", Contact.class);
-        //        constructor.addTypeDescription(customTypeDescription);
-        //        Yaml yaml = new Yaml(constructor);
-        if (this.unsafe)
-            return;
-        if (type == null || type.isParametrized())
-            throw new UnsupportedOperationException("yaml does not support parameterized yet.");
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Contract(pure = true)
-    public boolean hasUpdate() {
-        final String newYaml = yaml.get();
-        return newYaml != null && newYaml.hashCode() != lastHash;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    @Contract(pure = true,
-            value = "-> new")
-    public @NotNull Source updatedCopy() {
-        return this.hasUpdate()
-                ? new ExtYamlSource(name(), yaml, mapper, unsafe)
-                : ExtYamlSource.this;
     }
 
 }

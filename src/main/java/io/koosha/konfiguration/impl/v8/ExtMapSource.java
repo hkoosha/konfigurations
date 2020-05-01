@@ -9,6 +9,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,7 +142,8 @@ final class ExtMapSource extends Source {
     protected List<?> list0(@NotNull final String key,
                             @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
-        return check(type, key);
+        final List<?> asList = check(type, key);
+        return Collections.unmodifiableList(asList);
     }
 
     /**
@@ -153,7 +155,8 @@ final class ExtMapSource extends Source {
                           @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        return check(type, key);
+        final Set<?> asSet = check(type, key);
+        return Collections.unmodifiableSet(asSet);
     }
 
     /**

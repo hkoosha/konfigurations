@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
+import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
@@ -114,7 +115,7 @@ final class ExtPreferencesSource extends Source {
     @NotNull
     protected List<?> list0(@NotNull final String key,
                             @NotNull final Kind<?> type) {
-        throw new UnsupportedOperationException();
+        throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
     }
 
     /**
@@ -124,7 +125,7 @@ final class ExtPreferencesSource extends Source {
     @NotNull
     protected Set<?> set0(@NotNull final String key,
                           @NotNull final Kind<?> type) {
-        throw new UnsupportedOperationException();
+        throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
     }
 
     /**
@@ -134,7 +135,7 @@ final class ExtPreferencesSource extends Source {
     @NotNull
     protected Object custom0(@NotNull final String key,
                              @NotNull final Kind<?> type) {
-        throw new UnsupportedOperationException();
+        throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
     }
 
     /**

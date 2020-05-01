@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Unmodifiable;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.Executor;
 
 @NotThreadSafe
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
@@ -24,9 +26,15 @@ public interface KonfigurationManager {
     Map<String, Collection<Runnable>> update();
 
     default boolean updateNow() {
+        return this.updateNow(Runnable::run);
+    }
+
+    default boolean updateNow(@NotNull final Executor executor) {
+        Objects.requireNonNull(executor, "executor");
+
         boolean any = false;
         for (final Map.Entry<String, Collection<Runnable>> entry : this.update().entrySet()) {
-            entry.getValue().forEach(Runnable::run);
+            entry.getValue().forEach(executor::execute);
             any = true;
         }
         return any;

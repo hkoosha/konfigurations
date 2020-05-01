@@ -25,6 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -284,7 +286,25 @@ final class ExtJacksonJsonSource extends Source {
                             @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        return collection(key, type);
+
+        final ObjectMapper reader = this.mapperSupplier.get();
+        final TypeFactory tf = reader.getTypeFactory();
+        final Class<?> cInnerType = (Class<?>) type.getCollectionContainedType();
+        final JavaType ct = tf.constructSimpleType(cInnerType, new JavaType[0]);
+        final CollectionType javaType = tf.constructCollectionType(List.class, ct);
+
+        final List<?> asList;
+        synchronized (LOCK) {
+            final JsonNode at = node(key);
+            checkJsonType(at.isArray(), type, at, key);
+            try {
+                asList = reader.readValue(at.traverse(), javaType);
+            }
+            catch (final IOException e) {
+                throw new KfgTypeException(this.name(), key, type, at, "type mismatch", e);
+            }
+        }
+        return Collections.unmodifiableList(asList);
     }
 
     /**
@@ -296,29 +316,13 @@ final class ExtJacksonJsonSource extends Source {
                           @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        return (Set<?>) collection(key, type);
+
+        final List<?> asList = this.list0(key, type);
+        final Set<?> asSet = new HashSet<>(asList);
+        if (asSet.size() != asList.size())
+            throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
+        return Collections.unmodifiableSet(asSet);
     }
-
-    private List<?> collection(@NotNull final String key,
-                               @NotNull final Kind<?> type) {
-        final ObjectMapper reader = this.mapperSupplier.get();
-        final TypeFactory tf = reader.getTypeFactory();
-        final Class<?> cInnerType = (Class<?>) type.getCollectionContainedType();
-        final JavaType ct = tf.constructSimpleType(cInnerType, new JavaType[0]);
-        final CollectionType javaType = tf.constructCollectionType(List.class, ct);
-
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            checkJsonType(at.isArray(), type, at, key);
-            try {
-                return reader.readValue(at.traverse(), javaType);
-            }
-            catch (final IOException e) {
-                throw new KfgTypeException(this.name(), key, type, at, "type mismatch", e);
-            }
-        }
-    }
-
 
     /**
      * {@inheritDoc}
@@ -348,7 +352,12 @@ final class ExtJacksonJsonSource extends Source {
                 throw new KfgTypeException(this.name(), key, type, null, "jackson error", e);
             }
 
-            return ret;
+            if (ret instanceof List)
+                return Collections.unmodifiableList(((List<?>) ret));
+            else if (ret instanceof Set)
+                return Collections.unmodifiableSet(((Set<?>) ret));
+            else
+                return ret;
         }
     }
 
