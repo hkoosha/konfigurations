@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.ext;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -14,7 +14,6 @@ import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.KfgTypeNullException;
 import io.koosha.konfiguration.Source;
-import io.koosha.konfiguration.ext.KfgJacksonError;
 import io.koosha.konfiguration.type.Kind;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
@@ -46,14 +45,14 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 @ThreadSafe
 @ApiStatus.Internal
-final class ExtJacksonJsonSource extends Source {
+public final class ExtJacksonJsonSource extends Source {
 
     private static final String DOT_PATTERN = Pattern.quote(".");
 
     @Contract(pure = true,
             value = "->new")
     @NotNull
-    static ObjectMapper defaultJacksonObjectMapper() {
+    private static ObjectMapper defaultJacksonObjectMapper() {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         return mapper;
@@ -130,6 +129,11 @@ final class ExtJacksonJsonSource extends Source {
     }
 
 
+    public ExtJacksonJsonSource(@NotNull final String name,
+                                @NotNull final Supplier<String> jsonSupplier) {
+        this(name, jsonSupplier, ExtJacksonJsonSource::defaultJacksonObjectMapper);
+    }
+
     /**
      * Creates an instance with a with the given json
      * provider and object mapper provider.
@@ -148,9 +152,9 @@ final class ExtJacksonJsonSource extends Source {
      * @throws KfgSourceException   if the provided json string can not be parsed by jackson.
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
-    ExtJacksonJsonSource(@NotNull final String name,
-                         @NotNull final Supplier<String> jsonSupplier,
-                         @NotNull final Supplier<ObjectMapper> objectMapper) {
+    public ExtJacksonJsonSource(@NotNull final String name,
+                                @NotNull final Supplier<String> jsonSupplier,
+                                @NotNull final Supplier<ObjectMapper> objectMapper) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(jsonSupplier, "jsonSupplier");
         Objects.requireNonNull(objectMapper, "objectMapper");

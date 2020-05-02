@@ -3,6 +3,10 @@ package io.koosha.konfiguration.impl.v8;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationFactory;
+import io.koosha.konfiguration.ext.ExtJacksonJsonSource;
+import io.koosha.konfiguration.ext.ExtMapSource;
+import io.koosha.konfiguration.ext.ExtPreferencesSource;
+import io.koosha.konfiguration.ext.ExtYamlSource;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -179,8 +183,8 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final Supplier<String> json) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
-        final ObjectMapper mapper = ExtJacksonJsonSource.defaultJacksonObjectMapper();
-        return jacksonJson(name, json, () -> mapper);
+        final ExtJacksonJsonSource k = new ExtJacksonJsonSource(name, json);
+        return kombine(name, k);
     }
 
     /**
@@ -267,7 +271,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                                    @NotNull final Supplier<String> yaml) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
-        final ExtYamlSource k = new ExtYamlSource(name, yaml, ExtYamlSource.defaultYamlSupplier::get);
+        final ExtYamlSource k = new ExtYamlSource(name, yaml);
         return kombine(name, k);
     }
 

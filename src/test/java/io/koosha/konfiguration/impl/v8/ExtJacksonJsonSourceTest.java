@@ -1,6 +1,7 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgMissingKeyException;
+import io.koosha.konfiguration.ext.ExtJacksonJsonSource;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -50,10 +51,7 @@ public class ExtJacksonJsonSourceTest {
     @BeforeMethod
     public void setup() throws Exception {
         this.json = SAMPLE_0;
-        this.k = new ExtJacksonJsonSource(
-                "testJacksonSource",
-                () -> json,
-                ExtJacksonJsonSource::defaultJacksonObjectMapper);
+        this.k = new ExtJacksonJsonSource("testJacksonSource", () -> json);
     }
 
     private void update() {

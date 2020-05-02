@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.ext;
 
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgIllegalStateException;
@@ -37,7 +37,7 @@ import java.util.prefs.Preferences;
  */
 @ApiStatus.Internal
 @ThreadSafe
-final class ExtPreferencesSource extends Source {
+public final class ExtPreferencesSource extends Source {
 
     private final Preferences source;
     private final int lastHash;
@@ -45,8 +45,8 @@ final class ExtPreferencesSource extends Source {
     @NotNull
     private final String name;
 
-    ExtPreferencesSource(@NotNull final String name,
-                         @NotNull final Preferences preferences) {
+    public ExtPreferencesSource(@NotNull final String name,
+                                @NotNull final Preferences preferences) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(preferences, "preferences");
 

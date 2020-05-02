@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.ext;
 
 import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KfgTypeException;
@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
 @ApiStatus.Internal
-final class ExtMapSource extends Source {
+public final class ExtMapSource extends Source {
 
     private final Supplier<Map<String, ?>> map;
     private final Map<String, ?> root;
@@ -50,8 +50,8 @@ final class ExtMapSource extends Source {
         return t;
     }
 
-    ExtMapSource(@NotNull final String name,
-                 @NotNull final Supplier<Map<String, ?>> mapSupplier) {
+    public ExtMapSource(@NotNull final String name,
+                        @NotNull final Supplier<Map<String, ?>> mapSupplier) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(mapSupplier, "mapSupplier");
 

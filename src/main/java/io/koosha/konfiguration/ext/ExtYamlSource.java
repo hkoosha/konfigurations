@@ -1,15 +1,14 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.ext;
 
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Source;
-import io.koosha.konfiguration.ext.KfgSnakeYamlAssertionError;
-import io.koosha.konfiguration.ext.KfgSnakeYamlError;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.Constructor;
@@ -30,6 +29,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Function;
@@ -52,9 +52,31 @@ import static java.util.stream.Collectors.toList;
 @ApiStatus.Internal
 @Immutable
 @ThreadSafe
-final class ExtYamlSource extends Source {
+public final class ExtYamlSource extends Source {
 
     private static final Pattern DOT = Pattern.compile(Pattern.quote("."));
+
+    private static Class<?> upper(@NotNull final Class<?> klass) {
+        if (klass == boolean.class)
+            return Boolean.class;
+        if (klass == char.class)
+            return Character.class;
+        if (klass == byte.class)
+            return Byte.class;
+        if (klass == short.class)
+            return Short.class;
+        if (klass == int.class)
+            return Integer.class;
+        if (klass == long.class)
+            return Long.class;
+        if (klass == float.class)
+            return Float.class;
+        if (klass == double.class)
+            return Double.class;
+        if (klass == void.class)
+            return Void.class;
+        return klass;
+    }
 
     static final class ByConstructorConstructor<A extends Annotation> extends Constructor {
 
@@ -71,13 +93,13 @@ final class ExtYamlSource extends Source {
             final List<java.lang.reflect.Constructor<?>> constructors = Arrays
                     .stream(origin.getDeclaredConstructors())
                     .filter(it -> it.getAnnotation(marker) != null)
-                    .filter(it -> asList(markerExtractor.apply(it.getAnnotation(marker))).containsAll(cArgNames)
-                            && cArgNames.containsAll(asList(markerExtractor.apply(it.getAnnotation(marker)))))
+                    .filter(it -> asList(markerExtractor.apply(it.getAnnotation(marker))).containsAll(cArgNames))
+                    .filter(it -> cArgNames.containsAll(asList(markerExtractor.apply(it.getAnnotation(marker)))))
                     .filter(it -> {
                         final Parameter[] ps = it.getParameters();
                         final String[] ns = markerExtractor.apply(it.getAnnotation(marker));
                         for (int i = 0; i < ns.length; i++)
-                            if (!ps[i].getType().isAssignableFrom(cArgsByName.get(ns[i]).type))
+                            if (!upper(ps[i].getType()).isAssignableFrom(upper(cArgsByName.get(ns[i]).type)))
                                 return false;
                         return true;
                     })
@@ -98,6 +120,26 @@ final class ExtYamlSource extends Source {
             this.yamlClassConstructors.put(NodeId.mapping, new KonstructMapping());
         }
 
+        private static Class<?> lower(@Nullable final Class<?> c) {
+            if (c == Character.class)
+                return char.class;
+            if (c == Boolean.class)
+                return boolean.class;
+            if (c == Short.class)
+                return short.class;
+            if (c == Integer.class)
+                return int.class;
+            if (c == Long.class)
+                return long.class;
+            if (c == Float.class)
+                return float.class;
+            if (c == Double.class)
+                return double.class;
+            if (c == Void.class)
+                return void.class;
+            return c;
+        }
+
         private class KonstructMapping extends ConstructMapping {
 
             @Override
@@ -108,7 +150,7 @@ final class ExtYamlSource extends Source {
                     return super.construct(node);
 
                 if (node.isTwoStepsConstruction())
-                    throw new YAMLException("encountered two step node: " + node);
+                    throw new YAMLException("encountered two step node (node is recursive): " + node);
 
                 final MappingNode mNode = (MappingNode) node;
                 flattenMapping(mNode);
@@ -193,11 +235,6 @@ final class ExtYamlSource extends Source {
                         .map(t -> t.type)
                         .toArray(Class<?>[]::new);
 
-                final Object[] values = consArgs
-                        .stream()
-                        .map(t -> t.value)
-                        .toArray();
-
                 java.lang.reflect.Constructor<?> c0;
                 try {
                     c0 = find(marker,
@@ -217,7 +254,6 @@ final class ExtYamlSource extends Source {
                         // ignore
                     }
 
-
                 if (c0 == null)
                     try {
                         final Class<?>[] types2 = consArgs
@@ -233,6 +269,17 @@ final class ExtYamlSource extends Source {
 
                 requireNonNull(c0, "no constructor found for: " + node);
 
+                final String[] annotatedNames =
+                        c0.getAnnotation(ConstructorProperties.class).value();
+
+                final Object[] values = new Object[annotatedNames.length];
+                for (final ParamNode pm : consArgs)
+                    values[indexOf(annotatedNames, pm.name)] = pm.value;
+                //                consArgs
+                //                        .stream()
+                //                        .map(t -> t.value)
+                //                        .toArray();
+
                 try {
                     c0.setAccessible(true);
                     return c0.newInstance(values);
@@ -242,22 +289,15 @@ final class ExtYamlSource extends Source {
                 }
             }
 
-        }
+            private int indexOf(@NotNull final String[] annotatedNames,
+                                @NotNull final String name) {
+                for (int i = 0; i < annotatedNames.length; i++)
+                    if (Objects.equals(annotatedNames[i], name))
+                        return i;
+                throw new NoSuchElementException();
+            }
 
-        private static Class<?> lower(Class<?> c) {
-            if (c == Boolean.class)
-                return boolean.class;
-            if (c == Integer.class)
-                return int.class;
-            if (c == Long.class)
-                return long.class;
-            if (c == Float.class)
-                return float.class;
-            if (c == Double.class)
-                return double.class;
-            return c;
         }
-
 
         private static class Param {
             String name;
@@ -302,11 +342,11 @@ final class ExtYamlSource extends Source {
     }
 
     static final BaseConstructor defaultBaseConstructor = new ByConstructorConstructor<>(
-            (Class<? extends ConstructorProperties>) ConstructorProperties.class,
-            (Function<? super ConstructorProperties, String[]>) ConstructorProperties::value
+            ConstructorProperties.class,
+            ConstructorProperties::value
     );
 
-    static final ThreadLocal<Yaml> defaultYamlSupplier =
+    private static final ThreadLocal<Yaml> defaultYamlSupplier =
             ThreadLocal.withInitial(() -> new Yaml(defaultBaseConstructor));
 
     private final Supplier<Yaml> mapper;
@@ -318,9 +358,16 @@ final class ExtYamlSource extends Source {
     @NotNull
     private final String name;
 
+
+    public ExtYamlSource(@NotNull final String name,
+                         @NotNull final Supplier<String> yamlSupplier) {
+        this(name, yamlSupplier, ExtYamlSource.defaultYamlSupplier::get);
+    }
+
     /**
      * Creates an instance with the given Yaml parser.
      *
+     * @param name         Name of this source.
      * @param yamlSupplier backing store provider. Must always return a non-null valid yaml
      *                     string.
      * @param mapper       {@link Yaml} provider. Must always return a valid non-null Yaml,
@@ -331,9 +378,9 @@ final class ExtYamlSource extends Source {
      *                              specifically looks for the class: "org.yaml.snakeyaml"
      * @throws KfgSnakeYamlError    if the storage (yaml string) returned by yaml string is null.
      */
-    ExtYamlSource(@NotNull final String name,
-                  @NotNull final Supplier<String> yamlSupplier,
-                  @NotNull final Supplier<Yaml> mapper) {
+    public ExtYamlSource(@NotNull final String name,
+                         @NotNull final Supplier<String> yamlSupplier,
+                         @NotNull final Supplier<Yaml> mapper) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yamlSupplier, "yamlSupplier");
         Objects.requireNonNull(mapper, "mapper");

@@ -46,7 +46,6 @@ public final class TestUtil {
         public final int i;
         public final String again;
 
-        @ConstructorProperties({"str", "again", "olf", "i"})
         public DummyCustom2(final String str, final String again, final Map<String, String> olf, final int i) {
             this.str = str;
             this.olf = olf;

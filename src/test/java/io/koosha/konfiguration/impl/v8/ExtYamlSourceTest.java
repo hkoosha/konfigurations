@@ -3,6 +3,7 @@ package io.koosha.konfiguration.impl.v8;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.TestUtil;
+import io.koosha.konfiguration.ext.ExtYamlSource;
 import io.koosha.konfiguration.type.Kind;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -14,8 +15,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Scanner;
+import java.util.function.Supplier;
 
-import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
@@ -47,9 +48,7 @@ public class ExtYamlSourceTest {
     @BeforeMethod
     public void setup() throws Exception {
         this.yaml = SAMPLE_0;
-        this.k = new ExtYamlSource("yamlSourceTest",
-                                   () -> this.yaml,
-                                   ExtYamlSource.defaultYamlSupplier::get);
+        this.k = new ExtYamlSource("yamlSourceTest", () -> this.yaml);
     }
 
     private Konfiguration k() {
@@ -174,8 +173,7 @@ public class ExtYamlSourceTest {
     public void testCustomValue() {
         final String yamlString = "bang:\n  str : hello\n  i: 99";
 
-        final ExtYamlSource y = new ExtYamlSource(
-                "testYamlSource", () -> yamlString, ExtYamlSource.defaultYamlSupplier::get);
+        final ExtYamlSource y = new ExtYamlSource("testYamlSource", () -> yamlString);
 
         final TestUtil.DummyCustom bang = y.custom(
                 "bang", Kind.of(TestUtil.DummyCustom.class)).vn();
@@ -186,18 +184,23 @@ public class ExtYamlSourceTest {
 
     @Test
     public void testCustomValue2() {
-        final TestUtil.DummyCustom2 bang = kFactory().snakeYaml(
-                "snake",
-                () -> {
-                    try {
-                        File file = new File(getClass().getResource("/sample2.yaml").getPath());
-                        return new Scanner(file, StandardCharsets.UTF_8.name())
-                                .useDelimiter("\\Z").next();
-                    }
-                    catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }).custom("bang", Kind.of(TestUtil.DummyCustom2.class)).vn();
+        final Supplier<String> yamlString = () -> {
+            try {
+                File file = new File(getClass().getResource("/sample2.yaml").getPath());
+                return new Scanner(file, StandardCharsets.UTF_8.name())
+                        .useDelimiter("\\Z").next();
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        final ExtYamlSource y = new ExtYamlSource(
+                "testYamlSource", yamlString);
+
+        final TestUtil.DummyCustom2 bang = y.custom(
+                "bang", Kind.of(TestUtil.DummyCustom2.class)).vn();
+
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");
         assertEquals(bang.olf, TestUtil.mapOf(
