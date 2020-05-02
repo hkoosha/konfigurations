@@ -342,9 +342,9 @@ public abstract class Source implements Konfiguration {
         if (type.isLong())
             return (K<U>) long_(key);
         if (type.isDouble())
-            return (K<U>) float_(key);
-        if (type.isFloat())
             return (K<U>) double_(key);
+        if (type.isFloat())
+            return (K<U>) float_(key);
 
         if (type.isList())
             return (K<U>) list(key, type.getCollectionContainedKind());

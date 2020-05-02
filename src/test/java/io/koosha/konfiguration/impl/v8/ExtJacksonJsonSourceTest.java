@@ -1,7 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
-import io.koosha.konfiguration.KfgAssertionException;
-import io.koosha.konfiguration.KfgTypeException;
+import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -135,30 +134,7 @@ public class ExtJacksonJsonSourceTest {
 
     // BAD CASES
 
-    @Test(expectedExceptions = KfgTypeException.class,
-            dataProvider = "testBadIntDataProvider")
-    public void testBadInt(@NotNull final String konfigKey) throws Exception {
-        this.k().int_(konfigKey).v();
-        LOG.error("testBadInt: {} did not fail", konfigKey);
-    }
-
-    @DataProvider
-    public static Object[][] testBadIntDataProvider() {
-        return new Object[][]{
-                {"aString"},
-                // {"aInt"},
-                {"aBool"},
-                {"aIntList"},
-                {"aLong"},
-                {"aDouble"},
-                {"aMap"},
-                {"aSet"},
-                {"some"},
-        };
-    }
-
-
-    @Test(expectedExceptions = KfgAssertionException.class,
+    @Test(expectedExceptions = KfgMissingKeyException.class,
             dataProvider = "testBadDoubleDataProvider")
     public void testBadDouble(@NotNull final String konfigKey) throws Exception {
         this.k().double_(konfigKey).v();
@@ -179,50 +155,5 @@ public class ExtJacksonJsonSourceTest {
                 {"some"},
         };
     }
-
-
-    @Test(expectedExceptions = KfgAssertionException.class,
-            dataProvider = "testBadLongDataProvider")
-    public void testBadLong(@NotNull final String konfigKey) throws Exception {
-        this.k().long_(konfigKey).v();
-    }
-
-    @DataProvider
-    public static Object[][] testBadLongDataProvider() {
-        return new Object[][]{
-                {"aString"},
-                // {"aInt"},
-                {"aBool"},
-                {"aIntList"},
-                // {"aLong"},
-                {"aDouble"},
-                {"aMap"},
-                {"aSet"},
-                {"some"},
-        };
-    }
-
-
-    @Test(expectedExceptions = KfgAssertionException.class,
-            dataProvider = "testBadStringDataProvider")
-    public void testBadString(@NotNull final String konfigKey) throws Exception {
-        this.k().string(konfigKey).v();
-    }
-
-    @DataProvider
-    public static Object[][] testBadStringDataProvider() {
-        return new Object[][]{
-                // {"aString"},
-                {"aInt"},
-                {"aBool"},
-                {"aIntList"},
-                {"aLong"},
-                {"aDouble"},
-                {"aMap"},
-                {"aSet"},
-                {"some"},
-        };
-    }
-
 
 }

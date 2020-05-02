@@ -206,5 +206,4 @@ public class ExtYamlSourceTest {
         assertEquals(bang.i, 99);
     }
 
-
 }

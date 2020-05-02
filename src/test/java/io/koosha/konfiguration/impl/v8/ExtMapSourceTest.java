@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
+import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeClass;
@@ -136,70 +137,70 @@ public class ExtMapSourceTest {
     // BAD CASES
 
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadInt0() throws Exception {
         this.k().int_("aBool").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadInt1() throws Exception {
         this.k().int_("aLong").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadInt2() throws Exception {
         this.k().int_("aString").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadInt3() throws Exception {
         this.k().int_("aDouble").v();
     }
 
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadDouble0() throws Exception {
         this.k().double_("aBool").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadDouble1() throws Exception {
         this.k().double_("aLong").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadDouble() throws Exception {
         this.k().double_("aString").v();
     }
 
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadLong0() throws Exception {
         this.k().long_("aBool").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadLong1() throws Exception {
         this.k().long_("aString").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadLong2() throws Exception {
         this.k().long_("aDouble").v();
     }
 
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadString0() throws Exception {
         this.k().string("aInt").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadString1() throws Exception {
         this.k().string("aBool").v();
     }
 
-    @Test(expectedExceptions = KfgTypeException.class)
+    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadString2() throws Exception {
         this.k().string("aIntList").v();
     }
