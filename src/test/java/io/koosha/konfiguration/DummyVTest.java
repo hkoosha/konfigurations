@@ -18,7 +18,8 @@ public class DummyVTest {
     @Test
     public void testRegister() throws Exception {
         final K<?> dummyV = DummyV.string(key);
-        assertEquals(dummyV.register(k -> { }).id(), -1L);
+        assertEquals(dummyV.register(k -> {
+        }).id(), -1L);
     }
 
     @Test

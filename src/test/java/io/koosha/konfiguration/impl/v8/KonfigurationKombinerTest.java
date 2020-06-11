@@ -22,8 +22,8 @@ public final class KonfigurationKombinerTest {
     private final AtomicBoolean flag = new AtomicBoolean(true);
 
     private final Supplier<Map<String, ?>> sup = () -> flag.get()
-            ? singletonMap("xxx", 12)
-            : singletonMap("xxx", 99);
+        ? singletonMap("xxx", 12)
+        : singletonMap("xxx", 99);
 
     private Konfiguration k;
     private KonfigurationManager man;
@@ -32,7 +32,7 @@ public final class KonfigurationKombinerTest {
     public void setup() {
         this.flag.set(true);
         this.k = kFactory().kombine("def", kFactory().map("map", sup));
-        this.man = k.manager();
+        this.man = k.manager().get();
     }
 
     @Test

@@ -57,12 +57,12 @@ public class KonfigurationKombinerConcurrencyTest {
         this.json = this.JSON0;
 
         this.k = kFactory().kombine(
-                "kombine",
-                kFactory().map("map", () -> this.map),
-                kFactory().map("map", () -> this.MAP2),
-                kFactory().jacksonJson("json", () -> this.json)
+            "kombine",
+            kFactory().map("map", () -> this.map),
+            kFactory().map("map", () -> this.MAP2),
+            kFactory().jacksonJson("json", () -> this.json)
         );
-        this.man = this.k.manager();
+        this.man = this.k.manager().get();
     }
 
     private void toggle() {

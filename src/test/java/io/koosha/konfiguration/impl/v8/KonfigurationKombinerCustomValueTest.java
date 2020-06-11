@@ -19,8 +19,8 @@ public class KonfigurationKombinerCustomValueTest {
     final String key = "theKey";
 
     private final Konfiguration k = kFactory().kombine("def", kFactory().map(
-            "meName",
-            () -> Collections.singletonMap(key, value)
+        "meName",
+        () -> Collections.singletonMap(key, value)
     ));
 
     @Test

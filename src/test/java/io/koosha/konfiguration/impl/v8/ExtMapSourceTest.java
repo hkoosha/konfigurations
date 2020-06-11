@@ -1,7 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgMissingKeyException;
-import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Konfiguration;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -79,7 +78,7 @@ public class ExtMapSourceTest {
 
     private void update() {
         this.map = this.map1;
-        this.k.manager().updateNow();
+        this.k.manager().get().updateNow();
     }
 
     private Konfiguration k() {
@@ -88,13 +87,13 @@ public class ExtMapSourceTest {
 
     @Test
     public void testNotUpdatable() throws Exception {
-        assertFalse(this.k().manager().hasUpdate());
+        assertFalse(this.k().manager().get().hasUpdate());
     }
 
     @Test
     public void testUpdatable() throws Exception {
         map = map1;
-        assertTrue(this.k().manager().hasUpdate());
+        assertTrue(this.k().manager().get().hasUpdate());
     }
 
     // =========================================================================

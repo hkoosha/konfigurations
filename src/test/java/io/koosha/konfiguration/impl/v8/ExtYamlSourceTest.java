@@ -176,7 +176,7 @@ public class ExtYamlSourceTest {
         final ExtYamlSource y = new ExtYamlSource("testYamlSource", () -> yamlString);
 
         final TestUtil.DummyCustom bang = y.custom(
-                "bang", Kind.of(TestUtil.DummyCustom.class)).vn();
+            "bang", Kind.of(TestUtil.DummyCustom.class)).vn();
 
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");
@@ -188,7 +188,7 @@ public class ExtYamlSourceTest {
             try {
                 File file = new File(getClass().getResource("/sample2.yaml").getPath());
                 return new Scanner(file, StandardCharsets.UTF_8.name())
-                        .useDelimiter("\\Z").next();
+                    .useDelimiter("\\Z").next();
             }
             catch (Exception e) {
                 throw new RuntimeException(e);
@@ -196,15 +196,15 @@ public class ExtYamlSourceTest {
         };
 
         final ExtYamlSource y = new ExtYamlSource(
-                "testYamlSource", yamlString);
+            "testYamlSource", yamlString);
 
         final TestUtil.DummyCustom2 bang = y.custom(
-                "bang", Kind.of(TestUtil.DummyCustom2.class)).vn();
+            "bang", Kind.of(TestUtil.DummyCustom2.class)).vn();
 
         assertEquals(bang.i, 99);
         assertEquals(bang.str, "hello");
         assertEquals(bang.olf, TestUtil.mapOf(
-                "manga", "panga", "foo", "bar", "baz", "quo"));
+            "manga", "panga", "foo", "bar", "baz", "quo"));
         assertEquals(bang.again, "no");
         assertEquals(bang.i, 99);
     }

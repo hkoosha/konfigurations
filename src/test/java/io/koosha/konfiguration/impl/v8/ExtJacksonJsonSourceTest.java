@@ -133,7 +133,7 @@ public class ExtJacksonJsonSourceTest {
     // BAD CASES
 
     @Test(expectedExceptions = KfgMissingKeyException.class,
-            dataProvider = "testBadDoubleDataProvider")
+          dataProvider = "testBadDoubleDataProvider")
     public void testBadDouble(@NotNull final String konfigKey) throws Exception {
         this.k().double_(konfigKey).v();
         LOG.error("testBadDouble: {} did not fail", konfigKey);
@@ -142,16 +142,16 @@ public class ExtJacksonJsonSourceTest {
     @DataProvider
     public static Object[][] testBadDoubleDataProvider() {
         return new Object[][]{
-                {"aString"},
-                // {"aInt"},
-                {"aBool"},
-                {"aIntList"},
-                // {"aLong"},
-                // {"aDouble"},
-                {"aMap"},
-                {"aSet"},
-                {"some"},
-        };
+            {"aString"},
+            // {"aInt"},
+            {"aBool"},
+            {"aIntList"},
+            // {"aLong"},
+            // {"aDouble"},
+            {"aMap"},
+            {"aSet"},
+            {"some"},
+            };
     }
 
 }

@@ -16,8 +16,8 @@ public class KonfigurationMissingKeyTest {
     private boolean returnFourTaee = true;
 
     private final Supplier<Map<String, ?>> sup = () -> returnFourTaee
-            ? singletonMap("xxx", (Object) 12)
-            : singletonMap("xxx", (Object) 99);
+        ? singletonMap("xxx", (Object) 12)
+        : singletonMap("xxx", (Object) 99);
 
     private Konfiguration k;
 
