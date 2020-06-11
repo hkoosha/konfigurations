@@ -1,0 +1,6 @@
+image: "java:8"
+
+test:
+  script:
+    - ./gradlew test
+
