@@ -24,12 +24,12 @@ import static java.util.stream.Collectors.toList;
 
 @NotThreadSafe
 @ApiStatus.Internal
-final class Kombiner_Manager implements KonfigurationManager {
+final class KombinerManager implements KonfigurationManager {
 
     @NotNull
     private final Kombiner origin;
 
-    public Kombiner_Manager(@NotNull final Kombiner kombiner) {
+    public KombinerManager(@NotNull final Kombiner kombiner) {
         Objects.requireNonNull(kombiner, "kombiner");
         this.origin = kombiner;
     }
@@ -44,8 +44,8 @@ final class Kombiner_Manager implements KonfigurationManager {
     public Map<String, Collection<Runnable>> update() {
         return this.origin.r(() -> {
             if (this.origin.sources
-                    .sourcesStream()
-                    .noneMatch(x -> ((Source) x).hasUpdate()))
+                .sourcesStream()
+                .noneMatch(x -> ((Source) x).hasUpdate()))
                 return emptyMap();
 
             final Map<Handle, Konfiguration> newSources = this.origin.sources.sourcesCopy();
@@ -55,25 +55,25 @@ final class Kombiner_Manager implements KonfigurationManager {
             final Map<Kind<?>, Object> newCache = this.origin.cacheCopy();
             this.origin.issuedKeys.forEach(q -> {
                 final String key = requireNonNull(
-                        q.key(), "ket passed through kombiner is null");
+                    q.key(), "ket passed through kombiner is null");
 
                 final Optional<Konfiguration> first = newSources
-                        .values()
-                        .stream()
-                        .filter(x -> x.has(key, q))
-                        .findFirst();
+                    .values()
+                    .stream()
+                    .filter(x -> x.has(key, q))
+                    .findFirst();
 
                 final Object newV = first
-                        .map(konfiguration -> konfiguration.custom(q.key(), q).v())
-                        .orElse(null);
+                    .map(konfiguration -> konfiguration.custom(q.key(), q).v())
+                    .orElse(null);
 
                 final Object oldV = this.origin.has(q.key(), q)
-                        ? this.origin.issueValue(q)
-                        : null;
+                    ? this.origin.issueValue(q)
+                    : null;
 
                 // Went missing or came into existence.
                 if (this.origin.hasInCache(q) != first.isPresent()
-                        || !Objects.equals(newV, oldV))
+                    || !Objects.equals(newV, oldV))
                     updated.add(q);
 
                 if (first.isPresent())
@@ -82,32 +82,32 @@ final class Kombiner_Manager implements KonfigurationManager {
 
             return this.origin.w(() -> {
                 final Map<String, Collection<Runnable>> result = this
-                        .origin
-                        .sources
-                        .sourcesStream()
-                        // External non-optimizable konfig sources.
-                        .filter(target -> !(target instanceof Source))
-                        .map(Konfiguration::manager)
-                        .map(KonfigurationManager::update)
-                        .peek(x -> x.entrySet().forEach(e -> e.setValue(
-                                // just to wrap!
-                                e.getValue().stream().map(r -> {
-                                    Objects.requireNonNull(r, "runnable");
-                                    //noinspection Convert2Lambda,Anonymous2MethodRef
-                                    return new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            r.run();
-                                        }
-                                    };
-                                })
-                                 .collect(toList())
-                        )))
-                        .reduce(new HashMap<>(), (m0, m1) -> {
-                            m1.forEach((m1k, m1c) -> m0.computeIfAbsent(
-                                    m1k, m1k_ -> new ArrayList<>()).addAll(m1c));
-                            return m0;
-                        });
+                    .origin
+                    .sources
+                    .sourcesStream()
+                    // External non-optimizable konfig sources.
+                    .filter(target -> !(target instanceof Source))
+                    .map(Konfiguration::manager)
+                    .map(it -> it.get().update())
+                    .peek(x -> x.entrySet().forEach(e -> e.setValue(
+                        // just to wrap!
+                        e.getValue().stream().map(r -> {
+                            Objects.requireNonNull(r, "runnable");
+                            //noinspection Convert2Lambda,Anonymous2MethodRef
+                            return new Runnable() {
+                                @Override
+                                public void run() {
+                                    r.run();
+                                }
+                            };
+                        })
+                         .collect(toList())
+                    )))
+                    .reduce(new HashMap<>(), (m0, m1) -> {
+                        m1.forEach((m1k, m1c) -> m0.computeIfAbsent(
+                            m1k, m1k_ -> new ArrayList<>()).addAll(m1c));
+                        return m0;
+                    });
 
                 for (final Kind<?> kind : updated)
                     //noinspection ConstantConditions
@@ -130,10 +130,10 @@ final class Kombiner_Manager implements KonfigurationManager {
     @Override
     public boolean hasUpdate() {
         return this.origin.r(() -> this
-                .origin
-                .sources
-                .sourcesStream()
-                .anyMatch(x -> ((Source) x).hasUpdate()));
+            .origin
+            .sources
+            .sourcesStream()
+            .anyMatch(x -> ((Source) x).hasUpdate()));
     }
 
 }

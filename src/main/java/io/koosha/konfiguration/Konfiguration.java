@@ -7,6 +7,7 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -304,14 +305,11 @@ public interface Konfiguration {
 
     /**
      * Manager object associated with this konfiguration.
-     * <p>
-     * Throws exception if this method has been called previously.
      *
-     * @return manager associated with this konfiguration.
-     * @throws IllegalStateException if this method is called for a second time
-     *                               or more.
+     * @return manager associated with this konfiguration, or empty if this
+     * method has been already called before.
      */
     @Contract(mutates = "this")
-    KonfigurationManager manager() throws IllegalStateException;
+    Optional<KonfigurationManager> manager();
 
 }

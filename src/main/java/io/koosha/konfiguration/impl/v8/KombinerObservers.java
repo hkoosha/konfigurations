@@ -9,22 +9,27 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
 @SuppressWarnings("unused")
 @NotThreadSafe
 @ApiStatus.Internal
-final class Kombiner_Observers {
+final class KombinerObservers {
 
     @SuppressWarnings("FieldCanBeLocal")
     @NotNull
     private final String name;
 
-    private final Map<Handle, Kombiner_Observer> observers = new LinkedHashMap<>();
+    private final Map<Handle, KombinerObserver> observers = new LinkedHashMap<>();
 
-    Kombiner_Observers(@NotNull String name) {
+    KombinerObservers(@NotNull String name) {
         Objects.requireNonNull(name, "name");
         this.name = name;
     }
@@ -33,7 +38,7 @@ final class Kombiner_Observers {
     Handle registerSoft(@NotNull final KeyObserver observer,
                         @Nullable final String key) {
         Objects.requireNonNull(observer, "observer");
-        final Kombiner_Observer o = new Kombiner_Observer(new WeakReference<>(observer));
+        final KombinerObserver o = new KombinerObserver(new WeakReference<>(observer));
         this.observers.put(o.handle(), o);
         return o.handle();
     }
@@ -42,7 +47,7 @@ final class Kombiner_Observers {
     Handle registerHard(@NotNull final KeyObserver observer,
                         @Nullable final String key) {
         Objects.requireNonNull(observer, "observer");
-        final Kombiner_Observer o = new Kombiner_Observer(observer);
+        final KombinerObserver o = new KombinerObserver(observer);
         this.observers.put(o.handle(), o);
         return o.handle();
     }
@@ -56,7 +61,7 @@ final class Kombiner_Observers {
                     @NotNull final String key) {
         Objects.requireNonNull(handle, "handle");
         Objects.requireNonNull(key, "key");
-        final Kombiner_Observer o = this.observers.get(handle);
+        final KombinerObserver o = this.observers.get(handle);
         if (o != null)
             o.remove(key);
     }
@@ -65,17 +70,17 @@ final class Kombiner_Observers {
     Collection<Runnable> get(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return this.observers
-                .values()
-                .stream()
-                .filter(x -> x.has(key))
-                .map(Kombiner_Observer::listener)
-                .filter(Objects::nonNull)
-                .map(x -> (Runnable) () -> x.accept(key))
-                .collect(toList());
+            .values()
+            .stream()
+            .filter(x -> x.has(key))
+            .map(KombinerObserver::listener)
+            .filter(Objects::nonNull)
+            .map(x -> (Runnable) () -> x.accept(key))
+            .collect(toList());
     }
 
     @NotThreadSafe
-    private static final class Kombiner_Observer {
+    private static final class KombinerObserver {
 
         private final Handle handle = new HandleImpl();
 
@@ -87,13 +92,13 @@ final class Kombiner_Observers {
         @Nullable
         private final KeyObserver hard;
 
-        Kombiner_Observer(@NotNull final WeakReference<KeyObserver> keyObserver) {
+        KombinerObserver(@NotNull final WeakReference<KeyObserver> keyObserver) {
             Objects.requireNonNull(keyObserver, "keyObserver");
             this.soft = keyObserver;
             this.hard = null;
         }
 
-        Kombiner_Observer(@NotNull final KeyObserver keyObserver) {
+        KombinerObserver(@NotNull final KeyObserver keyObserver) {
             Objects.requireNonNull(keyObserver, "keyObserver");
             this.soft = null;
             this.hard = keyObserver;
@@ -102,10 +107,9 @@ final class Kombiner_Observers {
         @Nullable
         @Contract(pure = true)
         KeyObserver listener() {
-            if (this.soft != null)
-                return this.soft.get();
-            else
-                return this.hard;
+            return this.soft != null
+                ? this.soft.get()
+                : this.hard;
         }
 
         void add(@NotNull final String key) {
@@ -131,9 +135,8 @@ final class Kombiner_Observers {
 
         @Override
         public boolean equals(final Object o) {
-            return o == this ||
-                    o instanceof Kombiner_Observer
-                            && Objects.equals(this.handle, ((Kombiner_Observer) o).handle);
+            return o == this || o instanceof KombinerObserver
+                && Objects.equals(this.handle, ((KombinerObserver) o).handle);
         }
 
         @Override

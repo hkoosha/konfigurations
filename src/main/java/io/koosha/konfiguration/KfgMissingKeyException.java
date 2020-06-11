@@ -30,9 +30,9 @@ public class KfgMissingKeyException extends KfgException {
     @Override
     public String toString() {
         return format("%s(key=%s, neededType=%s)",
-                      this.getClass().getName(),
-                      this.key(),
-                      this.neededType());
+            this.getClass().getName(),
+            this.key(),
+            this.neededType());
     }
 
 }

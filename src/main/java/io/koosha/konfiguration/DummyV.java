@@ -72,7 +72,7 @@ public final class DummyV<U> implements K<U> {
      */
     @Override
     @Contract(pure = true,
-            value = "null->fail;_-> this")
+              value = "null->fail;_-> this")
     @NotNull
     public K<U> deregister(@NotNull final Handle observer) {
         Objects.requireNonNull(observer, "observer");
@@ -158,14 +158,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = " _ -> new")
+              value = " _ -> new")
     public static <U> K<U> null_(@Nullable final Kind<U> type) {
         return null_(type, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = " _, _ -> new")
+              value = " _, _ -> new")
     public static <U> K<U> null_(@Nullable final Kind<U> type,
                                  @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -175,7 +175,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = " _, _ -> new")
+              value = " _, _ -> new")
     public static <U> K<U> of(@Nullable final U u,
                               @Nullable final Kind<U> type) {
         return of(u, type, "");
@@ -183,7 +183,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _, _ -> new")
+              value = "_, _, _ -> new")
     public static <U> K<U> of(@Nullable final U u,
                               @Nullable final Kind<U> type,
                               @NotNull final String key) {
@@ -194,14 +194,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = " _ -> new")
+              value = " _ -> new")
     public static <U> K<U> missing(@Nullable final Kind<U> type) {
         return missing(type, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = " _, _ -> new")
+              value = " _, _ -> new")
     public static <U> K<U> missing(@Nullable final Kind<U> type,
                                    @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -211,7 +211,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = " _ -> new")
+              value = " _ -> new")
     public static K<Boolean> false_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return of(false, Kind.BOOL, key);
@@ -219,7 +219,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = " _ -> new")
+              value = " _ -> new")
     public static K<Boolean> true_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return of(true, Kind.BOOL, key);
@@ -227,14 +227,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = " -> new")
+              value = " -> new")
     public static K<Boolean> false_() {
         return false_("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Boolean> true_() {
         return true_("");
     }
@@ -242,28 +242,28 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Integer> mOne() {
         return mOne("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Integer> zero() {
         return zero("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Integer> one() {
         return one("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Integer> mOne(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return of(-1, Kind.INT, key);
@@ -271,7 +271,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Integer> zero(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return of(0, Kind.INT, key);
@@ -279,7 +279,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Integer> one(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return of(1, Kind.INT, key);
@@ -288,14 +288,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Boolean> bool(@Nullable final Boolean v) {
         return bool(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<Boolean> bool(@Nullable final Boolean v,
                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -306,14 +306,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Boolean> bool() {
         return missing(Kind.BOOL);
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Boolean> bool(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.BOOL, key);
@@ -322,14 +322,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Character> char_(@Nullable final Character v) {
         return of(v, Kind.CHAR);
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<Character> char_(@Nullable final Character v,
                                      @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -338,14 +338,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Character> char_() {
         return char_("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Character> char_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.CHAR, key);
@@ -354,14 +354,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<String> string(@Nullable final Object v) {
         return string(String.valueOf(v), "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<String> string(@Nullable final Object v,
                                    @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -370,14 +370,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<String> stringMissing() {
         return stringMissing("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<String> stringMissing(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.STRING, key);
@@ -386,14 +386,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Byte> byte_(@Nullable final Byte v) {
         return byte_(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<Byte> byte_(@Nullable final Byte v,
                                 @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -402,14 +402,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Byte> byte_() {
         return byte_("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Byte> byte_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.BYTE, key);
@@ -418,14 +418,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Short> short_(@Nullable final Short v) {
         return short_(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<Short> short_(final Short v,
                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -434,14 +434,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Short> short_() {
         return short_("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Short> short_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.SHORT, key);
@@ -450,14 +450,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Integer> int_(@Nullable final Integer v) {
         return int_(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<Integer> int_(final Integer v,
                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -466,14 +466,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Integer> int_() {
         return int_("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Integer> int_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.INT, key);
@@ -482,14 +482,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Long> long_(@Nullable final Long v) {
         return long_(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<Long> long_(@Nullable final Long v,
                                 @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -498,14 +498,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Long> long_() {
         return long_("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Long> long_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.LONG, key);
@@ -513,7 +513,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
 
     public static K<Float> float_(@Nullable final Float v) {
         return float_(v, "");
@@ -521,7 +521,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<Float> float_(@Nullable final Float v,
                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -530,14 +530,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Float> float_() {
         return float_("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Float> float_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.FLOAT, key);
@@ -546,14 +546,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Double> double_(@Nullable final Double v) {
         return double_(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static K<Double> double_(@Nullable final Double v,
                                     @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -562,14 +562,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static K<Double> double_() {
         return double_("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static K<Double> double_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return missing(Kind.DOUBLE, key);
@@ -579,14 +579,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<List<U>> list(@Nullable final List<U> v) {
         return list(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<List<U>> list(@Nullable final List<U> v,
                                       @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -595,7 +595,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<List<U>> list(@Nullable final List<U> v,
                                       @Nullable final Kind<List<U>> type) {
         return list(v, "", type);
@@ -603,7 +603,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _, _ -> new")
+              value = "_, _, _ -> new")
     public static <U> K<List<U>> list(@Nullable final List<U> v,
                                       @NotNull final String key,
                                       @Nullable final Kind<List<U>> type) {
@@ -614,14 +614,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static <U> K<List<U>> list() {
         return list("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<List<U>> list(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return list(key, null);
@@ -629,14 +629,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<List<U>> list(@Nullable final Kind<List<U>> type) {
         return list("", type);
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<List<U>> list(@NotNull final String key,
                                       @Nullable final Kind<List<U>> type) {
         Objects.requireNonNull(key, "key");
@@ -647,14 +647,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<Set<U>> set(@Nullable final Set<U> v) {
         return set(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<Set<U>> set(@Nullable final Set<U> v,
                                     @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -663,7 +663,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<Set<U>> set(@Nullable final Set<U> v,
                                     @Nullable final Kind<Set<U>> type) {
         return set(v, "", type);
@@ -671,7 +671,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _, _ -> new")
+              value = "_, _, _ -> new")
     public static <U> K<Set<U>> set(@Nullable final Set<U> v,
                                     @NotNull final String key,
                                     @Nullable final Kind<Set<U>> type) {
@@ -682,14 +682,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static <U> K<Set<U>> set() {
         return set("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<Set<U>> set(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return set(key, null);
@@ -697,14 +697,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<Set<U>> set(@Nullable final Kind<Set<U>> type) {
         return set("", type);
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<Set<U>> set(@NotNull final String key,
                                     @Nullable final Kind<Set<U>> type) {
         Objects.requireNonNull(key, "key");
@@ -715,14 +715,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<Collection<U>> collection(@Nullable final Collection<U> v) {
         return collection(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<Collection<U>> collection(@Nullable final Collection<U> v,
                                                   @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -731,7 +731,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<Collection<U>> collection(@Nullable final Collection<U> v,
                                                   @Nullable final Kind<Collection<U>> type) {
         return collection(v, "", type);
@@ -739,7 +739,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _, _ -> new")
+              value = "_, _, _ -> new")
     public static <U> K<Collection<U>> collection(@Nullable final Collection<U> v,
                                                   @NotNull final String key,
                                                   @Nullable final Kind<Collection<U>> type) {
@@ -750,14 +750,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static <U> K<Collection<U>> collection() {
         return collection("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<Collection<U>> collection(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return collection(key, null);
@@ -765,14 +765,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U> K<Collection<U>> collection(@NotNull final Kind<Collection<U>> type) {
         return collection("", type);
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U> K<Collection<U>> collection(@NotNull final String key,
                                                   @Nullable final Kind<Collection<U>> type) {
         Objects.requireNonNull(key, "key");
@@ -784,14 +784,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U, V> K<Map<U, V>> map(@Nullable final Map<U, V> v) {
         return map(v, "");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U, V> K<Map<U, V>> map(@Nullable final Map<U, V> v,
                                           @NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -800,7 +800,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U, V> K<Map<U, V>> map(@Nullable final Map<U, V> v,
                                           @Nullable final Kind<Map<U, V>> type) {
         return map(v, "", type);
@@ -808,7 +808,7 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _, _ -> new")
+              value = "_, _, _ -> new")
     public static <U, V> K<Map<U, V>> map(@Nullable final Map<U, V> v,
                                           @NotNull final String key,
                                           @Nullable final Kind<Map<U, V>> type) {
@@ -818,14 +818,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     public static <U, V> K<Map<U, V>> map() {
         return map("");
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U, V> K<Map<U, V>> map(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return map(key, null);
@@ -833,14 +833,14 @@ public final class DummyV<U> implements K<U> {
 
     @NotNull
     @Contract(pure = true,
-            value = "_ -> new")
+              value = "_ -> new")
     public static <U, V> K<Map<U, V>> map(@Nullable final Kind<Map<U, V>> type) {
         return map("", type);
     }
 
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public static <U, V> K<Map<U, V>> map(@NotNull final String key,
                                           @Nullable final Kind<Map<U, V>> type) {
         Objects.requireNonNull(key, "key");

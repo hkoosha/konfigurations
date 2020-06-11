@@ -51,8 +51,8 @@ final class ParameterizedTypeImpl implements ParameterizedType {
     @Override
     public int hashCode() {
         return Arrays.hashCode(this.actualTypeArguments)
-                ^ Objects.hashCode(this.ownerType)
-                ^ Objects.hashCode(this.rawType);
+            ^ Objects.hashCode(this.ownerType)
+            ^ Objects.hashCode(this.rawType);
     }
 
     @Contract(pure = true)
@@ -66,8 +66,8 @@ final class ParameterizedTypeImpl implements ParameterizedType {
             return false;
         final ParameterizedTypeImpl other = (ParameterizedTypeImpl) obj;
         return Objects.equals(other.ownerType, this.ownerType)
-                && Objects.equals(other.rawType, this.rawType)
-                && Arrays.equals(this.actualTypeArguments, other.actualTypeArguments);
+            && Objects.equals(other.rawType, this.rawType)
+            && Arrays.equals(this.actualTypeArguments, other.actualTypeArguments);
     }
 
 }

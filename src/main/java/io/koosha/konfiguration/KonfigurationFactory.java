@@ -126,7 +126,7 @@ public interface KonfigurationFactory {
      */
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     Konfiguration map(@NotNull String name,
                       @NotNull Supplier<Map<String, ?>> storage);
 
@@ -142,7 +142,7 @@ public interface KonfigurationFactory {
      */
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     Konfiguration map(@NotNull String name,
                       @NotNull Map<String, ?> storage);
 

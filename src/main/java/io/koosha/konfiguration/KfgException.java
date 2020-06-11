@@ -104,10 +104,10 @@ public class KfgException extends RuntimeException {
     @Override
     public String toString() {
         return format("%s(key=%s, neededType=%s, actualValue=%s)",
-                this.getClass().getName(),
-                this.key(),
-                this.neededType(),
-                this.actualValue());
+            this.getClass().getName(),
+            this.key(),
+            this.neededType(),
+            this.actualValue());
     }
 
 
@@ -151,8 +151,8 @@ public class KfgException extends RuntimeException {
 
     static String msgOf(final Throwable t) {
         return t == null
-                ? "[null exception]->[null exception]"
-                : format("[throwable::%s]->[%s]", t.getClass().getName(), t.getMessage());
+            ? "[null exception]->[null exception]"
+            : format("[throwable::%s]->[%s]", t.getClass().getName(), t.getMessage());
     }
 
     static String toStringOf(final Object value) {

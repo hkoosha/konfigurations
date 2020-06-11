@@ -4,12 +4,10 @@ import io.koosha.konfiguration.Handle;
 import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.KeyObserver;
 import io.koosha.konfiguration.KfgIllegalArgumentException;
-import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.type.Kind;
-import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -29,18 +27,20 @@ import java.util.stream.Stream;
 /**
  * Almost Thread-safe, <b>NOT</b> immutable.
  */
-@ThreadSafe
 @ApiStatus.Internal
 final class Kombiner implements Konfiguration {
 
     @NotNull
     private final String name;
 
-    @NotNull final Kombiner_Sources sources;
+    @NotNull
+    final KombinerSources sources;
 
-    @NotNull final Kombiner_Lock _lock;
+    @NotNull
+    final KombinerLock _lock;
 
-    @NotNull final Kombiner_Observers observers;
+    @NotNull
+    final KombinerObservers observers;
 
     @Nullable
     private volatile KonfigurationManager man;
@@ -60,25 +60,23 @@ final class Kombiner implements Konfiguration {
         final Map<Handle, Konfiguration> newSources = new HashMap<>();
         sources.stream()
                .peek(source -> {
-                   if (source == null)
-                       throw new KfgIllegalArgumentException(
-                               name, "null in config sources");
+                   Objects.requireNonNull(source, "null in config sources");
                    if (source instanceof SubsetView)
                        throw new KfgIllegalArgumentException(
-                               name, "can not kombine a " + source.getClass().getName() + " konfiguration.");
+                           name, "can not kombine a " + source.getClass().getName() + " konfiguration.");
                })
-               .flatMap(source ->// Unwrap.
-                                source instanceof Kombiner
-                                        ? ((Kombiner) source).sources.sourcesStream()
-                                        : Stream.of(source))
+               .flatMap(source ->
+                   source instanceof Kombiner
+                       ? ((Kombiner) source).sources.sourcesStream()
+                       : Stream.of(source))
                .forEach(source -> newSources.put(new HandleImpl(), source));
         if (newSources.isEmpty())
             throw new KfgIllegalArgumentException(name, "no source given");
 
-        this._lock = new Kombiner_Lock(name, lockWaitTimeMillis, fairLock);
-        this.observers = new Kombiner_Observers(this.name);
-        this.man = new Kombiner_Manager(this);
-        this.sources = new Kombiner_Sources(this);
+        this._lock = new KombinerLock(name, lockWaitTimeMillis, fairLock);
+        this.observers = new KombinerObservers(this.name);
+        this.man = new KombinerManager(this);
+        this.sources = new KombinerSources(this);
 
         this.sources.replaceSources(newSources);
     }
@@ -97,13 +95,14 @@ final class Kombiner implements Konfiguration {
 
     <U> K<U> k(@NotNull final String key,
                @NotNull final Kind<U> type) {
+        Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         final Kind<?> withKey = ((Kind<?>) type).withKey(key);
         this.w(() -> {
             this.issuedKeys.add(withKey);
             return null;
         });
-        return new Kombiner_K<>(this, key, type);
+        return new KombinerK<>(this, key, type);
     }
 
     @Nullable
@@ -111,6 +110,7 @@ final class Kombiner implements Konfiguration {
     <U> U getCachedValueOrIssueIt(@NotNull final String key,
                                   @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
 
         final Kind<U> t = type.withKey(key);
 
@@ -127,10 +127,10 @@ final class Kombiner implements Konfiguration {
         final String keyStr = key.key();
         Objects.requireNonNull(keyStr, "key passed through kombiner is null");
         final Optional<Konfiguration> find = this
-                .sources
-                .sourcesStream()
-                .filter(source -> source.has(keyStr, key))
-                .findFirst();
+            .sources
+            .sourcesStream()
+            .filter(source -> source.has(keyStr, key))
+            .findFirst();
         if (!find.isPresent())
             throw new KfgMissingKeyException(this.name(), keyStr, key);
         this.issuedKeys.add(key.withKey(keyStr));
@@ -173,13 +173,11 @@ final class Kombiner implements Konfiguration {
     @Contract(pure = true)
     @Override
     @NotNull
-    public KonfigurationManager manager() {
+    public Optional<KonfigurationManager> manager() {
         return this.w(() -> {
             final KonfigurationManager m = this.man;
-            if (m == null)
-                throw new KfgIllegalStateException(this.name(), null, null, null, "manager is already taken out");
             this.man = null;
-            return m;
+            return Optional.ofNullable(m);
         });
     }
 

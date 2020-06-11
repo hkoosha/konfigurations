@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 @NotThreadSafe
 @ApiStatus.Internal
-final class Kombiner_Sources {
+final class KombinerSources {
 
     @NotNull
     private final Kombiner origin;
@@ -26,13 +26,13 @@ final class Kombiner_Sources {
                 @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         return this.sources
-                .values()
-                .stream()
-                .filter(x -> x != this.origin)
-                .anyMatch(k -> k.has(key, type));
+            .values()
+            .stream()
+            .filter(x -> x != this.origin)
+            .anyMatch(k -> k.has(key, type));
     }
 
-    Kombiner_Sources(@NotNull final Kombiner origin) {
+    KombinerSources(@NotNull final Kombiner origin) {
         Objects.requireNonNull(origin, "origin");
         this.origin = origin;
     }

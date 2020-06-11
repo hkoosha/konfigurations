@@ -8,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -360,7 +361,7 @@ public abstract class Source implements Konfiguration {
      * {@inheritDoc}
      */
     @Override
-    public final KonfigurationManager manager() {
+    public final Optional<KonfigurationManager> manager() {
         throw new KfgAssertionException(this.name(), null, null, null, "manager() should not be called on a Source.");
     }
 
@@ -397,7 +398,8 @@ public abstract class Source implements Konfiguration {
 
     // =========================================================================
 
-    @Contract(pure = true, value = "null -> null")
+    @Contract(pure = true,
+              value = "null -> null")
     @Nullable
     private static Boolean toBool(@Nullable final Object o) {
         if (o instanceof Boolean)
@@ -414,31 +416,36 @@ public abstract class Source implements Konfiguration {
         return l == 0 ? false : true;
     }
 
-    @Contract(pure = true, value = "null -> null")
+    @Contract(pure = true,
+              value = "null -> null")
     @Nullable
     private static Long toByte(@Nullable final Number o) {
         return toIntegral(o, Byte.MIN_VALUE, Byte.MAX_VALUE);
     }
 
-    @Contract(pure = true, value = "null -> null")
+    @Contract(pure = true,
+              value = "null -> null")
     @Nullable
     private static Long toShort(@Nullable final Number o) {
         return toIntegral(o, Short.MIN_VALUE, Short.MAX_VALUE);
     }
 
-    @Contract(pure = true, value = "null -> null")
+    @Contract(pure = true,
+              value = "null -> null")
     @Nullable
     private static Long toInt(@Nullable final Number o) {
         return toIntegral(o, Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
-    @Contract(pure = true, value = "null -> null")
+    @Contract(pure = true,
+              value = "null -> null")
     @Nullable
     private static Long toLong(@Nullable final Number o) {
         return toIntegral(o, Long.MIN_VALUE, Long.MAX_VALUE);
     }
 
-    @Contract(pure = true, value = "null, _, _ -> null")
+    @Contract(pure = true,
+              value = "null, _, _ -> null")
     @Nullable
     private static Long toIntegral(@Nullable final Number o,
                                    final long min,
@@ -452,7 +459,8 @@ public abstract class Source implements Konfiguration {
         return o.longValue();
     }
 
-    @Contract(pure = true, value = "null -> null")
+    @Contract(pure = true,
+              value = "null -> null")
     @Nullable
     private static Float toFloat(@Nullable final Number o) {
         if (o == null)
@@ -464,7 +472,8 @@ public abstract class Source implements Konfiguration {
         return o.floatValue();
     }
 
-    @Contract(pure = true, value = "null -> null")
+    @Contract(pure = true,
+              value = "null -> null")
     @Nullable
     private static Double toDouble(@Nullable final Number o) {
         if (o == null)
@@ -542,9 +551,9 @@ public abstract class Source implements Konfiguration {
     @Override
     public final Konfiguration subset(@NotNull final String key) {
         throw new KfgAssertionException(
-                this.name(), null, null, null,
-                "subset(key) shouldn't be called on classes extending="
-                        + getClass().getName() + ", key=" + key);
+            this.name(), null, null, null,
+            "subset(key) shouldn't be called on classes extending="
+                + getClass().getName() + ", key=" + key);
     }
 
     /**
@@ -555,9 +564,9 @@ public abstract class Source implements Konfiguration {
     @Contract("_ -> fail")
     public final Handle registerSoft(@NotNull final KeyObserver observer) {
         throw new KfgAssertionException(
-                this.name(), null, null, null,
-                "registerSoft(observer) shouldn't be called on classes extending="
-                        + getClass().getName() + ", observer=" + observer);
+            this.name(), null, null, null,
+            "registerSoft(observer) shouldn't be called on classes extending="
+                + getClass().getName() + ", observer=" + observer);
     }
 
     /**
@@ -568,9 +577,9 @@ public abstract class Source implements Konfiguration {
     @NotNull
     public final Handle register(@NotNull final KeyObserver observer) {
         throw new KfgAssertionException(
-                this.name(), null, null, null,
-                "register(observer) shouldn't be called on classes extending="
-                        + getClass().getName() + ", observer=" + observer);
+            this.name(), null, null, null,
+            "register(observer) shouldn't be called on classes extending="
+                + getClass().getName() + ", observer=" + observer);
     }
 
     /**
@@ -582,10 +591,10 @@ public abstract class Source implements Konfiguration {
     public final Handle registerSoft(@NotNull final KeyObserver observer,
                                      @NotNull final String key) {
         throw new KfgAssertionException(
-                this.name(), null, null, null,
-                "registerSoft(observer, key) shouldn't be called on classes extending="
-                        + getClass().getName() + ", observer=" + observer
-                        + ", key=" + key);
+            this.name(), null, null, null,
+            "registerSoft(observer, key) shouldn't be called on classes extending="
+                + getClass().getName() + ", observer=" + observer
+                + ", key=" + key);
     }
 
     /**
@@ -597,10 +606,10 @@ public abstract class Source implements Konfiguration {
     public final Handle register(@NotNull final KeyObserver observer,
                                  @NotNull final String key) {
         throw new KfgAssertionException(
-                this.name(), null, null, null,
-                "register(observer, key) shouldn't be called on classes extending="
-                        + getClass().getName() + ", observer=" + observer
-                        + ", key=" + key);
+            this.name(), null, null, null,
+            "register(observer, key) shouldn't be called on classes extending="
+                + getClass().getName() + ", observer=" + observer
+                + ", key=" + key);
     }
 
     /**
@@ -611,10 +620,10 @@ public abstract class Source implements Konfiguration {
     public final void deregister(@NotNull final Handle observer,
                                  @NotNull final String key) {
         throw new KfgAssertionException(
-                this.name(), null, null, null,
-                "deregister(observer, key) shouldn't be called on classes extending="
-                        + getClass().getName() + ", observer=" + observer
-                        + ", key=" + key);
+            this.name(), null, null, null,
+            "deregister(observer, key) shouldn't be called on classes extending="
+                + getClass().getName() + ", observer=" + observer
+                + ", key=" + key);
     }
 
     /**
@@ -624,9 +633,9 @@ public abstract class Source implements Konfiguration {
     @Override
     public final void deregister(@NotNull final Handle observer) {
         throw new KfgAssertionException(
-                this.name(), null, null, null,
-                "deregister(observer) shouldn't be called on classes extending="
-                        + getClass().getName() + ", observer=" + observer);
+            this.name(), null, null, null,
+            "deregister(observer) shouldn't be called on classes extending="
+                + getClass().getName() + ", observer=" + observer);
     }
 
     @NotNull

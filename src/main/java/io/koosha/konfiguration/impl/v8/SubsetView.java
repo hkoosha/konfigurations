@@ -4,7 +4,6 @@ import io.koosha.konfiguration.Handle;
 import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.KeyObserver;
 import io.koosha.konfiguration.KfgIllegalArgumentException;
-import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.type.Kind;
@@ -15,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -255,31 +255,30 @@ final class SubsetView implements Konfiguration {
      * {@inheritDoc}
      */
     @Contract(pure = true,
-            value = "_ -> _")
+              value = "_ -> _")
     @NotNull
     @Override
     public Konfiguration subset(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return key.isEmpty()
-                ? this
-                : new SubsetView(
-                this.name.split("::")[0] + "::" + key,
-                this.wrapped,
-                this.baseKey + this.key(key)
+            ? this
+            : new SubsetView(
+            this.name.split("::")[0] + "::" + key,
+            this.wrapped,
+            this.baseKey + this.key(key)
         );
     }
 
     /**
      * {@inheritDoc}
      */
-    @Contract(value = "-> fail")
     @Override
-    public KonfigurationManager manager() {
-        throw new KfgIllegalStateException(this.name(), null, null, null, "manager is already taken out");
+    public Optional<KonfigurationManager> manager() {
+        return Optional.empty();
     }
 
     @Contract(pure = true,
-            value = "_ -> _")
+              value = "_ -> _")
     @NotNull
     private String key(@NotNull final String key) {
         Objects.requireNonNull(key, "key");

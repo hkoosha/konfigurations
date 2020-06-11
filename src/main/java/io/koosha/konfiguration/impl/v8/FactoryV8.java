@@ -131,7 +131,7 @@ public final class FactoryV8 implements KonfigurationFactory {
     @Override
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public Konfiguration map(@NotNull final String name,
                              @NotNull final Supplier<Map<String, ?>> storage) {
         Objects.requireNonNull(name, "name");
@@ -146,7 +146,7 @@ public final class FactoryV8 implements KonfigurationFactory {
     @Override
     @NotNull
     @Contract(pure = true,
-            value = "_, _ -> new")
+              value = "_, _ -> new")
     public Konfiguration map(@NotNull final String name,
                              @NotNull final Map<String, ?> storage) {
         Objects.requireNonNull(name, "name");

@@ -17,7 +17,7 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @ThreadSafe
 @ApiStatus.Internal
-final class Kombiner_Lock {
+final class KombinerLock {
 
     @NotNull
     private final String name;
@@ -28,9 +28,9 @@ final class Kombiner_Lock {
     @NotNull
     private final ReadWriteLock LOCK;
 
-    public Kombiner_Lock(@NotNull final String name,
-                         @Nullable final Long lockWaitTimeMillis,
-                         final boolean fair) {
+    public KombinerLock(@NotNull final String name,
+                        @Nullable final Long lockWaitTimeMillis,
+                        final boolean fair) {
         Objects.requireNonNull(name, "name");
 
         if (lockWaitTimeMillis != null && lockWaitTimeMillis < 0)

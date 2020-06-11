@@ -48,8 +48,8 @@ public abstract class Kind<TYPE> implements Serializable {
 
     protected Kind(@Nullable final String key) {
         final Type t =
-                ((ParameterizedType) this.getClass().getGenericSuperclass())
-                        .getActualTypeArguments()[0];
+            ((ParameterizedType) this.getClass().getGenericSuperclass())
+                .getActualTypeArguments()[0];
 
         checkIsClassOrParametrizedType(t, null);
         this.key = key;
@@ -73,8 +73,8 @@ public abstract class Kind<TYPE> implements Serializable {
     @NotNull
     public final Class<TYPE> klass() {
         return this.type instanceof Class
-                ? (Class<TYPE>) this.type
-                : (Class<TYPE>) ((ParameterizedType) this.type).getRawType();
+            ? (Class<TYPE>) this.type
+            : (Class<TYPE>) ((ParameterizedType) this.type).getRawType();
     }
 
     @Contract(pure = true)
@@ -92,8 +92,8 @@ public abstract class Kind<TYPE> implements Serializable {
     @NotNull
     public final Kind<TYPE> withKey(@Nullable final String key) {
         return Objects.equals(this.key, key)
-                ? this
-                : new Kind<TYPE>(key, this.type) {
+            ? this
+            : new Kind<TYPE>(key, this.type) {
         };
     }
 
@@ -102,7 +102,8 @@ public abstract class Kind<TYPE> implements Serializable {
     @Contract(pure = true)
     public final Type getCollectionContainedType() {
         if (!this.isCollection() || !this.isParametrized())
-            throw new KfgIllegalStateException(null, this.key, null, null, "is not a collection or collection type is not known");
+            throw new KfgIllegalStateException(
+                null, this.key, null, null, "is not a collection or collection type is not known");
         return this.parametrized().getActualTypeArguments()[0];
     }
 
@@ -115,14 +116,16 @@ public abstract class Kind<TYPE> implements Serializable {
     @Contract(pure = true)
     public final Type getMapKeyType() {
         if (!this.isMap() || !this.isParametrized())
-            throw new KfgIllegalStateException(null, this.key, null, null, "is not a map or map type is not known");
+            throw new KfgIllegalStateException(
+                null, this.key, null, null, "is not a map or map type is not known");
         return this.parametrized().getActualTypeArguments()[0];
     }
 
     @Contract(pure = true)
     public final Type getMapValueType() {
         if (!this.isMap() || !this.isParametrized())
-            throw new KfgIllegalStateException(null, this.key, null, null, "is not a map or map type is not known");
+            throw new KfgIllegalStateException(
+                null, this.key, null, null, "is not a map or map type is not known");
         return this.parametrized().getActualTypeArguments()[1];
     }
 
@@ -140,20 +143,22 @@ public abstract class Kind<TYPE> implements Serializable {
 
 
     @NotNull
-    @Contract(pure = true, value = "->new")
+    @Contract(pure = true,
+              value = "->new")
     public final Kind<List<TYPE>> asList() {
         return new Kind<List<TYPE>>(
-                new ParameterizedTypeImpl(
-                        new Type[]{this.type}, List.class, null)) {
+            new ParameterizedTypeImpl(
+                new Type[]{this.type}, List.class, null)) {
         };
     }
 
     @NotNull
-    @Contract(pure = true, value = "->new")
+    @Contract(pure = true,
+              value = "->new")
     public final Kind<Set<TYPE>> asSet() {
         return new Kind<Set<TYPE>>(
-                new ParameterizedTypeImpl(
-                        new Type[]{this.type}, Set.class, null)) {
+            new ParameterizedTypeImpl(
+                new Type[]{this.type}, Set.class, null)) {
         };
     }
 
@@ -244,9 +249,9 @@ public abstract class Kind<TYPE> implements Serializable {
     @Override
     public final String toString() {
         return String.format(
-                "Q::%s::%s",
-                this.key == null ? "key?" : this.key,
-                this.type
+            "Q::%s::%s",
+            this.key == null ? "key?" : this.key,
+            this.type
         );
     }
 
@@ -262,7 +267,7 @@ public abstract class Kind<TYPE> implements Serializable {
             return false;
         final Kind<?> other = (Kind<?>) o;
         return Objects.equals(this.key, other.key)
-                && Objects.equals(this.type, other.type);
+            && Objects.equals(this.type, other.type);
     }
 
     /**
@@ -291,7 +296,8 @@ public abstract class Kind<TYPE> implements Serializable {
      */
     @SuppressWarnings("unchecked")
     @NotNull
-    @Contract(value = "_ -> new", pure = true)
+    @Contract(value = "_ -> new",
+              pure = true)
     public static <U> Kind<U> of(@NotNull Class<U> klass) {
         Objects.requireNonNull(klass, "klass");
         if (klass == boolean.class)
@@ -333,7 +339,8 @@ public abstract class Kind<TYPE> implements Serializable {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @NotNull
-    @Contract(value = "_ -> new", pure = true)
+    @Contract(value = "_ -> new",
+              pure = true)
     private static <U> Kind<U> of_(@NotNull final Class<?> klass) {
         Objects.requireNonNull(klass, "klass");
         return new Kind(klass) {
@@ -351,8 +358,8 @@ public abstract class Kind<TYPE> implements Serializable {
 
         if (!(p instanceof Class) && !(p instanceof ParameterizedType))
             throw new UnsupportedOperationException(
-                    "only Class and ParameterizedType are supported (no array, wildcard or anything else), got: "
-                            + root + "::" + p);
+                "only Class and ParameterizedType are supported (no array, wildcard or anything else), got: "
+                    + root + "::" + p);
 
         if (!(p instanceof ParameterizedType))
             return;
@@ -366,7 +373,7 @@ public abstract class Kind<TYPE> implements Serializable {
     @Contract(pure = true)
     private static boolean isParametrized(@NotNull final Class<?> p) {
         return p.getTypeParameters().length > 0 ||
-                p.getSuperclass() != null && isParametrized(p.getSuperclass());
+            p.getSuperclass() != null && isParametrized(p.getSuperclass());
     }
 
     // =========================================================================

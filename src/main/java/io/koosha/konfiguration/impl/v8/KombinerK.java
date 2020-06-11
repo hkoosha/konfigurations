@@ -17,7 +17,7 @@ import static java.lang.String.format;
 
 @ThreadSafe
 @ApiStatus.Internal
-final class Kombiner_K<U> implements K<U> {
+final class KombinerK<U> implements K<U> {
 
     @NotNull
     private final Kombiner origin;
@@ -28,9 +28,9 @@ final class Kombiner_K<U> implements K<U> {
     @NotNull
     private final Kind<U> type;
 
-    public Kombiner_K(@NotNull final Kombiner origin,
-                      @NotNull final String key,
-                      @NotNull final Kind<U> type) {
+    public KombinerK(@NotNull final Kombiner origin,
+                     @NotNull final String key,
+                     @NotNull final Kind<U> type) {
         Objects.requireNonNull(origin, "origin");
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
@@ -161,12 +161,12 @@ final class Kombiner_K<U> implements K<U> {
     public boolean equals(final Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof Kombiner_K))
+        if (!(o instanceof KombinerK))
             return false;
-        final Kombiner_K<?> other = (Kombiner_K<?>) o;
+        final KombinerK<?> other = (KombinerK<?>) o;
         return Objects.equals(this.origin, other.origin)
-                && Objects.equals(this.key, other.key)
-                && Objects.equals(this.type, other.type);
+            && Objects.equals(this.key, other.key)
+            && Objects.equals(this.type, other.type);
     }
 
     /**

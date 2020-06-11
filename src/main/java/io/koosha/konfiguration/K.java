@@ -122,8 +122,8 @@ public interface K<U> {
     /**
      * Same as {@link #v()} but in case of null throws {@link KfgMissingKeyException}.
      *
-     * @see #v(Object)
      * @return value this konfig holds, but throws {@link KfgMissingKeyException} if that value is going to be null.
+     * @see #v(Object)
      */
     @NotNull
     U vn();
