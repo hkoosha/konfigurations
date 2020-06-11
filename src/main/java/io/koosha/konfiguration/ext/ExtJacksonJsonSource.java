@@ -50,7 +50,7 @@ public final class ExtJacksonJsonSource extends Source {
     private static final String DOT_PATTERN = Pattern.quote(".");
 
     @Contract(pure = true,
-            value = "->new")
+              value = "->new")
     @NotNull
     private static ObjectMapper defaultJacksonObjectMapper() {
         final ObjectMapper mapper = new ObjectMapper();
@@ -115,17 +115,17 @@ public final class ExtJacksonJsonSource extends Source {
                                 @NotNull final JsonNode node) {
 
         return type.isNull() && node.isNull()
-                || type.isBool() && node.isBoolean()
-                || type.isChar() && node.isTextual() && node.asText().length() == 1
-                || type.isString() && node.isTextual()
-                || type.isByte() && node.isShort() && node.asInt() <= Byte.MAX_VALUE && Byte.MIN_VALUE <= node.asInt()
-                || type.isShort() && node.isShort()
-                || type.isInt() && node.isInt()
-                || type.isLong() && node.isLong()
-                || type.isFloat() && node.isFloat()
-                || type.isDouble() && node.isDouble()
-                || type.isList() && node.isArray()
-                || type.isSet() && node.isArray();
+            || type.isBool() && node.isBoolean()
+            || type.isChar() && node.isTextual() && node.asText().length() == 1
+            || type.isString() && node.isTextual()
+            || type.isByte() && node.isShort() && node.asInt() <= Byte.MAX_VALUE && Byte.MIN_VALUE <= node.asInt()
+            || type.isShort() && node.isShort()
+            || type.isInt() && node.isInt()
+            || type.isLong() && node.isLong()
+            || type.isFloat() && node.isFloat()
+            || type.isDouble() && node.isDouble()
+            || type.isList() && node.isArray()
+            || type.isSet() && node.isArray();
     }
 
 
@@ -167,9 +167,9 @@ public final class ExtJacksonJsonSource extends Source {
         catch (final ClassNotFoundException e) {
             // XXX
             throw new KfgJacksonError(this.name(),
-                                      "jackson library is required to be present in " +
-                                              "the class path, can not find the class: " +
-                                              "com.fasterxml.jackson.databind.JsonNode", e);
+                "jackson library is required to be present in " +
+                    "the class path, can not find the class: " +
+                    "com.fasterxml.jackson.databind.JsonNode", e);
         }
 
         this.json = jsonSupplier;
@@ -226,8 +226,8 @@ public final class ExtJacksonJsonSource extends Source {
         synchronized (LOCK) {
             final JsonNode at = node(key);
             return checkJsonType(at.isTextual() && at.textValue().length() == 1, Kind.STRING, at, key)
-                    .textValue()
-                    .charAt(0);
+                .textValue()
+                .charAt(0);
         }
     }
 
@@ -256,8 +256,8 @@ public final class ExtJacksonJsonSource extends Source {
         synchronized (LOCK) {
             final JsonNode at = node(key);
             return checkJsonType(
-                    at.isShort() || at.isInt() || at.isLong(),
-                    Kind.LONG, at, key).longValue();
+                at.isShort() || at.isInt() || at.isLong(),
+                Kind.LONG, at, key).longValue();
         }
     }
 
@@ -272,12 +272,12 @@ public final class ExtJacksonJsonSource extends Source {
         synchronized (LOCK) {
             final JsonNode at = node(key);
             return checkJsonType(
-                    at.isFloat()
-                            || at.isDouble()
-                            || at.isShort()
-                            || at.isInt()
-                            || at.isLong(),
-                    Kind.DOUBLE, at, key).doubleValue();
+                at.isFloat()
+                    || at.isDouble()
+                    || at.isShort()
+                    || at.isInt()
+                    || at.isLong(),
+                Kind.DOUBLE, at, key).doubleValue();
         }
     }
 
@@ -420,13 +420,13 @@ public final class ExtJacksonJsonSource extends Source {
      * {@inheritDoc}
      */
     @Contract(pure = true,
-            value = "-> new")
+              value = "-> new")
     @Override
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-                ? new ExtJacksonJsonSource(this.name(), this.json, this.mapperSupplier)
-                : this;
+            ? new ExtJacksonJsonSource(this.name(), this.json, this.mapperSupplier)
+            : this;
     }
 
 }

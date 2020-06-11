@@ -46,7 +46,8 @@ public final class ExtMapSource extends Source {
         final Object value = node(key);
         if (!required.klass().isAssignableFrom(value.getClass()))
             throw new KfgTypeException(this.name(), key, required, value);
-        @SuppressWarnings("unchecked") final T t = (T) value;
+        @SuppressWarnings("unchecked")
+        final T t = (T) value;
         return t;
     }
 
@@ -113,7 +114,7 @@ public final class ExtMapSource extends Source {
 
         final Object n = node(key);
         if (n instanceof Long || n instanceof Integer ||
-                n instanceof Short || n instanceof Byte)
+            n instanceof Short || n instanceof Byte)
             return ((Number) n).longValue();
         return check(Kind.LONG, key);
     }
@@ -128,8 +129,8 @@ public final class ExtMapSource extends Source {
 
         final Object n = node(key);
         if (n instanceof Long || n instanceof Integer ||
-                n instanceof Short || n instanceof Byte ||
-                n instanceof Double || n instanceof Float)
+            n instanceof Short || n instanceof Byte ||
+            n instanceof Double || n instanceof Float)
             return ((Number) n).doubleValue();
         return check(Kind.LONG, key);
     }
@@ -189,8 +190,8 @@ public final class ExtMapSource extends Source {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
         return this.root.containsKey(key) &&
-                this.root.get(key) != null &&
-                type.klass().isAssignableFrom(this.root.get(key).getClass());
+            this.root.get(key) != null &&
+            type.klass().isAssignableFrom(this.root.get(key).getClass());
     }
 
     /**
@@ -222,8 +223,8 @@ public final class ExtMapSource extends Source {
     @Override
     public Source updatedCopy() {
         return this.hasUpdate()
-                ? new ExtMapSource(name(), map)
-                : ExtMapSource.this;
+            ? new ExtMapSource(name(), map)
+            : ExtMapSource.this;
     }
 
 

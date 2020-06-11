@@ -145,7 +145,7 @@ public final class ExtPreferencesSource extends Source {
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return this.source.get(sane(key), null) == null
-                && this.source.get(sane(key), "") == null;
+            && this.source.get(sane(key), "") == null;
     }
 
     /**
@@ -187,7 +187,7 @@ public final class ExtPreferencesSource extends Source {
             if (type.isFloat()) {
                 // Shaky
                 return this.numberDouble0(key).doubleValue() >= Float.MIN_VALUE
-                        && this.numberDouble0(key).doubleValue() <= Float.MAX_VALUE;
+                    && this.numberDouble0(key).doubleValue() <= Float.MAX_VALUE;
             }
             if (type.isDouble()) {
                 this.numberDouble0(key);

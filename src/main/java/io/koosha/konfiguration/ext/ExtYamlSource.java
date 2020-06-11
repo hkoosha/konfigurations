@@ -85,25 +85,25 @@ public final class ExtYamlSource extends Source {
 
         @SuppressWarnings("SameParameterValue")
         private static <A extends Annotation> java.lang.reflect.Constructor<?> find(
-                final Class<? extends A> marker,
-                final Function<? super A, String[]> markerExtractor,
-                final Class<?> origin,
-                final Map<String, ? extends Param> cArgsByName,
-                final List<String> cArgNames) {
+            final Class<? extends A> marker,
+            final Function<? super A, String[]> markerExtractor,
+            final Class<?> origin,
+            final Map<String, ? extends Param> cArgsByName,
+            final List<String> cArgNames) {
             final List<java.lang.reflect.Constructor<?>> constructors = Arrays
-                    .stream(origin.getDeclaredConstructors())
-                    .filter(it -> it.getAnnotation(marker) != null)
-                    .filter(it -> asList(markerExtractor.apply(it.getAnnotation(marker))).containsAll(cArgNames))
-                    .filter(it -> cArgNames.containsAll(asList(markerExtractor.apply(it.getAnnotation(marker)))))
-                    .filter(it -> {
-                        final Parameter[] ps = it.getParameters();
-                        final String[] ns = markerExtractor.apply(it.getAnnotation(marker));
-                        for (int i = 0; i < ns.length; i++)
-                            if (!upper(ps[i].getType()).isAssignableFrom(upper(cArgsByName.get(ns[i]).type)))
-                                return false;
-                        return true;
-                    })
-                    .collect(toList());
+                .stream(origin.getDeclaredConstructors())
+                .filter(it -> it.getAnnotation(marker) != null)
+                .filter(it -> asList(markerExtractor.apply(it.getAnnotation(marker))).containsAll(cArgNames))
+                .filter(it -> cArgNames.containsAll(asList(markerExtractor.apply(it.getAnnotation(marker)))))
+                .filter(it -> {
+                    final Parameter[] ps = it.getParameters();
+                    final String[] ns = markerExtractor.apply(it.getAnnotation(marker));
+                    for (int i = 0; i < ns.length; i++)
+                        if (!upper(ps[i].getType()).isAssignableFrom(upper(cArgsByName.get(ns[i]).type)))
+                            return false;
+                    return true;
+                })
+                .collect(toList());
             if (constructors.isEmpty())
                 throw new KfgSnakeYamlError(null, "no constructor with ConstructorProperties is liable for:" + cArgsByName);
             if (constructors.size() > 1)
@@ -145,8 +145,8 @@ public final class ExtYamlSource extends Source {
             @Override
             public Object construct(final Node node) {
                 if (Map.class.isAssignableFrom(node.getType()) ||
-                        Collection.class.isAssignableFrom(node.getType()) ||
-                        typeDefinitions.containsKey(node.getType()))
+                    Collection.class.isAssignableFrom(node.getType()) ||
+                    typeDefinitions.containsKey(node.getType()))
                     return super.construct(node);
 
                 if (node.isTwoStepsConstruction())
@@ -156,91 +156,91 @@ public final class ExtYamlSource extends Source {
                 flattenMapping(mNode);
 
                 final List<ParamNode> consArgs = mNode
-                        .getValue()
-                        .stream()
-                        .map(tuple -> {
-                            if (!(tuple.getKeyNode() instanceof ScalarNode))
-                                throw new YAMLException(
-                                        "Keys must be scalars but found: " + tuple.getKeyNode());
-                            final ScalarNode keyNode = (ScalarNode) tuple.getKeyNode();
-                            keyNode.setType(String.class);
-                            return new ParamNode((String) constructObject(keyNode), tuple.getValueNode());
-                        })
-                        .peek(t -> {
-                            final Tag tag = t.node.getTag();
-                            Class<?> tp = null;
-                            if (tag == Tag.INT)
-                                tp = Integer.class;
-                            else if (tag == Tag.FLOAT)
-                                tp = Float.class;
-                            else if (tag == Tag.STR)
-                                tp = String.class;
-                            else if (tag == Tag.MAP)
-                                tp = Map.class;
-                            else if (tag == Tag.SEQ)
-                                tp = List.class;
-                            else if (tag == Tag.SET)
-                                tp = Set.class;
-                            else if (tag == Tag.BOOL)
-                                tp = Boolean.class;
-                            else if (tag == Tag.NULL)
-                                tp = Object.class;
-                            t.type = tp;
-                            if (tp != null)
-                                t.node.setType(tp);
-                        })
-                        .peek(t -> {
-                            if (t.node.getNodeId() != NodeId.scalar) {
-                                // only if there is no explicit TypeDescription
-                                final Class<?>[] args = t.getActualTypeArguments();
-                                if (args != null && args.length > 0) {
-                                    // type safe (generic) collection may contain the proper class
-                                    if (t.node.getNodeId() == NodeId.sequence) {
-                                        ((SequenceNode) t.node).setListType(args[0]);
-                                    }
-                                    else if (Set.class.isAssignableFrom(t.node.getType())) {
-                                        ((MappingNode) t.node).setOnlyKeyType(args[0]);
-                                        t.node.setUseClassConstructor(true);
-                                    }
-                                    else if (Map.class.isAssignableFrom(t.node.getType())) {
-                                        ((MappingNode) t.node).setTypes(args[0], args[1]);
-                                        t.node.setUseClassConstructor(true);
-                                    }
+                    .getValue()
+                    .stream()
+                    .map(tuple -> {
+                        if (!(tuple.getKeyNode() instanceof ScalarNode))
+                            throw new YAMLException(
+                                "Keys must be scalars but found: " + tuple.getKeyNode());
+                        final ScalarNode keyNode = (ScalarNode) tuple.getKeyNode();
+                        keyNode.setType(String.class);
+                        return new ParamNode((String) constructObject(keyNode), tuple.getValueNode());
+                    })
+                    .peek(t -> {
+                        final Tag tag = t.node.getTag();
+                        Class<?> tp = null;
+                        if (tag == Tag.INT)
+                            tp = Integer.class;
+                        else if (tag == Tag.FLOAT)
+                            tp = Float.class;
+                        else if (tag == Tag.STR)
+                            tp = String.class;
+                        else if (tag == Tag.MAP)
+                            tp = Map.class;
+                        else if (tag == Tag.SEQ)
+                            tp = List.class;
+                        else if (tag == Tag.SET)
+                            tp = Set.class;
+                        else if (tag == Tag.BOOL)
+                            tp = Boolean.class;
+                        else if (tag == Tag.NULL)
+                            tp = Object.class;
+                        t.type = tp;
+                        if (tp != null)
+                            t.node.setType(tp);
+                    })
+                    .peek(t -> {
+                        if (t.node.getNodeId() != NodeId.scalar) {
+                            // only if there is no explicit TypeDescription
+                            final Class<?>[] args = t.getActualTypeArguments();
+                            if (args != null && args.length > 0) {
+                                // type safe (generic) collection may contain the proper class
+                                if (t.node.getNodeId() == NodeId.sequence) {
+                                    ((SequenceNode) t.node).setListType(args[0]);
+                                }
+                                else if (Set.class.isAssignableFrom(t.node.getType())) {
+                                    ((MappingNode) t.node).setOnlyKeyType(args[0]);
+                                    t.node.setUseClassConstructor(true);
+                                }
+                                else if (Map.class.isAssignableFrom(t.node.getType())) {
+                                    ((MappingNode) t.node).setTypes(args[0], args[1]);
+                                    t.node.setUseClassConstructor(true);
                                 }
                             }
-                        })
-                        .peek(t -> t.value = constructObject(t.node))
-                        .peek(t -> {
-                            if (t.value instanceof Double && t.typeIs(Float.TYPE, Float.class))
-                                t.value = t.double_().floatValue();
+                        }
+                    })
+                    .peek(t -> t.value = constructObject(t.node))
+                    .peek(t -> {
+                        if (t.value instanceof Double && t.typeIs(Float.TYPE, Float.class))
+                            t.value = t.double_().floatValue();
 
-                            else if (t.value instanceof byte[] &&
-                                    Objects.equals(t.node.getTag(), Tag.BINARY) &&
-                                    t.typeIs(String.class))
-                                t.value = new String(t.byteArray());
-                        })
-                        .collect(toList());
+                        else if (t.value instanceof byte[] &&
+                            Objects.equals(t.node.getTag(), Tag.BINARY) &&
+                            t.typeIs(String.class))
+                            t.value = new String(t.byteArray());
+                    })
+                    .collect(toList());
 
                 final Map<String, ParamNode> byName = consArgs
-                        .stream()
-                        .collect(Collectors.toMap(ca -> ca.name, Function.identity()));
+                    .stream()
+                    .collect(Collectors.toMap(ca -> ca.name, Function.identity()));
 
                 final List<String> names = consArgs
-                        .stream()
-                        .map(t -> t.name)
-                        .collect(toList());
+                    .stream()
+                    .map(t -> t.name)
+                    .collect(toList());
 
                 final Class<?>[] types = consArgs
-                        .stream()
-                        .map(t -> t.type)
-                        .toArray(Class<?>[]::new);
+                    .stream()
+                    .map(t -> t.type)
+                    .toArray(Class<?>[]::new);
 
                 java.lang.reflect.Constructor<?> c0;
                 try {
                     c0 = find(marker,
-                              markerExtractor,
-                              node.getType(),
-                              byName, names);
+                        markerExtractor,
+                        node.getType(),
+                        byName, names);
                 }
                 catch (YAMLException y) {
                     c0 = null;
@@ -257,10 +257,10 @@ public final class ExtYamlSource extends Source {
                 if (c0 == null)
                     try {
                         final Class<?>[] types2 = consArgs
-                                .stream()
-                                .map(t -> t.type)
-                                .map(ByConstructorConstructor::lower)
-                                .toArray(Class<?>[]::new);
+                            .stream()
+                            .map(t -> t.type)
+                            .map(ByConstructorConstructor::lower)
+                            .toArray(Class<?>[]::new);
                         c0 = node.getType().getDeclaredConstructor(types2);
                     }
                     catch (NoSuchMethodException ex) {
@@ -270,7 +270,7 @@ public final class ExtYamlSource extends Source {
                 requireNonNull(c0, "no constructor found for: " + node);
 
                 final String[] annotatedNames =
-                        c0.getAnnotation(ConstructorProperties.class).value();
+                    c0.getAnnotation(ConstructorProperties.class).value();
 
                 final Object[] values = new Object[annotatedNames.length];
                 for (final ParamNode pm : consArgs)
@@ -342,12 +342,12 @@ public final class ExtYamlSource extends Source {
     }
 
     static final BaseConstructor defaultBaseConstructor = new ByConstructorConstructor<>(
-            ConstructorProperties.class,
-            ConstructorProperties::value
+        ConstructorProperties.class,
+        ConstructorProperties::value
     );
 
     private static final ThreadLocal<Yaml> defaultYamlSupplier =
-            ThreadLocal.withInitial(() -> new Yaml(defaultBaseConstructor));
+        ThreadLocal.withInitial(() -> new Yaml(defaultBaseConstructor));
 
     private final Supplier<Yaml> mapper;
     private final Supplier<String> yaml;
@@ -395,9 +395,9 @@ public final class ExtYamlSource extends Source {
         }
         catch (final ClassNotFoundException e) {
             throw new KfgSnakeYamlError(this.name(),
-                                        "org.yaml.snakeyaml library is required to be" +
-                                                " present in the class path, can not find the" +
-                                                "class: org.yaml.snakeyaml.Yaml", e);
+                "org.yaml.snakeyaml library is required to be" +
+                    " present in the class path, can not find the" +
+                    "class: org.yaml.snakeyaml.Yaml", e);
         }
 
         final String newYaml = this.yaml.get();
@@ -516,8 +516,8 @@ public final class ExtYamlSource extends Source {
 
         if (type.isParametrized())
             throw new KfgSnakeYamlAssertionError(
-                    this.name, key, type, null,
-                    "parametrized type are not supported by yaml source");
+                this.name, key, type, null,
+                "parametrized type are not supported by yaml source");
 
         final Object g = this.get(key);
         final Yaml mapper = this.mapper.get();
@@ -571,12 +571,13 @@ public final class ExtYamlSource extends Source {
      * {@inheritDoc}
      */
     @Override
-    @Contract(pure = true, value = "-> new")
+    @Contract(pure = true,
+              value = "-> new")
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-                ? new ExtYamlSource(name(), yaml, mapper)
-                : ExtYamlSource.this;
+            ? new ExtYamlSource(name(), yaml, mapper)
+            : ExtYamlSource.this;
     }
 
 
