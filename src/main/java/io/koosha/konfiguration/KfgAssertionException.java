@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * This shouldn't happen. This must be prevented by konfigurations.
  */
-public final class KfgAssertionException extends KfgException {
+public class KfgAssertionException extends KfgException {
 
     public KfgAssertionException(@Nullable final String source,
                                  @Nullable final String key,

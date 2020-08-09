@@ -165,8 +165,7 @@ public final class ExtJacksonJsonSource extends Source {
             Class.forName("com.fasterxml.jackson.databind.JsonNode");
         }
         catch (final ClassNotFoundException e) {
-            // XXX
-            throw new KfgJacksonError(this.name(),
+            throw new KfgSourceException(this.name(),
                 "jackson library is required to be present in " +
                     "the class path, can not find the class: " +
                     "com.fasterxml.jackson.databind.JsonNode", e);
@@ -184,7 +183,7 @@ public final class ExtJacksonJsonSource extends Source {
             update = this.mapperSupplier.get().readTree(this.lastJson);
         }
         catch (final IOException e) {
-            throw new KfgJacksonError(this.name(), "error parsing json string", e);
+            throw new KfgSourceException(this.name(), "error parsing json string", e);
         }
         requireNonNull(update, "root element is null");
 

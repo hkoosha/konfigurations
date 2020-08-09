@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.ext;
 
+import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
@@ -105,9 +106,9 @@ public final class ExtYamlSource extends Source {
                 })
                 .collect(toList());
             if (constructors.isEmpty())
-                throw new KfgSnakeYamlError(null, "no constructor with ConstructorProperties is liable for:" + cArgsByName);
+                throw new KfgSourceException(null, "no constructor with ConstructorProperties is liable for:" + cArgsByName);
             if (constructors.size() > 1)
-                throw new KfgSnakeYamlError(null, "multiple constructor with ConstructorProperties are liable for: " + cArgsByName);
+                throw new KfgSourceException(null, "multiple constructor with ConstructorProperties are liable for: " + cArgsByName);
             return constructors.get(0);
         }
 
@@ -374,9 +375,6 @@ public final class ExtYamlSource extends Source {
      *                     and if required, it must be able to deserialize custom types, so
      *                     that {@link #custom(String, Kind)} works as well.
      * @throws NullPointerException if any of its arguments are null.
-     * @throws KfgSnakeYamlError    if org.yaml.snakeyaml library is not in the classpath. it
-     *                              specifically looks for the class: "org.yaml.snakeyaml"
-     * @throws KfgSnakeYamlError    if the storage (yaml string) returned by yaml string is null.
      */
     public ExtYamlSource(@NotNull final String name,
                          @NotNull final Supplier<String> yamlSupplier,
@@ -394,7 +392,7 @@ public final class ExtYamlSource extends Source {
             Class.forName("org.yaml.snakeyaml.Yaml");
         }
         catch (final ClassNotFoundException e) {
-            throw new KfgSnakeYamlError(this.name(),
+            throw new KfgSourceException(this.name(),
                 "org.yaml.snakeyaml library is required to be" +
                     " present in the class path, can not find the" +
                     "class: org.yaml.snakeyaml.Yaml", e);
