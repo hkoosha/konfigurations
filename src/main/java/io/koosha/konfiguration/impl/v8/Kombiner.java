@@ -4,6 +4,7 @@ import io.koosha.konfiguration.Handle;
 import io.koosha.konfiguration.K;
 import io.koosha.konfiguration.KeyObserver;
 import io.koosha.konfiguration.KfgIllegalArgumentException;
+import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
@@ -21,6 +22,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -48,19 +50,26 @@ final class Kombiner implements Konfiguration {
     final Set<Kind<?>> issuedKeys = new HashSet<>();
     private final Map<Kind<?>, ? super Object> cache = new HashMap<>();
 
+    final boolean listenable;
+    final boolean updatable;
+
     Kombiner(@NotNull final String name,
              @NotNull final Collection<Konfiguration> sources,
              @Nullable final Long lockWaitTimeMillis,
-             final boolean fairLock) {
+             final boolean fairLock,
+             final boolean listenable,
+             final boolean updatable) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(sources, "sources");
 
         this.name = name;
+        this.listenable = listenable;
+        this.updatable = updatable;
 
         final Map<Handle, Konfiguration> newSources = new HashMap<>();
         sources.stream()
+               .peek(source -> Objects.requireNonNull(source, "null in config sources"))
                .peek(source -> {
-                   Objects.requireNonNull(source, "null in config sources");
                    if (source instanceof SubsetView)
                        throw new KfgIllegalArgumentException(
                            name, "can not kombine a " + source.getClass().getName() + " konfiguration.");
@@ -114,11 +123,18 @@ final class Kombiner implements Konfiguration {
 
         final Kind<U> t = type.withKey(key);
 
-        return this.r(() -> {
-            if (cache.containsKey(t))
-                return ((U) cache.get(t));
-            return this.w(() -> (U) this.issueValue(t));
+        final AtomicBoolean hadValue = new AtomicBoolean(false);
+        final U value = this.r(() -> {
+            if (cache.containsKey(t)) {
+                hadValue.set(true);
+                return (U) cache.get(t);
+            }
+            return null;
         });
+        if (hadValue.get())
+            return value;
+
+        return this.w(() -> (U) this.issueValue(t));
     }
 
     // @NotThreadSafe
@@ -151,6 +167,10 @@ final class Kombiner implements Konfiguration {
 
     void replaceCache(@NotNull final Map<Kind<?>, Object> copy) {
         Objects.requireNonNull(copy, "copy");
+
+        if (!this.updatable)
+            throw new KfgIllegalStateException(this.name, "konfiguration is not updatable");
+
         this.cache.clear();
         this.cache.putAll(copy);
     }
@@ -280,6 +300,10 @@ final class Kombiner implements Konfiguration {
     public Handle registerSoft(@NotNull final KeyObserver observer,
                                @Nullable final String key) {
         Objects.requireNonNull(observer, "observer");
+
+        if (!listenable)
+            throw new KfgIllegalArgumentException(this.name, "register not supported");
+
         return w(() -> observers.registerSoft(observer, key));
     }
 
@@ -289,6 +313,10 @@ final class Kombiner implements Konfiguration {
                            @NotNull final String key) {
         Objects.requireNonNull(observer, "observer");
         Objects.requireNonNull(key, "key");
+
+        if (!listenable)
+            throw new KfgIllegalArgumentException(this.name, "register not supported");
+
         return w(() -> observers.registerHard(observer, key));
     }
 
@@ -297,6 +325,10 @@ final class Kombiner implements Konfiguration {
                            @NotNull final String key) {
         Objects.requireNonNull(observer, "observer");
         Objects.requireNonNull(key, "key");
+
+        if (!listenable)
+            throw new KfgIllegalArgumentException(this.name, "deregister not supported");
+
         w(() -> {
             if (Objects.equals(KeyObserver.LISTEN_TO_ALL, key))
                 this.observers.remove(observer);

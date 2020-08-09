@@ -13,8 +13,7 @@ import java.util.Set;
 /**
  * All methods are thread-safe (and should be implemented as such).
  * <p>
- * Entry point to this library is at {@link KonfigurationFactory#getInstance(String)}
- * or the versioned alternative: {@link KonfigurationFactory#getInstanceV8()}.
+ * Entry point to this library is at {@link KonfigurationFactory#getInstanceV8()}.
  */
 @SuppressWarnings("unused")
 @ThreadSafe

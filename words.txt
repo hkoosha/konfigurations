@@ -1,3 +1,5 @@
+// Words to be added to IDE dictionary so that it won't nag.
+
 deregistered
 deregister
 deser
@@ -12,6 +14,7 @@ konfigurations
 konstruct
 koosha
 kval
+listentable
 optimizable
 paranamer
 prefs

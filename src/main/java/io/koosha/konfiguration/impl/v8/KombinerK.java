@@ -74,7 +74,7 @@ final class KombinerK<U> implements K<U> {
     @Override
     @Contract(pure = true)
     public boolean exists() {
-        return origin.has(this.key, this.type);
+        return this.origin.has(this.key, this.type);
     }
 
 
@@ -99,6 +99,12 @@ final class KombinerK<U> implements K<U> {
         this.origin.deregister(observerHandle, this.key);
         return this;
     }
+
+    @Override
+    public boolean supportsRegister() {
+        return this.origin.listenable;
+    }
+
 
 
     @Override

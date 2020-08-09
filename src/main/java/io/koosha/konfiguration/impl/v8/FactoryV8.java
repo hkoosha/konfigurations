@@ -33,11 +33,13 @@ import static java.util.Collections.unmodifiableMap;
 @ApiStatus.Internal
 public final class FactoryV8 implements KonfigurationFactory {
 
-    private static final String VERSION = "io.koosha.konfiguration:7.0.0";
+    private static final String VERSION = "io.koosha.konfiguration:8.0.0";
 
     private static final boolean DEFAULT_FAIR_LOCK = false;
 
     private static final Long DEFAULT_LOCK_WAIT_TIME_MILLIS = null;
+    private static final boolean DEFAULT_LISTENABLE = true;
+    private static final boolean DEFAULT_UPDATABLE = true;
 
     @Contract(pure = true)
     @NotNull
@@ -49,21 +51,39 @@ public final class FactoryV8 implements KonfigurationFactory {
     @NotNull
     public static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
                                                    final boolean fairLock) {
-        return new FactoryV8(lockWaitTime, fairLock);
+        return getInstance(lockWaitTime, fairLock, DEFAULT_LISTENABLE, DEFAULT_UPDATABLE);
+    }
+
+    @Contract(pure = true)
+    @NotNull
+    public static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
+                                                   final boolean fairLock,
+                                                   final boolean listentable,
+                                                   final boolean updatable) {
+        return new FactoryV8(lockWaitTime, fairLock, listentable, updatable);
     }
 
     @Nullable
     private final Long lockWaitTime;
     private final boolean fairLock;
+    private final boolean listentable;
+    private final boolean updatable;
 
     private FactoryV8() {
-        this(DEFAULT_LOCK_WAIT_TIME_MILLIS, DEFAULT_FAIR_LOCK);
+        this(DEFAULT_LOCK_WAIT_TIME_MILLIS,
+            DEFAULT_FAIR_LOCK,
+            DEFAULT_LISTENABLE,
+            DEFAULT_UPDATABLE);
     }
 
     private FactoryV8(@Nullable final Long lockWaitTime,
-                      final boolean fairLock) {
+                      final boolean fairLock,
+                      final boolean listentable,
+                      final boolean updatable) {
         this.lockWaitTime = lockWaitTime;
         this.fairLock = fairLock;
+        this.listentable = listentable;
+        this.updatable = updatable;
     }
 
 
@@ -98,7 +118,12 @@ public final class FactoryV8 implements KonfigurationFactory {
         final List<Konfiguration> l = new ArrayList<>();
         l.add(source);
         l.addAll(asList(rest));
-        return new Kombiner(name, l, this.lockWaitTime, this.fairLock);
+        return new Kombiner(name,
+            l,
+            this.lockWaitTime,
+            this.fairLock,
+            this.listentable,
+            this.updatable);
     }
 
     @Override
@@ -108,7 +133,12 @@ public final class FactoryV8 implements KonfigurationFactory {
                                  @NotNull final Collection<Konfiguration> sources) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(sources, "sources");
-        return new Kombiner(name, sources, this.lockWaitTime, this.fairLock);
+        return new Kombiner(name,
+            sources,
+            this.lockWaitTime,
+            this.fairLock,
+            this.listentable,
+            this.updatable);
     }
 
     // ==================================================================== MAP

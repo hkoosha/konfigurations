@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,17 +38,25 @@ final class KombinerManager implements KonfigurationManager {
     @NotNull
     @Override
     public Map<String, Collection<Runnable>> update() {
-        return this.origin.r(() -> {
+        if(!this.origin.updatable)
+            return Collections.emptyMap();
+
+        final Map<Handle, Konfiguration> newSources = new HashMap<>();
+        final Set<Kind<?>> updated = new HashSet<>();
+        final Map<Kind<?>, Object> newCache = new HashMap<>();
+
+        final Map<String, Collection<Runnable>> ret = this.origin.r(() -> {
             if (this.origin.sources
                 .sourcesStream()
                 .noneMatch(x -> ((Source) x).hasUpdate()))
                 return emptyMap();
 
-            final Map<Handle, Konfiguration> newSources = this.origin.sources.sourcesCopy();
+
+            newSources.putAll(this.origin.sources.sourcesCopy());
             newSources.entrySet().forEach(x -> x.setValue(((Source) x.getValue()).updatedCopy()));
 
-            final Set<Kind<?>> updated = new HashSet<>();
-            final Map<Kind<?>, Object> newCache = this.origin.cacheCopy();
+            newCache.putAll(this.origin.cacheCopy());
+
             this.origin.issuedKeys.forEach(q -> {
                 final String key = requireNonNull(
                     q.key(), "ket passed through kombiner is null");
@@ -75,50 +84,58 @@ final class KombinerManager implements KonfigurationManager {
                     newCache.put(q, newV);
             });
 
-            return this.origin.w(() -> {
-                final Map<String, Collection<Runnable>> result = this
-                    .origin
-                    .sources
-                    .sourcesStream()
-                    // External non-optimizable konfig sources.
-                    .filter(target -> !(target instanceof Source))
-                    .map(Konfiguration::manager)
-                    .map(it -> it.get().update())
-                    .peek(x -> x.entrySet().forEach(e -> e.setValue(
-                        // just to wrap!
-                        e.getValue().stream().map(r -> {
-                            Objects.requireNonNull(r, "runnable");
-                            //noinspection Convert2Lambda,Anonymous2MethodRef
-                            return new Runnable() {
-                                @Override
-                                public void run() {
-                                    r.run();
-                                }
-                            };
-                        })
-                         .collect(toList())
-                    )))
-                    .reduce(new HashMap<>(), (m0, m1) -> {
-                        m1.forEach((m1k, m1c) -> m0.computeIfAbsent(
-                            m1k, m1k_ -> new ArrayList<>()).addAll(m1c));
-                        return m0;
-                    });
+            return null;
+        });
+        if (ret != null)
+            return ret;
 
-                for (final Kind<?> kind : updated)
-                    //noinspection ConstantConditions
-                    result.computeIfAbsent(kind.key(), (q_) -> new ArrayList<>())
-                          .addAll(this.origin.observers.get(kind.key()));
+        return this.origin.w(() -> {
+            //noinspection OptionalGetWithoutIsPresent
+            final Map<String, Collection<Runnable>> result = this
+                .origin
+                .sources
+                .sourcesStream()
+                // External non-optimizable konfig sources.
+                .filter(target -> !(target instanceof Source))
+                .map(Konfiguration::manager)
+                .map(it -> it.get().update())
+                .peek(x -> x.entrySet().forEach(e -> e.setValue(
+                    // just to wrap!
+                    e.getValue().stream().map(r -> {
+                        requireNonNull(r, "ret");
+                        //noinspection Convert2Lambda,Anonymous2MethodRef
+                        return new Runnable() {
+                            @Override
+                            public void run() {
+                                r.run();
+                            }
+                        };
+                    })
+                     .collect(toList())
+                )))
+                .reduce(new HashMap<>(), (m0, m1) -> {
+                    m1.forEach((m1k, m1c) -> m0.computeIfAbsent(
+                        m1k, m1k_ -> new ArrayList<>()).addAll(m1c));
+                    return m0;
+                });
 
-                this.origin.sources.replaceSources(newSources);
-                this.origin.replaceCache(newCache);
+            for (final Kind<?> kind : updated)
+                //noinspection ConstantConditions
+                result.computeIfAbsent(kind.key(), (q_) -> new ArrayList<>())
+                      .addAll(this.origin.observers.get(kind.key()));
 
-                return result;
-            });
+            this.origin.sources.replaceSources(newSources);
+            this.origin.replaceCache(newCache);
+
+            return result;
         });
     }
 
     @Override
     public boolean hasUpdate() {
+        if(!this.origin.updatable)
+            return false;
+
         return this.origin.r(() -> this
             .origin
             .sources

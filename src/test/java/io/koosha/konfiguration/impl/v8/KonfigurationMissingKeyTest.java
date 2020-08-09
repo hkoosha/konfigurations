@@ -13,9 +13,9 @@ import static java.util.Collections.singletonMap;
 
 public class KonfigurationMissingKeyTest {
 
-    private boolean returnFourTaee = true;
+    private boolean returnFour = true;
 
-    private final Supplier<Map<String, ?>> sup = () -> returnFourTaee
+    private final Supplier<Map<String, ?>> sup = () -> returnFour
         ? singletonMap("xxx", (Object) 12)
         : singletonMap("xxx", (Object) 99);
 
@@ -23,7 +23,7 @@ public class KonfigurationMissingKeyTest {
 
     @BeforeMethod
     public void setup() {
-        this.returnFourTaee = true;
+        this.returnFour = true;
         this.k = kFactory().map("map", sup);
     }
 

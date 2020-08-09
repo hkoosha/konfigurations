@@ -185,7 +185,7 @@ public final class ExtMapSource extends Source {
     public Source updatedCopy() {
         return this.hasUpdate()
             ? new ExtMapSource(name(), map)
-            : ExtMapSource.this;
+            : this;
     }
 
 }

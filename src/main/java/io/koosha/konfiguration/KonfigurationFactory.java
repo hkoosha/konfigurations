@@ -11,7 +11,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
@@ -39,21 +38,16 @@ public interface KonfigurationFactory {
     @NotNull
     static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
                                               final boolean fairLock) {
-        return FactoryV8.getInstance(lockWaitTime, false);
+        return FactoryV8.getInstance(lockWaitTime, fairLock);
     }
 
     @Contract(pure = true)
     @NotNull
-    static KonfigurationFactory getInstance(@NotNull final String version) {
-        Objects.requireNonNull(version, "version");
-        //noinspection SwitchStatementWithTooFewBranches
-        switch (version) {
-            case VERSION_8:
-                return getInstanceV8();
-
-            default:
-                throw new KfgException(null, "implementation not available for version=" + version);
-        }
+    static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
+                                              final boolean fairLock,
+                                              final boolean listenable,
+                                              final boolean updatable) {
+        return FactoryV8.getInstance(lockWaitTime, fairLock, listenable, updatable);
     }
 
 

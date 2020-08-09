@@ -78,6 +78,7 @@ public class ExtMapSourceTest {
 
     private void update() {
         this.map = this.map1;
+        //noinspection OptionalGetWithoutIsPresent
         this.k.manager().get().updateNow();
     }
 
@@ -87,12 +88,14 @@ public class ExtMapSourceTest {
 
     @Test
     public void testNotUpdatable() throws Exception {
+        //noinspection OptionalGetWithoutIsPresent
         assertFalse(this.k().manager().get().hasUpdate());
     }
 
     @Test
     public void testUpdatable() throws Exception {
         map = map1;
+        //noinspection OptionalGetWithoutIsPresent
         assertTrue(this.k().manager().get().hasUpdate());
     }
 

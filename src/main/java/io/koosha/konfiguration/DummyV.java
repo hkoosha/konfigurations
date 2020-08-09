@@ -89,6 +89,13 @@ public final class DummyV<U> implements K<U> {
         return M_1;
     }
 
+    @Contract(pure = true)
+    @Override
+    public boolean supportsRegister() {
+        return false;
+    }
+
+
     @Override
     @Nullable
     @Contract(pure = true)

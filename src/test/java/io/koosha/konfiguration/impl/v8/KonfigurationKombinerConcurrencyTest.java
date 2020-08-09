@@ -2,10 +2,15 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
+import io.koosha.konfiguration.ext.ExtJacksonJsonSource;
+import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
@@ -33,21 +38,20 @@ public class KonfigurationKombinerConcurrencyTest {
     private KonfigurationManager man;
 
     @BeforeClass
-    void setup() {
-        // URL url0 = getClass().getResource("sample0.json");
-        // File file0 = new File(url0.toURI());
-        // this.JSON0 = new Scanner(file0, "UTF8").useDelimiter("\\Z").next();
-        this.JSON0 = ExtJacksonJsonSourceTest.SAMPLE_0;
-
-        // URL url1 = getClass().getResource("sample1.json");
-        // File file1 = new File(url1.toURI());
-        // this.JSON1 = new Scanner(file1, "UTF8").useDelimiter("\\Z").next();
-        this.JSON1 = ExtJacksonJsonSourceTest.SAMPLE_1;
+    public void init() throws Exception {
+        //noinspection ConstantConditions
+        final URI uri0 = ExtJacksonJsonSource.class.getClassLoader()
+                                                   .getResource("sample0.json")
+                                                   .toURI();
+        //noinspection ConstantConditions
+        final URI uri1 = ExtJacksonJsonSource.class.getClassLoader()
+                                                   .getResource("sample1.json")
+                                                   .toURI();
+        JSON0 = new String(Files.readAllBytes(Paths.get(uri0)));
+        JSON1 = new String(Files.readAllBytes(Paths.get(uri1)));
 
         this.MAP0 = mapOf("aInt", 12, "aBool", false, "aIntList", asList(1, 0, 2), "aLong", 88L);
-
         this.MAP1 = mapOf("aInt", 99, "bBool", false, "aIntList", asList(2, 2));
-
         this.MAP2 = mapOf("xx", 44, "yy", true);
     }
 
@@ -62,10 +66,11 @@ public class KonfigurationKombinerConcurrencyTest {
             kFactory().map("map", () -> this.MAP2),
             kFactory().jacksonJson("json", () -> this.json)
         );
+        //noinspection OptionalGetWithoutIsPresent
         this.man = this.k.manager().get();
     }
 
-    private void toggle() {
+    private synchronized void toggle() {
         this.json = Objects.equals(this.json, JSON0) ? JSON1 : JSON0;
         this.map = Objects.equals(this.map, MAP0) ? MAP1 : MAP0;
     }
@@ -105,6 +110,7 @@ public class KonfigurationKombinerConcurrencyTest {
         }
     }
 
+    // This test is plain wrong.
     @Test(enabled = false)
     public void testMissedUpdates() {
         ExecutorService e = null;
@@ -121,10 +127,8 @@ public class KonfigurationKombinerConcurrencyTest {
             }
 
             for (int i = 0; i < 10_000; i++) {
-                k.int_("aInt").v();
-                // Uncomment to make sure update happens
-                //            Assert.assertEquals(value, (Integer) 12);
-                // Add the damn Sl4j already!
+                final Integer value = k.int_("aInt").v();
+                Assert.assertEquals(value, (Integer) 12);
                 if (i % 1000 == 0)
                     System.out.println(i);
             }
@@ -135,10 +139,6 @@ public class KonfigurationKombinerConcurrencyTest {
             if (e != null)
                 e.shutdown();
         }
-    }
-
-    @Test
-    public void dummy() {
     }
 
 }

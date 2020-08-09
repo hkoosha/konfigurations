@@ -20,6 +20,8 @@ import org.jetbrains.annotations.Nullable;
 @Immutable
 public interface K<U> {
 
+    boolean supportsRegister();
+
     /**
      * Register to receive update notifications for changes in value of this
      * konfiguration value, and this value only.

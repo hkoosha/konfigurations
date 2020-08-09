@@ -236,7 +236,7 @@ public final class ExtPreferencesSource extends Source {
     @NotNull
     @Override
     public Source updatedCopy() {
-        return ExtPreferencesSource.this;
+        return this;
     }
 
 }

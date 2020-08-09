@@ -32,6 +32,7 @@ public final class KonfigurationKombinerTest {
     public void setup() {
         this.flag.set(true);
         this.k = kFactory().kombine("def", kFactory().map("map", sup));
+        //noinspection OptionalGetWithoutIsPresent
         this.man = k.manager().get();
     }
 
@@ -70,7 +71,7 @@ public final class KonfigurationKombinerTest {
 
     @Test
     public void testDefaultValue() {
-        assertEquals(k.long_("someblablabla").v(9876L), (Long) 9876L);
+        assertEquals(k.long_("some bla bla bla").v(9876L), (Long) 9876L);
     }
 
 }

@@ -536,7 +536,7 @@ public final class ExtYamlSource extends Source {
     public Source updatedCopy() {
         return this.hasUpdate()
             ? new ExtYamlSource(name(), yaml, mapper)
-            : ExtYamlSource.this;
+            : this;
     }
 
 
