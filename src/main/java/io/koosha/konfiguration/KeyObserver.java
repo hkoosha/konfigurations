@@ -13,6 +13,7 @@ import java.util.function.Consumer;
  * intermediate objects, one listener for each source, yourself.
  */
 @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_1)
+@FunctionalInterface
 public interface KeyObserver extends Consumer<String> {
 
     /**

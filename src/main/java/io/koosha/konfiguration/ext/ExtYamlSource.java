@@ -410,9 +410,6 @@ public final class ExtYamlSource extends Source {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     public String name() {
@@ -420,9 +417,6 @@ public final class ExtYamlSource extends Source {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object bool0(@NotNull final String key) {
@@ -430,9 +424,6 @@ public final class ExtYamlSource extends Source {
         return get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object char0(@NotNull final String key) {
@@ -440,9 +431,6 @@ public final class ExtYamlSource extends Source {
         return get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object string0(@NotNull final String key) {
@@ -450,9 +438,6 @@ public final class ExtYamlSource extends Source {
         return get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Number number0(@NotNull final String key) {
@@ -460,9 +445,6 @@ public final class ExtYamlSource extends Source {
         return (Number) get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Number numberDouble0(@NotNull final String key) {
@@ -470,9 +452,6 @@ public final class ExtYamlSource extends Source {
         return (Number) get(key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected List<?> list0(@NotNull final String key,
@@ -487,9 +466,6 @@ public final class ExtYamlSource extends Source {
         return Collections.unmodifiableList(asList);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Set<?> set0(@NotNull final String key,
@@ -504,9 +480,6 @@ public final class ExtYamlSource extends Source {
         return Collections.unmodifiableSet(asSet);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object custom0(@NotNull final String key,
@@ -525,9 +498,6 @@ public final class ExtYamlSource extends Source {
         return mapper.loadAs(yamlAgain, type.klass());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -539,9 +509,6 @@ public final class ExtYamlSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean has(@NotNull final String key,
                        @NotNull final Kind<?> type) {
@@ -557,9 +524,6 @@ public final class ExtYamlSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     public boolean hasUpdate() {
@@ -567,9 +531,6 @@ public final class ExtYamlSource extends Source {
         return newYaml != null && !Objects.equals(newYaml, lastYaml);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true,
               value = "-> new")

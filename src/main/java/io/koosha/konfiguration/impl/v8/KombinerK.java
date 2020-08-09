@@ -41,18 +41,12 @@ final class KombinerK<U> implements K<U> {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public String key() {
         return this.key;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public Kind<U> type() {
@@ -60,18 +54,12 @@ final class KombinerK<U> implements K<U> {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Nullable
     public U v() {
         return this.origin.getCachedValueOrIssueIt(key, this.type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     public U vn() {
@@ -83,9 +71,6 @@ final class KombinerK<U> implements K<U> {
         return v;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     public boolean exists() {
@@ -93,9 +78,6 @@ final class KombinerK<U> implements K<U> {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public Handle registerSoft(@NotNull final KeyObserver keyObserver) {
@@ -103,11 +85,6 @@ final class KombinerK<U> implements K<U> {
         return origin.registerSoft(keyObserver, this.key);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
     @Override
     @NotNull
     public Handle register(@NotNull final KeyObserver keyObserver) {
@@ -115,23 +92,6 @@ final class KombinerK<U> implements K<U> {
         return this.origin.register(keyObserver, this.key);
     }
 
-    /**
-     * De-register a listener previously registered via
-     * {@link #register(KeyObserver)}.
-     *
-     * <p>De-registering a previously de-registered listener, or a listener not
-     * previously registered at all has no effect.
-     *
-     * <p>Thread-safe.
-     *
-     * <p><b>IMPORTANT:</b> Do NOT just pass in lambdas, as this method stores
-     * only weak references and the observer will be garbage collected. Keep a
-     * reference to the observer yourself.
-     *
-     * @param observerHandle listener being registered for key {@link #key()}
-     * @return this
-     * @see #register(KeyObserver)
-     */
     @Override
     @NotNull
     public K<U> deregister(@NotNull Handle observerHandle) {
@@ -141,9 +101,6 @@ final class KombinerK<U> implements K<U> {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         try {
@@ -154,9 +111,6 @@ final class KombinerK<U> implements K<U> {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(final Object o) {
         if (o == this)
@@ -169,9 +123,6 @@ final class KombinerK<U> implements K<U> {
             && Objects.equals(this.type, other.type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         final int PRIME = 59;

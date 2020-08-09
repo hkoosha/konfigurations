@@ -63,9 +63,6 @@ public final class ExtMapSource extends Source {
         requireNonNull(this.map.get(), "supplied map is null");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Boolean bool0(@NotNull final String key) {
@@ -73,9 +70,6 @@ public final class ExtMapSource extends Source {
         return check(Kind.BOOL, key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Character char0(@NotNull final String key) {
@@ -83,9 +77,6 @@ public final class ExtMapSource extends Source {
         return check(Kind.CHAR, key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected String string0(@NotNull final String key) {
@@ -104,11 +95,8 @@ public final class ExtMapSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     @Override
+    @NotNull
     protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -119,11 +107,8 @@ public final class ExtMapSource extends Source {
         return check(Kind.LONG, key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     @Override
+    @NotNull
     protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -135,10 +120,6 @@ public final class ExtMapSource extends Source {
         return check(Kind.LONG, key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     @Override
     protected List<?> list0(@NotNull final String key,
                             @NotNull final Kind<?> type) {
@@ -147,10 +128,6 @@ public final class ExtMapSource extends Source {
         return Collections.unmodifiableList(asList);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     @Override
     protected Set<?> set0(@NotNull final String key,
                           @NotNull final Kind<?> type) {
@@ -160,9 +137,6 @@ public final class ExtMapSource extends Source {
         return Collections.unmodifiableSet(asSet);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object custom0(@NotNull final String key,
@@ -172,18 +146,12 @@ public final class ExtMapSource extends Source {
         return check(type, key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return this.root.containsKey(key) && this.root.get(key) == null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean has(@NotNull final String key,
                        @NotNull final Kind<?> type) {
@@ -194,18 +162,12 @@ public final class ExtMapSource extends Source {
             type.klass().isAssignableFrom(this.root.get(key).getClass());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public String name() {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     public boolean hasUpdate() {
@@ -216,16 +178,12 @@ public final class ExtMapSource extends Source {
         return newHash != lastHash;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @NotNull
     @Override
+    @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
             ? new ExtMapSource(name(), map)
             : ExtMapSource.this;
     }
-
 
 }

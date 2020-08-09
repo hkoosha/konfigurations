@@ -24,9 +24,6 @@ public class KfgMissingKeyException extends KfgException {
         super(source, key, type, null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return format("%s(key=%s, neededType=%s)",

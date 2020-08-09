@@ -9,10 +9,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
-import io.koosha.konfiguration.KfgTypeNullException;
 import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
 import jdk.nashorn.internal.ir.annotations.Immutable;
@@ -107,7 +107,7 @@ public final class ExtJacksonJsonSource extends Source {
         if (!condition)
             throw new KfgTypeException(this.name(), key, required, node);
         if (node.isNull())
-            throw new KfgTypeNullException(this.name(), key, required);
+            throw new KfgAssertionException(this.name(), key, required, null, null);
         return node;
     }
 
@@ -192,18 +192,12 @@ public final class ExtJacksonJsonSource extends Source {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     public String name() {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Boolean bool0(@NotNull final String key) {
@@ -215,9 +209,6 @@ public final class ExtJacksonJsonSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Character char0(@NotNull final String key) {
@@ -231,9 +222,6 @@ public final class ExtJacksonJsonSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected String string0(@NotNull final String key) {
@@ -245,9 +233,6 @@ public final class ExtJacksonJsonSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     protected Number number0(@NotNull final String key) {
@@ -261,9 +246,6 @@ public final class ExtJacksonJsonSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     protected Number numberDouble0(@NotNull final String key) {
@@ -281,9 +263,6 @@ public final class ExtJacksonJsonSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     protected List<?> list0(@NotNull final String key,
@@ -310,9 +289,6 @@ public final class ExtJacksonJsonSource extends Source {
         return Collections.unmodifiableList(asList);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     protected Set<?> set0(@NotNull final String key,
@@ -327,9 +303,6 @@ public final class ExtJacksonJsonSource extends Source {
         return Collections.unmodifiableSet(asSet);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object custom0(@NotNull final String key,
@@ -364,9 +337,6 @@ public final class ExtJacksonJsonSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -376,9 +346,6 @@ public final class ExtJacksonJsonSource extends Source {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean has(@NotNull final String key,
                        @Nullable final Kind<?> type) {
@@ -406,9 +373,6 @@ public final class ExtJacksonJsonSource extends Source {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     public boolean hasUpdate() {
@@ -416,9 +380,6 @@ public final class ExtJacksonJsonSource extends Source {
         return newJson != null && !Objects.equals(newJson, lastJson);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true,
               value = "-> new")
     @Override

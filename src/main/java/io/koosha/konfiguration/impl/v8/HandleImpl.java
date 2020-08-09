@@ -17,18 +17,12 @@ final class HandleImpl implements Handle {
     private final long id = id_pool.incrementAndGet();
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public long id() {
         return this.id;
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean equals(final Object o) {
         if (o == this)
@@ -38,9 +32,6 @@ final class HandleImpl implements Handle {
         return this.id == ((HandleImpl) o).id;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public int hashCode() {
         return 59 + (int) (this.id >>> 32 ^ this.id);

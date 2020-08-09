@@ -98,9 +98,6 @@ public class KfgException extends RuntimeException {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         return format("%s(key=%s, neededType=%s, actualValue=%s)",

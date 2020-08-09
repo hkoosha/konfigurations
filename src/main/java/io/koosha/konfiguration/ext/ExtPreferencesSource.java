@@ -55,9 +55,6 @@ public final class ExtPreferencesSource extends Source {
         this.lastHash = hashOf();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object bool0(@NotNull final String key) {
@@ -65,9 +62,6 @@ public final class ExtPreferencesSource extends Source {
         return this.source.getBoolean(sane(key), false);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object char0(@NotNull final String key) {
@@ -78,9 +72,6 @@ public final class ExtPreferencesSource extends Source {
         return ((String) this.string0(sane(key))).charAt(0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object string0(@NotNull final String key) {
@@ -88,9 +79,6 @@ public final class ExtPreferencesSource extends Source {
         return this.source.get(sane(key), null);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Number number0(@NotNull final String key) {
@@ -98,9 +86,6 @@ public final class ExtPreferencesSource extends Source {
         return this.source.getLong(sane(key), 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Number numberDouble0(@NotNull final String key) {
@@ -108,9 +93,6 @@ public final class ExtPreferencesSource extends Source {
         return this.source.getDouble(sane(key), 0);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected List<?> list0(@NotNull final String key,
@@ -118,9 +100,6 @@ public final class ExtPreferencesSource extends Source {
         throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Set<?> set0(@NotNull final String key,
@@ -128,9 +107,6 @@ public final class ExtPreferencesSource extends Source {
         throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     protected Object custom0(@NotNull final String key,
@@ -138,9 +114,6 @@ public final class ExtPreferencesSource extends Source {
         throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -148,9 +121,6 @@ public final class ExtPreferencesSource extends Source {
             && this.source.get(sane(key), "") == null;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean has(@NotNull final String key,
                        @NotNull final Kind<?> type) {
@@ -225,28 +195,18 @@ public final class ExtPreferencesSource extends Source {
         return Arrays.hashCode(buffer.toByteArray());
     }
 
-
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     public String name() {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     public boolean hasUpdate() {
         return lastHash != hashOf();
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     public Source updatedCopy() {

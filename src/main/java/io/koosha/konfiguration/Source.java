@@ -16,9 +16,6 @@ import java.util.Set;
  */
 public abstract class Source implements Konfiguration {
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<Boolean> bool(@NotNull final String key) {
@@ -39,9 +36,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<Character> char_(@NotNull final String key) {
@@ -75,9 +69,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<String> string(@NotNull final String key) {
@@ -104,9 +95,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<Byte> byte_(@NotNull final String key) {
@@ -129,9 +117,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv.byteValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<Short> short_(@NotNull final String key) {
@@ -154,9 +139,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv.shortValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<Integer> int_(@NotNull final String key) {
@@ -179,9 +161,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv.intValue());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<Long> long_(@NotNull final String key) {
@@ -204,9 +183,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<Float> float_(@NotNull final String key) {
@@ -229,9 +205,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final K<Double> double_(@NotNull final String key) {
@@ -254,9 +227,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, kind, vv);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final <U> K<List<U>> list(@NotNull final String key,
@@ -278,9 +248,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, listKind, v);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final <U> K<Set<U>> set(@NotNull final String key,
@@ -310,9 +277,6 @@ public abstract class Source implements Konfiguration {
         return this.k(key, setKind, vv);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @SuppressWarnings("unchecked")
     @Override
     @NotNull
@@ -357,9 +321,6 @@ public abstract class Source implements Konfiguration {
 
     // =========================================================================
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public final Optional<KonfigurationManager> manager() {
         throw new KfgAssertionException(this.name(), null, null, null, "manager() should not be called on a Source.");
@@ -543,9 +504,6 @@ public abstract class Source implements Konfiguration {
 
     // ============================================================= UNSUPPORTED
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Contract("_ -> fail")
     @Override
@@ -556,10 +514,6 @@ public abstract class Source implements Konfiguration {
                 + getClass().getName() + ", key=" + key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @NotNull
     @Contract("_ -> fail")
     public final Handle registerSoft(@NotNull final KeyObserver observer) {
@@ -569,10 +523,6 @@ public abstract class Source implements Konfiguration {
                 + getClass().getName() + ", observer=" + observer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Contract("_ -> fail")
     @NotNull
     public final Handle register(@NotNull final KeyObserver observer) {
@@ -582,10 +532,6 @@ public abstract class Source implements Konfiguration {
                 + getClass().getName() + ", observer=" + observer);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Contract("_, _ -> fail")
     @Override
     @NotNull
     public final Handle registerSoft(@NotNull final KeyObserver observer,
@@ -597,10 +543,6 @@ public abstract class Source implements Konfiguration {
                 + ", key=" + key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     @Contract("_, _ -> fail")
     @NotNull
     public final Handle register(@NotNull final KeyObserver observer,
@@ -612,10 +554,6 @@ public abstract class Source implements Konfiguration {
                 + ", key=" + key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Contract("_, _ -> fail")
     @Override
     public final void deregister(@NotNull final Handle observer,
                                  @NotNull final String key) {
@@ -626,10 +564,6 @@ public abstract class Source implements Konfiguration {
                 + ", key=" + key);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    @Contract("_ -> fail")
     @Override
     public final void deregister(@NotNull final Handle observer) {
         throw new KfgAssertionException(

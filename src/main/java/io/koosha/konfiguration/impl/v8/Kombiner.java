@@ -157,9 +157,6 @@ final class Kombiner implements Konfiguration {
 
     // =========================================================================
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     @NotNull
@@ -167,9 +164,6 @@ final class Kombiner implements Konfiguration {
         return this.name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @Override
     @NotNull
@@ -183,9 +177,6 @@ final class Kombiner implements Konfiguration {
 
     // =========================================================================
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<Boolean> bool(@NotNull final String key) {
@@ -193,9 +184,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.BOOL);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<Byte> byte_(@NotNull final String key) {
@@ -203,9 +191,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.BYTE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<Character> char_(@NotNull final String key) {
@@ -213,9 +198,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.CHAR);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<Short> short_(@NotNull final String key) {
@@ -223,9 +205,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.SHORT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<Integer> int_(@NotNull final String key) {
@@ -233,9 +212,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.INT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<Long> long_(@NotNull final String key) {
@@ -243,9 +219,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.LONG);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<Float> float_(@NotNull final String key) {
@@ -253,9 +226,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.FLOAT);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<Double> double_(@NotNull final String key) {
@@ -263,9 +233,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.DOUBLE);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public K<String> string(@NotNull final String key) {
@@ -273,9 +240,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, Kind.STRING);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public <U> K<List<U>> list(@NotNull final String key,
@@ -284,9 +248,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, type.asList());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public <U> K<Set<U>> set(@NotNull final String key,
@@ -295,9 +256,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, type.asSet());
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public <U> K<U> custom(@NotNull final String key,
@@ -306,9 +264,6 @@ final class Kombiner implements Konfiguration {
         return this.k(key, type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean has(@NotNull final String key,
                        @NotNull final Kind<?> type) {
@@ -320,9 +275,6 @@ final class Kombiner implements Konfiguration {
 
     // =========================================================================
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     public Handle registerSoft(@NotNull final KeyObserver observer,
@@ -331,9 +283,6 @@ final class Kombiner implements Konfiguration {
         return w(() -> observers.registerSoft(observer, key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public Handle register(@NotNull final KeyObserver observer,
@@ -343,9 +292,6 @@ final class Kombiner implements Konfiguration {
         return w(() -> observers.registerHard(observer, key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public void deregister(@NotNull final Handle observer,
                            @NotNull final String key) {
@@ -360,9 +306,6 @@ final class Kombiner implements Konfiguration {
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public final Konfiguration subset(@NotNull final String key) {

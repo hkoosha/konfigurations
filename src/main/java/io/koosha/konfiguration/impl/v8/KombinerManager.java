@@ -34,11 +34,6 @@ final class KombinerManager implements KonfigurationManager {
         this.origin = kombiner;
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
     @NotNull
     @Override
     public Map<String, Collection<Runnable>> update() {
@@ -122,11 +117,6 @@ final class KombinerManager implements KonfigurationManager {
         });
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return
-     */
     @Override
     public boolean hasUpdate() {
         return this.origin.r(() -> this

@@ -242,9 +242,6 @@ public abstract class Kind<TYPE> implements Serializable {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @Override
     public final String toString() {
@@ -255,9 +252,6 @@ public abstract class Kind<TYPE> implements Serializable {
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @Override
     public final boolean equals(final Object o) {
@@ -270,9 +264,6 @@ public abstract class Kind<TYPE> implements Serializable {
             && Objects.equals(this.type, other.type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @Override
     public final int hashCode() {

@@ -8,7 +8,11 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static java.lang.String.format;
 
@@ -49,39 +53,26 @@ public final class DummyV<U> implements K<U> {
         this.type = type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     public String key() {
         return this.key;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Nullable
     public Kind<U> type() {
         return this.type;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    @Contract(pure = true,
-              value = "null->fail;_-> this")
+    @Contract(pure = true)
     @NotNull
     public K<U> deregister(@NotNull final Handle observer) {
         Objects.requireNonNull(observer, "observer");
         return this;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     @NotNull
@@ -90,9 +81,6 @@ public final class DummyV<U> implements K<U> {
         return M_1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     @NotNull
@@ -101,9 +89,6 @@ public final class DummyV<U> implements K<U> {
         return M_1;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Nullable
     @Contract(pure = true)
@@ -114,9 +99,6 @@ public final class DummyV<U> implements K<U> {
         throw new KfgMissingKeyException(null, this.key, this.type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     public U vn() {
@@ -128,18 +110,12 @@ public final class DummyV<U> implements K<U> {
         return v;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     public boolean exists() {
         return this.exists;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public String toString() {
         String vStr;

@@ -57,9 +57,6 @@ final class SubsetView implements Konfiguration {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @NotNull
     @Override
     public String name() {
@@ -67,9 +64,6 @@ final class SubsetView implements Konfiguration {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @Override
     @NotNull
@@ -78,9 +72,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.bool(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -89,9 +80,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.byte_(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -100,9 +88,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.char_(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -111,9 +96,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.short_(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -122,9 +104,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.int_(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -133,9 +112,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.long_(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -144,9 +120,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.float_(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -155,9 +128,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.double_(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -166,9 +136,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.string(key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -178,9 +145,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.list(key(key), type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -190,9 +154,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.set(key(key), type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -202,9 +163,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.custom(key(key), type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @Override
     public boolean has(@NotNull final String key,
@@ -213,9 +171,6 @@ final class SubsetView implements Konfiguration {
         return wrapped.has(key(key), type);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @NotNull
     @Override
@@ -226,9 +181,6 @@ final class SubsetView implements Konfiguration {
         return this.wrapped.registerSoft(observer, key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @Override
     public void deregister(@NotNull final Handle observer,
@@ -238,9 +190,6 @@ final class SubsetView implements Konfiguration {
         this.wrapped.deregister(observer, key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true)
     @Override
     @NotNull
@@ -251,9 +200,6 @@ final class SubsetView implements Konfiguration {
         return this.wrapped.register(observer, key(key));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Contract(pure = true,
               value = "_ -> _")
     @NotNull
@@ -269,9 +215,6 @@ final class SubsetView implements Konfiguration {
         );
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public Optional<KonfigurationManager> manager() {
         return Optional.empty();

@@ -67,9 +67,6 @@ public final class FactoryV8 implements KonfigurationFactory {
     }
 
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract(pure = true)
     @NotNull
@@ -79,9 +76,6 @@ public final class FactoryV8 implements KonfigurationFactory {
 
     // ================================================================ KOMBINER
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @Contract("_, _ -> new")
     @NotNull
@@ -92,9 +86,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return kombine(name, singleton(source));
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _, _ -> new")
@@ -110,9 +101,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return new Kombiner(name, l, this.lockWaitTime, this.fairLock);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _ -> new")
@@ -125,9 +113,6 @@ public final class FactoryV8 implements KonfigurationFactory {
 
     // ==================================================================== MAP
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract(pure = true,
@@ -140,9 +125,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return kombine(name, k);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract(pure = true,
@@ -157,9 +139,6 @@ public final class FactoryV8 implements KonfigurationFactory {
 
     // ============================================================ PREFERENCES
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _ -> new")
@@ -173,9 +152,6 @@ public final class FactoryV8 implements KonfigurationFactory {
 
     // ================================================================ JACKSON
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _ -> new")
@@ -187,9 +163,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return kombine(name, k);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _ -> new")
@@ -200,9 +173,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return jacksonJson(name, () -> json);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _, _ -> new")
@@ -215,9 +185,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return jacksonJson(name, () -> json, objectMapper);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _, _ -> new")
@@ -233,9 +200,6 @@ public final class FactoryV8 implements KonfigurationFactory {
 
     // ============================================================= SNAKE YAML
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _ -> new")
@@ -246,9 +210,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return snakeYaml(name, () -> yaml);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _, _ -> new")
@@ -261,9 +222,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return snakeYaml(name, () -> yaml, objectMapper);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _ -> new")
@@ -275,9 +233,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         return kombine(name, k);
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     @NotNull
     @Contract("_, _, _ -> new")
