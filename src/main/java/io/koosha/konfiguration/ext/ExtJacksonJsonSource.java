@@ -59,7 +59,7 @@ public final class ExtJacksonJsonSource extends Source {
     }
 
     private final Supplier<ObjectMapper> mapperSupplier;
-    private final Supplier<String> json;
+    private final Supplier<String> jsonSupplier;
     private final String lastJson;
     private final JsonNode root;
     private final Object LOCK = new Object();
@@ -172,9 +172,9 @@ public final class ExtJacksonJsonSource extends Source {
                     "com.fasterxml.jackson.databind.JsonNode", e);
         }
 
-        this.json = jsonSupplier;
+        this.jsonSupplier = jsonSupplier;
         this.mapperSupplier = objectMapper;
-        this.lastJson = this.json.get();
+        this.lastJson = this.jsonSupplier.get();
 
         requireNonNull(this.lastJson, "supplied json is null");
         requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
@@ -376,7 +376,7 @@ public final class ExtJacksonJsonSource extends Source {
     @Override
     @Contract(pure = true)
     public boolean hasUpdate() {
-        final String newJson = json.get();
+        final String newJson = jsonSupplier.get();
         return newJson != null && !Objects.equals(newJson, lastJson);
     }
 
@@ -386,7 +386,7 @@ public final class ExtJacksonJsonSource extends Source {
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-            ? new ExtJacksonJsonSource(this.name(), this.json, this.mapperSupplier)
+            ? new ExtJacksonJsonSource(this.name(), this.jsonSupplier, this.mapperSupplier)
             : this;
     }
 

@@ -1,6 +1,5 @@
 package io.koosha.konfiguration;
 
-import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Nullable;
 
 public class KfgConcurrencyException extends KfgException {
@@ -19,34 +18,6 @@ public class KfgConcurrencyException extends KfgException {
     public KfgConcurrencyException(@Nullable String source,
                                    @Nullable Throwable cause) {
         super(source, null, null, null, "", cause);
-    }
-
-    public KfgConcurrencyException(@Nullable String source,
-                                   @Nullable String key,
-                                   @Nullable Kind<?> neededType,
-                                   @Nullable Object actualValue,
-                                   @Nullable String message, @Nullable Throwable cause) {
-        super(source, key, neededType, actualValue, message, cause);
-    }
-
-    public KfgConcurrencyException(@Nullable String source,
-                                   @Nullable String key,
-                                   @Nullable Kind<?> neededType, @Nullable Object actualValue, @Nullable String message) {
-        super(source, key, neededType, actualValue, message);
-    }
-
-    public KfgConcurrencyException(@Nullable String source,
-                                   @Nullable String key,
-                                   @Nullable Kind<?> neededType,
-                                   @Nullable Object actualValue,
-                                   @Nullable Throwable cause) {
-        super(source, key, neededType, actualValue, cause);
-    }
-
-    public KfgConcurrencyException(@Nullable String source,
-                                   @Nullable String key,
-                                   @Nullable Kind<?> neededType, @Nullable Object actualValue) {
-        super(source, key, neededType, actualValue);
     }
 
 }

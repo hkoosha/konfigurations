@@ -373,7 +373,7 @@ public abstract class Source implements Konfiguration {
         if (l == null)
             return null;
 
-        //noinspection RedundantConditionalExpression
+        //noinspection SimplifiableConditionalExpression
         return l == 0 ? false : true;
     }
 

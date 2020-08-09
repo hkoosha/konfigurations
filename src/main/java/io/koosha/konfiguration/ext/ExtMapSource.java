@@ -121,6 +121,7 @@ public final class ExtMapSource extends Source {
     }
 
     @Override
+    @NotNull
     protected List<?> list0(@NotNull final String key,
                             @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
@@ -129,6 +130,7 @@ public final class ExtMapSource extends Source {
     }
 
     @Override
+    @NotNull
     protected Set<?> set0(@NotNull final String key,
                           @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");

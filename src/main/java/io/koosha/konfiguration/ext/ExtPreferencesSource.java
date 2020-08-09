@@ -45,6 +45,8 @@ public final class ExtPreferencesSource extends Source {
     @NotNull
     private final String name;
 
+    private final Object LOCK = new Object();
+
     public ExtPreferencesSource(@NotNull final String name,
                                 @NotNull final Preferences preferences) {
         Objects.requireNonNull(name, "name");
@@ -59,38 +61,53 @@ public final class ExtPreferencesSource extends Source {
     @NotNull
     protected Object bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.source.getBoolean(sane(key), false);
+
+        synchronized (LOCK) {
+            return this.source.getBoolean(sane(key), false);
+        }
     }
 
     @Override
     @NotNull
     protected Object char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        final String s = ((String) this.string0(sane(key)));
-        if (s.length() != 1)
-            throw new KfgTypeException(this.name(), key, Kind.CHAR, s);
-        return ((String) this.string0(sane(key))).charAt(0);
+
+        synchronized (LOCK) {
+            final String s = ((String) this.string0(sane(key)));
+            if (s.length() != 1)
+                throw new KfgTypeException(this.name(), key, Kind.CHAR, s);
+            return ((String) this.string0(sane(key))).charAt(0);
+        }
     }
 
     @Override
     @NotNull
     protected Object string0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.source.get(sane(key), null);
+
+        synchronized (LOCK) {
+            return this.source.get(sane(key), null);
+        }
     }
 
     @Override
     @NotNull
     protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.source.getLong(sane(key), 0);
+
+        synchronized (LOCK) {
+            return this.source.getLong(sane(key), 0);
+        }
     }
 
     @Override
     @NotNull
     protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.source.getDouble(sane(key), 0);
+
+        synchronized (LOCK) {
+            return this.source.getDouble(sane(key), 0);
+        }
     }
 
     @Override
@@ -117,8 +134,11 @@ public final class ExtPreferencesSource extends Source {
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
-        return this.source.get(sane(key), null) == null
-            && this.source.get(sane(key), "") == null;
+
+        synchronized (LOCK) {
+            return this.source.get(sane(key), null) == null
+                && this.source.get(sane(key), "") == null;
+        }
     }
 
     @Override
@@ -127,13 +147,15 @@ public final class ExtPreferencesSource extends Source {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
-        try {
-            if (!source.nodeExists(sane(key)))
-                return false;
-        }
-        catch (Throwable e) {
-            throw new KfgSourceException(this.name(), key, null, null, "error checking existence of key", e);
-        }
+            try {
+                synchronized (LOCK) {
+                    if (!source.nodeExists(sane(key)))
+                        return false;
+                }
+            }
+            catch (Throwable e) {
+                throw new KfgSourceException(this.name(), key, null, null, "error checking existence of key", e);
+            }
 
         try {
             if (type.isChar()) {
@@ -174,8 +196,10 @@ public final class ExtPreferencesSource extends Source {
         Objects.requireNonNull(key, "key");
 
         try {
-            if (!this.source.nodeExists(key))
-                throw new KfgIllegalStateException(this.name(), "missing key=" + key);
+            synchronized (LOCK) {
+                if (!this.source.nodeExists(key))
+                    throw new KfgIllegalStateException(this.name(), "missing key=" + key);
+            }
         }
         catch (final BackingStoreException e) {
             throw new KfgIllegalStateException(this.name(), "backing store error for key=" + key, e);
@@ -187,9 +211,11 @@ public final class ExtPreferencesSource extends Source {
     private int hashOf() {
         final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
-            this.source.exportSubtree(buffer);
+            synchronized (LOCK) {
+                this.source.exportSubtree(buffer);
+            }
         }
-        catch (IOException | BackingStoreException e) {
+        catch (final IOException | BackingStoreException e) {
             throw new KfgSourceException(this.name(), "could not calculate hash of the java.util.prefs.Preferences source", e);
         }
         return Arrays.hashCode(buffer.toByteArray());
