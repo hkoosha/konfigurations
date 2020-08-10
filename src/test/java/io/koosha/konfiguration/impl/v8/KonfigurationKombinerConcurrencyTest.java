@@ -2,7 +2,7 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
-import io.koosha.konfiguration.ext.ExtJacksonJsonSource;
+import io.koosha.konfiguration.ext.v8.ExtJacksonJsonSource;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;

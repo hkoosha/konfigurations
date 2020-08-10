@@ -29,7 +29,7 @@ final class KombinerObservers {
 
     private final Map<Handle, KombinerObserver> observers = new LinkedHashMap<>();
 
-    KombinerObservers(@NotNull String name) {
+    KombinerObservers(@NotNull final String name) {
         Objects.requireNonNull(name, "name");
         this.name = name;
     }
@@ -87,10 +87,10 @@ final class KombinerObservers {
         @Nullable
         private final WeakReference<KeyObserver> soft;
 
-        private final Set<String> interestedKeys = new HashSet<>();
-
         @Nullable
         private final KeyObserver hard;
+
+        private final Set<String> interestedKeys = new HashSet<>();
 
         KombinerObserver(@NotNull final WeakReference<KeyObserver> keyObserver) {
             Objects.requireNonNull(keyObserver, "keyObserver");

@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.ext;
+package io.koosha.konfiguration.ext.v8;
 
 import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KfgTypeException;

@@ -1,6 +1,6 @@
 ## Java Configuration Library [![Build Status](https://travis-ci.org/hkoosha/konfigurations.svg?branch=master)](https://travis-ci.org/hkoosha/konfigurations)
 
-Simple, small and extendable configuration management library with live updates.
+Simple, small and extendable zero dependency configuration management library with live updates.
 
 ## Maven
 
@@ -8,15 +8,15 @@ Simple, small and extendable configuration management library with live updates.
 <dependency>
     <groupId>io.koosha.konfigurations</groupId>
     <artifactId>konfigurations</artifactId>
-    <version>5.0.0</version>
+    <version>8.0.0</version>
 </dependency>
 ```
 
 ```groovy
-compile group: 'io.koosha.konfigurations', name: 'konfigurations', version: '5.0.0'
+compile group: 'io.koosha.konfigurations', name: 'konfigurations', version: '8.0.0'
 ```
 
-Development happens on master branch. Releases (versions) are tagged. 
+Development happens on the master branch. Releases are tagged. 
 
 
 ## Project goals:
@@ -26,20 +26,20 @@ Development happens on master branch. Releases (versions) are tagged.
 - Live updates, with possibility of removing old keys or adding new ones.
 - Possibility of registering to configuration changes, per key or generally.
 - Configuration namespace management.
-- Hopefully support Android.
 
 ## Usage:
 
 **Overrides**: Konfiguration sources can override each other. The first source 
-which contains the requested key is selected and takes precendece.
+which contains the requested key is selected and takes precedence.
 
 **Default values**: For non-existing keys, default values can be passed to 
 `v(DEFAULT_VALUE)`
 
 **List, Map, Custom Type**: As long as the underlying source can parse it from 
-the actual configuration source, it's possible. The JsonKonfigSource uses 
+the actual configuration source, it's possible. The ExtJacksonJsonSource uses 
 Jackson for parsing json, so if the Jackson parser can parse the map / list /
-object, so can the configuration.
+object, so can the configuration. The same is true for ExtYamlSource which
+uses snakeyaml. You could also implement your own source.
 
 **Observing changes**: Observers can register to changes of a specific key 
 (`register(KeyObserver` on the `V` interface) or to any configuration change 
@@ -52,13 +52,16 @@ observer will be notified once for each updated key in each update.
 reference is kept to listeners (GC works as expected).
 
 ```java
-// Create as many sources as necessary
-JsonKonfigSource     json = new JsonKonfigSource    (() -> Files.read("/etc/my_app.cfg"));
-InMemoryKonfigSource map0 = new InMemoryKonfigSource(() -> Map.of(foo, bar, baz, quo));
-InMemoryKonfigSource map1 = new InMemoryKonfigSource(() -> NetworkUtil.decodeAsMap("http://example.com/endpoint/config?token=hahaha"));
+KonfigurationFactory f    = KonfigurationFactory.getInstanceV8();
 
-// Kombine them (map0 takes priority over json and json over map1).
-Konfiguration konfig = new KonfigurationKombiner(map0, json, map1);
+// Create as many sources as necessary
+Konfiguration        json = f.jacksonJson ("myJsonSource", "some_valid_json...");
+Konfiguration        yaml = f.snakeYaml   ("myYamlSource", () -> "some_valid_yaml_provider");
+Konfiguration        mem  = f.map         ("myMapSource",  () -> Map.of(foo, bar, baz, quo));
+Konfiguration        net  = f.snakeYaml   ("fromNetwork",  () -> NetworkUtil.httpGet("http://example.com/endpoint/config.yaml?token=hahaha"));
+
+// Kombine them (json takes priority over yaml and yaml over mem, and mem over net).
+Konfiguration konfig = f.konbine(json, yaml, mem, net);
 
 // Get the value, notice the .v()
 boolean b = konfig.bool   ("some.konfig.key.deeply.nested").v()
@@ -68,7 +71,6 @@ String  s = konfig.string ("aString").v()
 double  d = konfig.double_("double").v()
 
 List<Invoice>       list = konfig.list("a.nice.string.list", Invoice.class).v()
-Map<String, Integer> map = konfig.map ("my.map", int.class).v()
 
 // --------------
 
@@ -76,13 +78,12 @@ K<Integer> maybe = konfig.int_("might.be.unavailable");
 int value = maybe.v(42);
 assert value == 42;
 
-// Sometime later, "non.existing.key" is actually written into config source,
+// Sometime later, "non.existing.key = 99" is actually written into config source,
 // and konfig.update() is called in the worker thread.
 
 K<Integer> defValue = konfig.int_("non.existing.key");
 int value = defValue.v(42);
-assert value == 42;
-
+assert value == 99;
 
 ```
 
@@ -93,9 +94,9 @@ a value directly but returns a wrapper. The wrapper has a method v() which
 returns the actual value.
 
 ```java
-private static String theJsonKonfigString = "{ \"isAllowed\": true }";
-private static Konfiguration konfig =
-    new KonfigurationKombiner(new JsonKonfigSource(() -> theJsonKonfigString));;
+String theJsonKonfigString = "{ \"isAllowed\": true }";
+KonfigurationFactory f = KonfigurationFactory.getInstance();
+Konfiguration konfig = f.jacksonJson("mySource", () -> this.theJsonKonfigString);
 
 // ...
 
@@ -107,7 +108,7 @@ amIAllowed.register(updatedKey -> {
 
 assert amIAllowed.v() == true;
 
-theJsonKonfigString = "{ \"isAllowed\": false }";
+this.theJsonKonfigString = "{ \"isAllowed\": false }";
 konfig.update(); 
 
 // Changed!
@@ -118,28 +119,18 @@ assert amIAllowed.v() == false;
 ### Assumptions / Limitations:
  - First source containing a key takes priority over others.
 
- - First call to get a konfig value, defines type for it's key. further calls
-   must comply.
-
  - A value returned from K.v() must be immutable. Care must be taken
    when using custom types.
 
- - Every object returned by konfiguration, including custom types, MUST 
-   implement equals(), otherwise calls to update() will not work properly/
-
- - KonvigV.v() will return new values if the konfiguration source is updated,
+ - K.v() will return new values if the konfiguration source is updated,
    while konfig key observers are still waiting to be notified (are not 
    notified *yet*).
 
  - Currently, custom types and ALL the required fields corresponding to those
    read from json string, MUST be public. (This is actually a jackson limitation  
-   (feature?) as it wont find private, protected and package local fields AND 
+   (feature?) as it won't find private, protected and package local fields AND 
    classes (important: both class and fields, must be public)). This affects 
-   list(), map() and custom() methods.
-
- - Changing a key type (such as from int to String) during an update is not 
-   recommended and might cause unexpected behaviour.
-   TODO: how to disallow this?
+   list() and custom() methods.
 
  - TODO: Do not call isUpdatable on a source twice.
 

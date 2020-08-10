@@ -8,10 +8,10 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Stream;
 
 @NotThreadSafe
 @ApiStatus.Internal
@@ -39,8 +39,8 @@ final class KombinerSources {
 
     @Contract(pure = true)
     @NotNull
-    Stream<Konfiguration> sourcesStream() {
-        return sources.values().stream();
+    Collection<Konfiguration> sources() {
+        return sources.values();
     }
 
     @Contract(mutates = "this")

@@ -1,21 +1,15 @@
+/*
 package io.koosha.konfiguration.ext;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.CollectionType;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import io.koosha.konfiguration.KfgAssertionException;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 import io.koosha.konfiguration.KfgMissingKeyException;
-import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
+import io.koosha.konfiguration.KfgTypeNullException;
 import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
@@ -34,65 +28,56 @@ import java.util.regex.Pattern;
 
 import static java.util.Objects.requireNonNull;
 
-/**
- * Reads konfig from a json source (supplied as string).
- *
- * <p>for {@link #custom(String, Kind)} to work, the supplied json reader must
- * be configured to handle arbitrary types accordingly.
- *
- * <p>Thread safe and immutable.
- */
 @Immutable
 @ThreadSafe
 @ApiStatus.Internal
-public final class ExtJacksonJsonSource extends Source {
+public final class ExtGsonJsonSource extends Source {
 
     private static final String DOT_PATTERN = Pattern.quote(".");
+    private static final Gson GSON = new Gson();
 
-    @Contract(pure = true,
-              value = "->new")
+    @Contract(pure = true)
     @NotNull
-    private static ObjectMapper defaultJacksonObjectMapper() {
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        return mapper;
+    private static Gson defaultJacksonObjectMapper() {
+        return GSON;
     }
 
-    private final Supplier<ObjectMapper> mapperSupplier;
-    private final Supplier<String> jsonSupplier;
+    private final Supplier<Gson> mapperSupplier;
+    private final Supplier<String> json;
     private final String lastJson;
-    private final JsonNode root;
+    private final JsonObject root;
     private final Object LOCK = new Object();
 
     @NotNull
     private final String name;
 
-    private JsonNode node_(@NotNull final String key) {
+    private JsonObject node_(@NotNull final String key) {
         synchronized (LOCK) {
             Objects.requireNonNull(key, "key");
 
             if (key.isEmpty())
                 throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
 
-            JsonNode node = this.root;
+            JsonObject node = this.root;
             for (final String sub : key.split(DOT_PATTERN)) {
                 if (node.isMissingNode())
                     return node;
-                node = root.findPath(sub);
+                // XXX null.
+                node = root.get(sub).getAsJsonObject();
             }
             return node;
         }
     }
 
     @NotNull
-    private JsonNode node(@NotNull final String key) {
+    private JsonObject node(@NotNull final String key) {
         synchronized (LOCK) {
             Objects.requireNonNull(key, "key");
 
             if (key.isEmpty())
                 throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
 
-            final JsonNode node = node_(key);
+            final JsonObject node = node_(key);
             if (node.isMissingNode())
                 throw new KfgMissingKeyException(this.name(), key);
             return node;
@@ -100,14 +85,14 @@ public final class ExtJacksonJsonSource extends Source {
     }
 
     @NotNull
-    private JsonNode checkJsonType(final boolean condition,
-                                   @NotNull final Kind<?> required,
-                                   @NotNull final JsonNode node,
-                                   @NotNull final String key) {
+    private JsonObject checkJsonType(final boolean condition,
+                                     @NotNull final Kind<?> required,
+                                     @NotNull final JsonObject node,
+                                     @NotNull final String key) {
         if (!condition)
             throw new KfgTypeException(this.name(), key, required, node);
-        if (node.isNull())
-            throw new KfgAssertionException(this.name(), key, required, null, null);
+        if (node.isJsonNull())
+            throw new KfgTypeNullException(this.name(), key, required);
         return node;
     }
 
@@ -129,32 +114,14 @@ public final class ExtJacksonJsonSource extends Source {
     }
 
 
-    public ExtJacksonJsonSource(@NotNull final String name,
-                                @NotNull final Supplier<String> jsonSupplier) {
-        this(name, jsonSupplier, ExtJacksonJsonSource::defaultJacksonObjectMapper);
+    public ExtGsonJsonSource(@NotNull final String name,
+                             @NotNull final Supplier<String> jsonSupplier) {
+        this(name, jsonSupplier, ExtGsonJsonSource::defaultJacksonObjectMapper);
     }
 
-    /**
-     * Creates an instance with a with the given json
-     * provider and object mapper provider.
-     *
-     * @param name         name of this source
-     * @param jsonSupplier backing store provider. Must always return a non-null valid json
-     *                     string.
-     * @param objectMapper {@link ObjectMapper} provider. Must always return a valid
-     *                     non-null ObjectMapper, and if required, it must be able to
-     *                     deserialize custom types, so that {@link #custom(String, Kind)}
-     *                     works as well.
-     * @throws NullPointerException if any of its arguments are null.
-     * @throws KfgSourceException   if jackson library is not in the classpath. it specifically looks
-     *                              for the class: "com.fasterxml.jackson.databind.JsonNode"
-     * @throws KfgSourceException   if the storage (json string) returned by json string is null.
-     * @throws KfgSourceException   if the provided json string can not be parsed by jackson.
-     * @throws KfgSourceException   if the the root element returned by jackson is null.
-     */
-    public ExtJacksonJsonSource(@NotNull final String name,
-                                @NotNull final Supplier<String> jsonSupplier,
-                                @NotNull final Supplier<ObjectMapper> objectMapper) {
+    public ExtGsonJsonSource(@NotNull final String name,
+                             @NotNull final Supplier<String> jsonSupplier,
+                             @NotNull final Supplier<Gson> objectMapper) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(jsonSupplier, "jsonSupplier");
         Objects.requireNonNull(objectMapper, "objectMapper");
@@ -162,28 +129,28 @@ public final class ExtJacksonJsonSource extends Source {
         this.name = name;
         // Check early, so we're not fooled with a dummy object reader.
         try {
-            Class.forName("com.fasterxml.jackson.databind.JsonNode");
+            Class.forName("com.google.gson");
         }
         catch (final ClassNotFoundException e) {
-            throw new KfgSourceException(this.name(),
-                "jackson library is required to be present in " +
+            throw new KfgJacksonError(this.name(),
+                "gson library is required to be present in " +
                     "the class path, can not find the class: " +
-                    "com.fasterxml.jackson.databind.JsonNode", e);
+                    "com.google.gson", e);
         }
 
-        this.jsonSupplier = jsonSupplier;
+        this.json = jsonSupplier;
         this.mapperSupplier = objectMapper;
-        this.lastJson = this.jsonSupplier.get();
+        this.lastJson = this.json.get();
 
         requireNonNull(this.lastJson, "supplied json is null");
         requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
 
-        final JsonNode update;
+        final JsonObject update;
         try {
-            update = this.mapperSupplier.get().readTree(this.lastJson);
+            update = this.mapperSupplier.get().fromJson(this.lastJson, JsonObject.class);
         }
-        catch (final IOException e) {
-            throw new KfgSourceException(this.name(), "error parsing json string", e);
+        catch (final JsonSyntaxException e) {
+            throw new KfgJacksonError(this.name(), "error parsing json string", e);
         }
         requireNonNull(update, "root element is null");
 
@@ -203,8 +170,8 @@ public final class ExtJacksonJsonSource extends Source {
         Objects.requireNonNull(key, "key");
 
         synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(at.isBoolean(), Kind.BOOL, at, key).asBoolean();
+            final JsonObject at = node(key);
+            return checkJsonType(at.isJsonPrimitive(), Kind.BOOL, at, key).asBoolean();
         }
     }
 
@@ -371,11 +338,10 @@ public final class ExtJacksonJsonSource extends Source {
         }
     }
 
-
     @Override
     @Contract(pure = true)
     public boolean hasUpdate() {
-        final String newJson = jsonSupplier.get();
+        final String newJson = json.get();
         return newJson != null && !Objects.equals(newJson, lastJson);
     }
 
@@ -385,8 +351,9 @@ public final class ExtJacksonJsonSource extends Source {
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-            ? new ExtJacksonJsonSource(this.name(), this.jsonSupplier, this.mapperSupplier)
+            ? new ExtGsonJsonSource(this.name(), this.json, this.mapperSupplier)
             : this;
     }
 
 }
+*/

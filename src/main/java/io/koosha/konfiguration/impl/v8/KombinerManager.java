@@ -1,6 +1,7 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Handle;
+import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.Source;
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -38,16 +38,18 @@ final class KombinerManager implements KonfigurationManager {
     @NotNull
     @Override
     public Map<String, Collection<Runnable>> update() {
-        if(!this.origin.updatable)
-            return Collections.emptyMap();
+        if (!this.origin.updatable)
+            throw new KfgAssertionException(this.origin.name(), null, null, null, "update is not supported");
 
         final Map<Handle, Konfiguration> newSources = new HashMap<>();
         final Set<Kind<?>> updated = new HashSet<>();
         final Map<Kind<?>, Object> newCache = new HashMap<>();
+        final Map<String, Collection<Runnable>> result = new HashMap<>();
 
         final Map<String, Collection<Runnable>> ret = this.origin.r(() -> {
             if (this.origin.sources
-                .sourcesStream()
+                .sources()
+                .stream()
                 .noneMatch(x -> ((Source) x).hasUpdate()))
                 return emptyMap();
 
@@ -84,17 +86,12 @@ final class KombinerManager implements KonfigurationManager {
                     newCache.put(q, newV);
             });
 
-            return null;
-        });
-        if (ret != null)
-            return ret;
-
-        return this.origin.w(() -> {
             //noinspection OptionalGetWithoutIsPresent
-            final Map<String, Collection<Runnable>> result = this
+            final Map<String, Collection<Runnable>> result0 = this
                 .origin
                 .sources
-                .sourcesStream()
+                .sources()
+                .stream()
                 // External non-optimizable konfig sources.
                 .filter(target -> !(target instanceof Source))
                 .map(Konfiguration::manager)
@@ -119,27 +116,36 @@ final class KombinerManager implements KonfigurationManager {
                     return m0;
                 });
 
+            result.putAll(result0);
+
             for (final Kind<?> kind : updated)
                 //noinspection ConstantConditions
                 result.computeIfAbsent(kind.key(), (q_) -> new ArrayList<>())
                       .addAll(this.origin.observers.get(kind.key()));
 
+            return null;
+        });
+
+        if (ret != null)
+            return ret;
+
+        return this.origin.w(() -> {
             this.origin.sources.replaceSources(newSources);
             this.origin.replaceCache(newCache);
-
             return result;
         });
     }
 
     @Override
     public boolean hasUpdate() {
-        if(!this.origin.updatable)
+        if (!this.origin.updatable)
             return false;
 
         return this.origin.r(() -> this
             .origin
             .sources
-            .sourcesStream()
+            .sources()
+            .stream()
             .anyMatch(x -> ((Source) x).hasUpdate()));
     }
 

@@ -1,5 +1,6 @@
-package io.koosha.konfiguration.ext;
+package io.koosha.konfiguration.ext.v8;
 
+import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Source;
@@ -556,6 +557,24 @@ public final class ExtYamlSource extends Source {
             node = (Map<?, ?>) n;
         }
         throw new KfgSnakeYamlAssertionError(this.name(), "assertion error");
+    }
+
+
+    private static final class KfgSnakeYamlAssertionError extends KfgAssertionException {
+
+        public KfgSnakeYamlAssertionError(@Nullable final String source,
+                                          @Nullable final String message) {
+            super(source, null, null, null, message);
+        }
+
+        public KfgSnakeYamlAssertionError(@Nullable final String source,
+                                          @Nullable final String key,
+                                          @Nullable final Kind<?> neededType,
+                                          @Nullable final Object actualValue,
+                                          @Nullable final String message) {
+            super(source, key, neededType, actualValue, message);
+        }
+
     }
 
 }

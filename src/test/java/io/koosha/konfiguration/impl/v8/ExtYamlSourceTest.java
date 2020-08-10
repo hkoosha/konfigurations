@@ -3,7 +3,7 @@ package io.koosha.konfiguration.impl.v8;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.TestUtil;
-import io.koosha.konfiguration.ext.ExtYamlSource;
+import io.koosha.konfiguration.ext.v8.ExtYamlSource;
 import io.koosha.konfiguration.type.Kind;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;

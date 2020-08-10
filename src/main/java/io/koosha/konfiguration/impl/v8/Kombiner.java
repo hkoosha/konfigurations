@@ -39,7 +39,7 @@ final class Kombiner implements Konfiguration {
     final KombinerSources sources;
 
     @NotNull
-    final KombinerLock _lock;
+    final KombinerLock lock;
 
     @NotNull
     final KombinerObservers observers;
@@ -76,13 +76,13 @@ final class Kombiner implements Konfiguration {
                })
                .flatMap(source ->
                    source instanceof Kombiner
-                       ? ((Kombiner) source).sources.sourcesStream()
+                       ? ((Kombiner) source).sources.sources().stream()
                        : Stream.of(source))
                .forEach(source -> newSources.put(new HandleImpl(), source));
         if (newSources.isEmpty())
             throw new KfgIllegalArgumentException(name, "no source given");
 
-        this._lock = new KombinerLock(name, lockWaitTimeMillis, fairLock);
+        this.lock = new KombinerLock(name, lockWaitTimeMillis, fairLock);
         this.observers = new KombinerObservers(this.name);
         this.man = new KombinerManager(this);
         this.sources = new KombinerSources(this);
@@ -92,12 +92,12 @@ final class Kombiner implements Konfiguration {
 
     <T> T r(@NotNull final Supplier<T> func) {
         Objects.requireNonNull(func, "func");
-        return _lock.doReadLocked(func);
+        return lock.doReadLocked(func);
     }
 
     <T> T w(@NotNull final Supplier<T> func) {
         Objects.requireNonNull(func, "func");
-        return _lock.doWriteLocked(func);
+        return lock.doWriteLocked(func);
     }
 
     // =========================================================================
@@ -106,11 +106,22 @@ final class Kombiner implements Konfiguration {
                @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
+
         final Kind<?> withKey = ((Kind<?>) type).withKey(key);
-        this.w(() -> {
-            this.issuedKeys.add(withKey);
+        final AtomicBoolean contains = new AtomicBoolean(false);
+
+        this.r(() -> {
+            if (this.issuedKeys.contains(withKey))
+                contains.set(true);
             return null;
         });
+
+        if (!contains.get())
+            this.w(() -> {
+                this.issuedKeys.add(withKey);
+                return null;
+            });
+
         return new KombinerK<>(this, key, type);
     }
 
@@ -144,7 +155,8 @@ final class Kombiner implements Konfiguration {
         Objects.requireNonNull(keyStr, "key passed through kombiner is null");
         final Optional<Konfiguration> find = this
             .sources
-            .sourcesStream()
+            .sources()
+            .stream()
             .filter(source -> source.has(keyStr, key))
             .findFirst();
         if (!find.isPresent())

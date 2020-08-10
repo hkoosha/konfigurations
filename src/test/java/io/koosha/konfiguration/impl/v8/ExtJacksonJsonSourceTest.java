@@ -1,7 +1,7 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgMissingKeyException;
-import io.koosha.konfiguration.ext.ExtJacksonJsonSource;
+import io.koosha.konfiguration.ext.v8.ExtJacksonJsonSource;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
