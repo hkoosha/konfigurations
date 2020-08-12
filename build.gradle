@@ -8,7 +8,7 @@ def isCiServer = System.getenv().containsKey("IS_CI_ENV")
 project.ext {
     my_group = 'io.koosha.konfigurations'
     my_artifact = 'konfigurations'
-    my_version = '6.0.0'
+    my_version = '8.0.0'
     my_name = 'Konfigurations'
     my_real_name = 'Koosha Hosseiny'
     my_email = 'koosha.hosseiny@gmail.com'
