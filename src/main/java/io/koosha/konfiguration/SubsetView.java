@@ -1,14 +1,7 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration;
 
-import io.koosha.konfiguration.Handle;
-import io.koosha.konfiguration.K;
-import io.koosha.konfiguration.KeyObserver;
-import io.koosha.konfiguration.KfgIllegalArgumentException;
-import io.koosha.konfiguration.Konfiguration;
-import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,16 +20,15 @@ import java.util.Set;
  * konfiguration's thread safety is not guarantied.
  */
 @ThreadSafe
-@ApiStatus.Internal
-final class SubsetView implements Konfiguration {
+public final class SubsetView implements Konfiguration {
 
     private final String name;
     private final Konfiguration wrapped;
     private final String baseKey;
 
-    SubsetView(@NotNull final String name,
-               @NotNull final Konfiguration wrappedKonfiguration,
-               @NotNull final String baseKey) {
+    public SubsetView(@NotNull final String name,
+                      @NotNull final Konfiguration wrappedKonfiguration,
+                      @NotNull final String baseKey) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(wrappedKonfiguration, "wrappedKonfiguration");
         Objects.requireNonNull(baseKey, "baseKey");

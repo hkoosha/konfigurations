@@ -8,6 +8,7 @@ import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
+import io.koosha.konfiguration.SubsetView;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
