@@ -11,7 +11,7 @@ project.ext {
     my_version = '8.0.0'
     my_name = 'Konfigurations'
     my_real_name = 'Koosha Hosseiny'
-    my_email = 'koosha.hosseiny@gmail.com'
+    my_email = 'i@koosha.io'
     my_description = 'Simple, small and extendable configuration management library with live updates.'
     my_url = 'https://github.com/hkoosha/konfigurations'
     my_url_issues = 'https://github.com/hkoosha/konfigurations/issues'
