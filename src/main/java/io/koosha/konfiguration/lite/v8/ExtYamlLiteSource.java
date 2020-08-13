@@ -413,6 +413,16 @@ public final class ExtYamlLiteSource extends LiteSource {
         return null;
     }
 
+    @Override
+    public boolean isReadonly() {
+        return false;
+    }
+
+    @Override
+    public LiteKonfiguration toReadonly() {
+        return null;
+    }
+
 
     @Override
     @NotNull

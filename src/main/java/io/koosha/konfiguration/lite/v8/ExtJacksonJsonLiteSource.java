@@ -16,6 +16,7 @@ import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.lite.LiteKonfiguration;
 import io.koosha.konfiguration.lite.LiteSource;
+import io.koosha.konfiguration.lite.LiteSubsetView;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
@@ -226,6 +227,16 @@ public final class ExtJacksonJsonLiteSource extends LiteSource {
         synchronized (LOCK) {
             return this.root.toString();
         }
+    }
+
+    @Override
+    public boolean isReadonly() {
+        return false;
+    }
+
+    @Override
+    public LiteKonfiguration toReadonly() {
+        return new LiteSubsetView(this.name(), this, "", true);
     }
 
     @Override

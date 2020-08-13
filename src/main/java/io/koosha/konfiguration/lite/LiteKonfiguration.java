@@ -253,4 +253,8 @@ public interface LiteKonfiguration {
 
     String serialize();
 
+    boolean isReadonly();
+
+    LiteKonfiguration toReadonly();
+
 }

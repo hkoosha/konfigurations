@@ -539,7 +539,7 @@ public abstract class LiteSource implements LiteKonfiguration {
     @Contract("_ -> fail")
     @Override
     public final LiteKonfiguration subset(@NotNull final String key) {
-        return new LiteSubsetView(this.name(), this, key);
+        return new LiteSubsetView(this.name(), this, key, this.isReadonly());
     }
 
 }

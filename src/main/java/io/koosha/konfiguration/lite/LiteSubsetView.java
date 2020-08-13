@@ -2,6 +2,7 @@ package io.koosha.konfiguration.lite;
 
 import io.koosha.konfiguration.KfgException;
 import io.koosha.konfiguration.KfgIllegalArgumentException;
+import io.koosha.konfiguration.KfgReadonlyException;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
@@ -26,10 +27,12 @@ public final class LiteSubsetView implements LiteKonfiguration {
     private final String name;
     private final LiteKonfiguration wrapped;
     private final String baseKey;
+    private final boolean isReadonly;
 
     public LiteSubsetView(@NotNull final String name,
                           @NotNull final LiteKonfiguration wrappedKonfiguration,
-                          @NotNull final String baseKey) {
+                          @NotNull final String baseKey,
+                          final boolean isReadonly) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(wrappedKonfiguration, "wrappedKonfiguration");
         Objects.requireNonNull(baseKey, "baseKey");
@@ -47,8 +50,9 @@ public final class LiteSubsetView implements LiteKonfiguration {
             this.baseKey = baseKey;
         else
             this.baseKey = baseKey + ".";
-    }
 
+        this.isReadonly = isReadonly;
+    }
 
     @Override
     @Contract(pure = true)
@@ -60,6 +64,23 @@ public final class LiteSubsetView implements LiteKonfiguration {
     @Override
     public String serialize() {
         throw new KfgException(this.name, "serialize not supported on subset view.");
+    }
+
+    @Override
+    public boolean isReadonly() {
+        return this.isReadonly;
+    }
+
+    @Override
+    public LiteKonfiguration toReadonly() {
+        return this.isReadonly()
+            ? this
+            : new LiteSubsetView(this.name, this.wrapped, this.baseKey, true);
+    }
+
+    private void ensureWritable() {
+        if (this.isReadonly())
+            throw new KfgReadonlyException(this.name, "source is readonly");
     }
 
 
@@ -81,7 +102,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Boolean value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -103,7 +125,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Byte value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -125,7 +148,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Character value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -146,7 +170,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Short value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -168,7 +193,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Integer value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -191,7 +217,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Long value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -214,7 +241,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Float value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -237,7 +265,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Double value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -260,7 +289,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final String value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -285,7 +315,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final List<?> value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -310,7 +341,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Set<?> value) {
         Objects.requireNonNull(key, "key");
-        wrapped.put(key(key), value);
+        this.ensureWritable();
+        this.wrapped.put(key(key), value);
         return this;
     }
 
@@ -335,7 +367,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     public LiteKonfiguration putCustom(@NotNull final String key,
                                        final Object value) {
         Objects.requireNonNull(key, "key");
-        wrapped.putCustom(key(key), value);
+        this.ensureWritable();
+        this.wrapped.putCustom(key(key), value);
         return this;
     }
 
@@ -358,7 +391,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
             : new LiteSubsetView(
             this.name.split("::")[0] + "::" + key,
             this.wrapped,
-            this.baseKey + this.key(key)
+            this.baseKey + this.key(key),
+            this.isReadonly
         );
     }
 
