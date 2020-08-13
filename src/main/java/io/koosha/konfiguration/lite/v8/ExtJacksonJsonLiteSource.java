@@ -240,6 +240,11 @@ final class ExtJacksonJsonLiteSource extends LiteSource {
     }
 
     @Override
+    public LiteKonfiguration toWritableCopy() {
+        return new ExtJacksonJsonLiteSource(this.name, this.serialize(), this.mapperSupplier);
+    }
+
+    @Override
     public boolean has(@NotNull final String key,
                        @Nullable final Kind<?> type) {
         requireNonNull(key, "key");

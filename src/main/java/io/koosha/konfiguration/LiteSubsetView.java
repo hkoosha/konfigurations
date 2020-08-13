@@ -75,6 +75,11 @@ public final class LiteSubsetView implements LiteKonfiguration {
             : new LiteSubsetView(this.name, this.wrapped, this.baseKey, true);
     }
 
+    @Override
+    public LiteKonfiguration toWritableCopy() {
+        return new LiteSubsetView(this.name, this.wrapped.toWritableCopy(), this.baseKey, false);
+    }
+
     private void ensureWritable() {
         if (this.isReadonly())
             throw new KfgReadonlyException(this.name, "source is readonly");

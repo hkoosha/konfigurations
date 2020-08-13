@@ -258,4 +258,6 @@ public interface LiteKonfiguration {
 
     LiteKonfiguration toReadonly();
 
+    LiteKonfiguration toWritableCopy();
+
 }

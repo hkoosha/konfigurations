@@ -50,7 +50,7 @@ import static java.util.stream.Collectors.toList;
  * <p>Thread safe and immutable.
  */
 @ThreadSafe
-final class ExtYamlLiteSource extends LiteSource {
+abstract class ExtYamlLiteSource extends LiteSource {
 
     private static final Pattern DOT = Pattern.compile(Pattern.quote("."));
 
