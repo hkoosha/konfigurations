@@ -8,6 +8,7 @@ klass
 kombine
 kombined
 kombiner
+kombining
 konfig
 konfiguration
 konfigurations

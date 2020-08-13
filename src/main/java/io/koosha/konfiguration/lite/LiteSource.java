@@ -1,5 +1,8 @@
-package io.koosha.konfiguration;
+package io.koosha.konfiguration.lite;
 
+import io.koosha.konfiguration.KfgIllegalStateException;
+import io.koosha.konfiguration.KfgMissingKeyException;
+import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -8,20 +11,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 
 /**
- * Special version of {@link Konfiguration}, intended to go into a Kombiner.
+ * Special version of {@link LiteKonfiguration}, intended to go into a Kombiner.
  */
-public abstract class Source implements Konfiguration {
+public abstract class LiteSource implements LiteKonfiguration {
 
-    protected static final String DOT_PATTERN = Pattern.quote(".");
+    protected final static Pattern DOT_PATTERN = Pattern.compile("\\.");
+
+    protected final static String DOT_PATTERN_QUOTED = Pattern.quote(".");
 
     @Override
-    @NotNull
-    public final K<Boolean> bool(@NotNull final String key) {
+    public final Boolean bool(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<Boolean> kind = Kind.BOOL;
@@ -30,18 +33,23 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return this.null_(key, kind);
+            return null;
 
         final Object v = this.bool0(key);
         final Boolean vv = toBool(v);
         if (vv == null)
             throw new KfgTypeException(this.name(), key, kind, v);
-        return this.k(key, kind, vv);
+        return vv;
     }
 
     @Override
-    @NotNull
-    public final K<Character> char_(@NotNull final String key) {
+    public final Boolean bool(@NotNull final String key,
+                              final Boolean def) {
+        return this.has(key, Kind.of(boolean.class).withKey(key)) ? bool(key) : def;
+    }
+
+    @Override
+    public final Character char_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<Character> kind = Kind.CHAR;
@@ -50,7 +58,7 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return this.null_(key, kind);
+            return null;
 
         final Object v = this.char0(key);
         char vv;
@@ -69,12 +77,24 @@ public abstract class Source implements Konfiguration {
                 throw new KfgTypeException(this.name(), key, kind, v);
             }
         }
-        return this.k(key, kind, vv);
+        return vv;
     }
 
     @Override
-    @NotNull
-    public final K<String> string(@NotNull final String key) {
+    public final Character char_(@NotNull final String key,
+                                 final Character def) {
+        return this.has(key, Kind.of(char.class).withKey(key)) ? char_(key) : def;
+    }
+
+
+    @Override
+    public final Byte byte_(@NotNull final String key,
+                            final Byte def) {
+        return this.has(key, Kind.of(byte.class).withKey(key)) ? byte_(key) : def;
+    }
+
+    @Override
+    public final String string(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<String> kind = Kind.STRING;
@@ -83,7 +103,7 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return null_(key, kind);
+            return null;
 
         final Object v = this.string0(key);
 
@@ -95,12 +115,18 @@ public abstract class Source implements Konfiguration {
             throw new KfgTypeException(this.name(), key, kind, v);
         }
 
-        return this.k(key, kind, vv);
+        return vv;
     }
 
     @Override
-    @NotNull
-    public final K<Byte> byte_(@NotNull final String key) {
+    public final String string(@NotNull final String key,
+                               final String def) {
+        return this.has(key, Kind.of(String.class).withKey(key)) ? string(key) : def;
+    }
+
+
+    @Override
+    public final Byte byte_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<Byte> kind = Kind.BYTE;
@@ -109,7 +135,7 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return null_(key, kind);
+            return null;
 
         final Number v = this.number0(key);
 
@@ -117,12 +143,11 @@ public abstract class Source implements Konfiguration {
         if (vv == null)
             throw new KfgTypeException(this.name(), key, kind, v);
 
-        return this.k(key, kind, vv.byteValue());
+        return vv.byteValue();
     }
 
     @Override
-    @NotNull
-    public final K<Short> short_(@NotNull final String key) {
+    public final Short short_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<Short> kind = Kind.SHORT;
@@ -131,7 +156,7 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return null_(key, kind);
+            return null;
 
         final Number v = this.number0(key);
 
@@ -139,12 +164,17 @@ public abstract class Source implements Konfiguration {
         if (vv == null)
             throw new KfgTypeException(this.name(), key, kind, v);
 
-        return this.k(key, kind, vv.shortValue());
+        return vv.shortValue();
     }
 
     @Override
-    @NotNull
-    public final K<Integer> int_(@NotNull final String key) {
+    public final Short short_(@NotNull final String key,
+                              final Short def) {
+        return this.has(key, Kind.of(short.class).withKey(key)) ? short_(key) : def;
+    }
+
+    @Override
+    public final Integer int_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<Integer> kind = Kind.INT;
@@ -153,7 +183,7 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return null_(key, kind);
+            return null;
 
         final Number v = this.number0(key);
 
@@ -161,12 +191,17 @@ public abstract class Source implements Konfiguration {
         if (vv == null)
             throw new KfgTypeException(this.name(), key, kind, v);
 
-        return this.k(key, kind, vv.intValue());
+        return vv.intValue();
     }
 
     @Override
-    @NotNull
-    public final K<Long> long_(@NotNull final String key) {
+    public final Integer int_(@NotNull final String key,
+                              final Integer def) {
+        return this.has(key, Kind.of(int.class).withKey(key)) ? int_(key) : def;
+    }
+
+    @Override
+    public final Long long_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<Long> kind = Kind.LONG;
@@ -175,7 +210,7 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return null_(key, kind);
+            return null;
 
         final Number v = this.number0(key);
 
@@ -183,12 +218,17 @@ public abstract class Source implements Konfiguration {
         if (vv == null)
             throw new KfgTypeException(this.name(), key, kind, v);
 
-        return this.k(key, kind, vv);
+        return vv;
     }
 
     @Override
-    @NotNull
-    public final K<Float> float_(@NotNull final String key) {
+    public final Long long_(@NotNull final String key,
+                            final Long def) {
+        return this.has(key, Kind.of(long.class).withKey(key)) ? long_(key) : def;
+    }
+
+    @Override
+    public final Float float_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<Float> kind = Kind.FLOAT;
@@ -197,7 +237,7 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return null_(key, kind);
+            return null;
 
         final Number v = this.numberDouble0(key);
 
@@ -205,12 +245,17 @@ public abstract class Source implements Konfiguration {
         if (vv == null)
             throw new KfgTypeException(this.name(), key, kind, v);
 
-        return this.k(key, kind, vv);
+        return vv;
     }
 
     @Override
-    @NotNull
-    public final K<Double> double_(@NotNull final String key) {
+    public final Float float_(@NotNull final String key,
+                              final Float def) {
+        return this.has(key, Kind.of(float.class).withKey(key)) ? float_(key) : def;
+    }
+
+    @Override
+    public final Double double_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
         final Kind<Double> kind = Kind.DOUBLE;
@@ -219,7 +264,7 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, kind);
 
         if (this.isNull(key))
-            return null_(key, kind);
+            return null;
 
         final Number v = this.numberDouble0(key);
 
@@ -227,43 +272,52 @@ public abstract class Source implements Konfiguration {
         if (vv == null)
             throw new KfgTypeException(this.name(), key, kind, v);
 
-        return this.k(key, kind, vv);
+        return vv;
     }
 
     @Override
-    @NotNull
-    public final <U> K<List<U>> list(@NotNull final String key,
-                                     @NotNull final Kind<U> type) {
+    public final Double double_(@NotNull final String key,
+                                final Double def) {
+        return this.has(key, Kind.of(double.class).withKey(key)) ? double_(key) : def;
+    }
+
+    @Override
+    public final <U> List<U> list(@NotNull final String key,
+                                  @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
 
         if (!this.has(key, type.asList()))
             throw new KfgMissingKeyException(this.name(), key, type);
 
-        final Kind<List<U>> listKind = type.asList();
-
         if (this.isNull(key))
-            return null_(key, listKind);
+            return null;
 
         final List<?> v = this.list0(key, type);
 
         this.checkCollectionType(key, type, v);
 
-        return this.k(key, listKind, v);
+        @SuppressWarnings("unchecked")
+        final List<U> vv = (List<U>) v;
+        return vv;
     }
 
     @Override
-    @NotNull
-    public final <U> K<Set<U>> set(@NotNull final String key,
-                                   @NotNull final Kind<U> type) {
+    public final <U> List<U> list(@NotNull final String key,
+                                  @NotNull final Kind<U> type,
+                                  final List<U> def) {
+        return this.has(key, type.withKey(key)) ? list(key, type) : def;
+    }
+
+    @Override
+    public final <U> Set<U> set(@NotNull final String key,
+                                @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
 
         if (!this.has(key, type.asSet()))
             throw new KfgMissingKeyException(this.name(), key, type);
 
-        final Kind<Set<U>> setKind = type.asSet();
-
         if (this.isNull(key))
-            return null_(key, setKind);
+            return null;
 
         final Object v = this.set0(key, type);
 
@@ -277,14 +331,22 @@ public abstract class Source implements Konfiguration {
 
         this.checkCollectionType(key, type, vv);
 
-        return this.k(key, setKind, vv);
+        @SuppressWarnings("unchecked")
+        final Set<U> vvv = (Set<U>) vv;
+        return vvv;
+    }
+
+    @Override
+    public final <U> Set<U> set(@NotNull final String key,
+                                @NotNull final Kind<U> type,
+                                final Set<U> def) {
+        return this.has(key, type.withKey(key)) ? set(key, type) : def;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    @NotNull
-    public final <U> K<U> custom(@NotNull final String key,
-                                 @NotNull final Kind<U> type) {
+    public final <U> U custom(@NotNull final String key,
+                              @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
@@ -292,43 +354,45 @@ public abstract class Source implements Konfiguration {
             throw new KfgMissingKeyException(this.name(), key, type);
 
         if (this.isNull(key))
-            return null_(key, type);
+            return null;
 
         if (type.isBool())
-            return (K<U>) bool(key);
+            return (U) bool(key);
         if (type.isChar())
-            return (K<U>) char_(key);
+            return (U) char_(key);
         if (type.isString())
-            return (K<U>) string(key);
+            return (U) string(key);
 
         if (type.isByte())
-            return (K<U>) byte_(key);
+            return (U) byte_(key);
         if (type.isShort())
-            return (K<U>) short_(key);
+            return (U) short_(key);
         if (type.isInt())
-            return (K<U>) int_(key);
+            return (U) int_(key);
         if (type.isLong())
-            return (K<U>) long_(key);
+            return (U) long_(key);
         if (type.isDouble())
-            return (K<U>) double_(key);
+            return (U) double_(key);
         if (type.isFloat())
-            return (K<U>) float_(key);
+            return (U) float_(key);
 
         if (type.isList())
-            return (K<U>) list(key, type.getCollectionContainedKind());
+            return (U) list(key, type.getCollectionContainedKind());
         if (type.isSet())
-            return (K<U>) set(key, type.getCollectionContainedKind());
+            return (U) set(key, type.getCollectionContainedKind());
 
-        return this.k(key, type, this.custom0(key, type));
+        return (U) this.custom0(key, type);
     }
-
-    // =========================================================================
 
     @Override
-    public final Optional<KonfigurationManager> manager() {
-        throw new KfgAssertionException(this.name(), null, null, null, "manager() should not be called on a Source.");
+    public final <U> U custom(@NotNull final String key,
+                              @NotNull final Kind<U> type,
+                              final U def) {
+        return has(key, type.withKey(key)) ? custom(key, type) : def;
     }
 
+
+    // =========================================================================
 
     protected abstract boolean isNull(@NotNull String key);
 
@@ -448,21 +512,6 @@ public abstract class Source implements Konfiguration {
 
 
     /**
-     * Handle the case where value of a key is null.
-     *
-     * @param key  the config key who's value is null.
-     * @param type type of requested konfig.
-     * @return true if it's ok to have null values.
-     */
-    @NotNull
-    private <U> K<U> null_(@NotNull final String key,
-                           @NotNull final Kind<U> type) {
-        Objects.requireNonNull(key, "key");
-        return k(key, type, null);
-    }
-
-
-    /**
      * Make sure the value is of the requested type.
      *
      * @param key        the config key whose value is being checked
@@ -486,125 +535,11 @@ public abstract class Source implements Konfiguration {
                 throw new KfgTypeException(this.name(), key, neededType, value);
     }
 
-
-    /**
-     * Wrap the actual sanitized value in a  {@link K} instance.
-     *
-     * @param key  config key
-     * @param type type holder of wanted value
-     * @param <U>  generic type of wanted konfig.
-     * @return the wrapped value in K.
-     */
-    @SuppressWarnings("unchecked")
-    @NotNull
-    private <U> K<U> k(@NotNull final String key,
-                       @Nullable final Kind<U> type,
-                       @Nullable final Object value) {
-        Objects.requireNonNull(key, "key");
-        return DummyV.of((U) value, type, key);
-    }
-
-
-    // ============================================================= UNSUPPORTED
-
     @NotNull
     @Contract("_ -> fail")
     @Override
-    public final Konfiguration subset(@NotNull final String key) {
-        throw new KfgAssertionException(
-            this.name(), null, null, null,
-            "subset(key) shouldn't be called on classes extending="
-                + getClass().getName() + ", key=" + key);
+    public final LiteKonfiguration subset(@NotNull final String key) {
+        return new LiteSubsetView(this.name(), this, key);
     }
-
-    @NotNull
-    @Contract("_ -> fail")
-    public final Handle registerSoft(@NotNull final KeyObserver observer) {
-        throw new KfgAssertionException(
-            this.name(), null, null, null,
-            "registerSoft(observer) shouldn't be called on classes extending="
-                + getClass().getName() + ", observer=" + observer);
-    }
-
-    @Contract("_ -> fail")
-    @NotNull
-    public final Handle register(@NotNull final KeyObserver observer) {
-        throw new KfgAssertionException(
-            this.name(), null, null, null,
-            "register(observer) shouldn't be called on classes extending="
-                + getClass().getName() + ", observer=" + observer);
-    }
-
-    @Override
-    @NotNull
-    public final Handle registerSoft(@NotNull final KeyObserver observer,
-                                     @NotNull final String key) {
-        throw new KfgAssertionException(
-            this.name(), null, null, null,
-            "registerSoft(observer, key) shouldn't be called on classes extending="
-                + getClass().getName() + ", observer=" + observer
-                + ", key=" + key);
-    }
-
-    @Contract("_, _ -> fail")
-    @NotNull
-    public final Handle register(@NotNull final KeyObserver observer,
-                                 @NotNull final String key) {
-        throw new KfgAssertionException(
-            this.name(), null, null, null,
-            "register(observer, key) shouldn't be called on classes extending="
-                + getClass().getName() + ", observer=" + observer
-                + ", key=" + key);
-    }
-
-    @Override
-    public final void deregister(@NotNull final Handle observer,
-                                 @NotNull final String key) {
-        throw new KfgAssertionException(
-            this.name(), null, null, null,
-            "deregister(observer, key) shouldn't be called on classes extending="
-                + getClass().getName() + ", observer=" + observer
-                + ", key=" + key);
-    }
-
-    @Override
-    public final void deregister(@NotNull final Handle observer) {
-        throw new KfgAssertionException(
-            this.name(), null, null, null,
-            "deregister(observer) shouldn't be called on classes extending="
-                + getClass().getName() + ", observer=" + observer);
-    }
-
-    @NotNull
-    public abstract Source updatedCopy();
-
-    /**
-     * Indicates whether if anything is actually updated in the origin of
-     * this source.
-     *
-     * <p>This action must <b>NOT</b> modify the instance.</p>
-     *
-     * <p><b>VERY VERY IMPORTANT:</b> This method is to be called only from
-     * a single thread or concurrency issues will arise.</p>
-     *
-     * <p>Why? To check and see if it's updatable, a source might ask it's
-     * origin (a web url?) to get the new content, to compare with the old
-     * content, and it asks it's origin for the new content once more, to
-     * actually update the values. If this method is called during
-     * KonfigurationKombiner is also calling it, this might interfere and
-     * lost updates may happen.</p>
-     *
-     * <p>To help blocking issues, update() is allowed to block the current
-     * thread, and update observers will continue to work in their own
-     * thread. This mechanism also helps to notify them only after when
-     * <em>all</em> the combined sources are updated.</p>
-     *
-     * <p>NOT Thread-safe.
-     *
-     * @return true if the source obtained via {@link #updatedCopy()}  will
-     * differ from this source.
-     */
-    @Contract(pure = true)
-    public abstract boolean hasUpdate();
 
 }

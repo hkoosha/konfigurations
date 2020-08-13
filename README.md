@@ -116,6 +116,24 @@ assert amIAllowed.v() == false;
 
 ```
 
+
+### Lite version:
+There's a lite version, currently only for jackson source. The lite version
+does not support:
+
+- Kombining
+- Registering to updates
+- Live updates
+
+But instead supports writing and modifying:
+
+```java
+LiteKonfiguration konfig = new ExtJacksonJsonLiteSource("my_source", "{}");
+konfig.put("some.nested.key", 99L);
+// Here serialize will be <"some": { "nested": { "key": {99}}}>
+final String serialize = konfig.serialize();
+```
+
 ### Assumptions / Limitations:
  - First source containing a key takes priority over others.
 
