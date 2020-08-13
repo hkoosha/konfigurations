@@ -1,8 +1,5 @@
-package io.koosha.konfiguration.lite;
+package io.koosha.konfiguration;
 
-import io.koosha.konfiguration.KfgException;
-import io.koosha.konfiguration.KfgIllegalArgumentException;
-import io.koosha.konfiguration.KfgReadonlyException;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;

@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.lite;
+package io.koosha.konfiguration;
 
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
@@ -210,6 +210,7 @@ public interface LiteKonfiguration {
                  @NotNull Kind<U> type,
                  U def);
 
+    @SuppressWarnings("UnusedReturnValue")
     LiteKonfiguration putCustom(@NotNull String key,
                                 Object value);
 

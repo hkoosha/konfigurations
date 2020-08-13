@@ -1,10 +1,8 @@
 package io.koosha.konfiguration.type;
 
 import io.koosha.konfiguration.KfgIllegalStateException;
-import io.koosha.konfiguration.KonfigurationFactory;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +18,6 @@ import java.util.Set;
 @SuppressWarnings("unused")
 @ThreadSafe
 @Immutable
-@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public abstract class Kind<TYPE> implements Serializable {
 
     private static final long serialVersionUID = 1;

@@ -14,9 +14,9 @@ import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
-import io.koosha.konfiguration.lite.LiteKonfiguration;
-import io.koosha.konfiguration.lite.LiteSource;
-import io.koosha.konfiguration.lite.LiteSubsetView;
+import io.koosha.konfiguration.LiteKonfiguration;
+import io.koosha.konfiguration.LiteSource;
+import io.koosha.konfiguration.LiteSubsetView;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
  * <p>Thread safe and immutable.
  */
 @ThreadSafe
-public final class ExtJacksonJsonLiteSource extends LiteSource {
+final class ExtJacksonJsonLiteSource extends LiteSource {
 
     @Contract(pure = true,
               value = "->new")

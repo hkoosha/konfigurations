@@ -3,7 +3,6 @@ package io.koosha.konfiguration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.koosha.konfiguration.impl.v8.FactoryV8;
 import io.koosha.konfiguration.type.Kind;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,38 +15,34 @@ import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 
 @SuppressWarnings("unused")
-@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public interface KonfigurationFactory {
 
-    String VERSION_1 = "1.0.0";
-
-    String VERSION_8 = "8.0.0";
-
-    String VERSION = VERSION_8;
+    String VERSION = "8.0.0";
 
     long LOCK_WAIT_MILLIS__DEFAULT = 300;
     AtomicBoolean UNSAFE_YAML = new AtomicBoolean(true);
 
+
     @Contract(pure = true)
     @NotNull
-    static KonfigurationFactory getInstanceV8() {
-        return FactoryV8.getInstance();
+    static KonfigurationFactory getInstance() {
+        return FactoryV8.getInstanceV8();
     }
 
     @Contract(pure = true)
     @NotNull
-    static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
-                                              final boolean fairLock) {
-        return FactoryV8.getInstance(lockWaitTime, fairLock);
+    static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
+                                            final boolean fairLock) {
+        return FactoryV8.getInstanceV8(lockWaitTime, fairLock);
     }
 
     @Contract(pure = true)
     @NotNull
-    static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
-                                              final boolean fairLock,
-                                              final boolean listenable,
-                                              final boolean updatable) {
-        return FactoryV8.getInstance(lockWaitTime, fairLock, listenable, updatable);
+    static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
+                                            final boolean fairLock,
+                                            final boolean listenable,
+                                            final boolean updatable) {
+        return FactoryV8.getInstanceV8(lockWaitTime, fairLock, listenable, updatable);
     }
 
 

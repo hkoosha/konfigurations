@@ -1,6 +1,6 @@
 /**
  * This is an internal implementation. To get an instance, use
- * {@link io.koosha.konfiguration.KonfigurationFactory#getInstanceV8()}
+ * {@link io.koosha.konfiguration.KonfigurationFactory#getInstance()}
  *
  * This package hides all implementing classes, and only exposes the
  * {@link io.koosha.konfiguration.impl.v8.FactoryV8}, which yet, shouldn't

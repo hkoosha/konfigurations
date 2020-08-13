@@ -3,7 +3,6 @@ package io.koosha.konfiguration;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -28,7 +27,6 @@ import static java.lang.String.format;
 @SuppressWarnings({"unused", "WeakerAccess"})
 @ThreadSafe
 @Immutable
-@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_1)
 public final class DummyV<U> implements K<U> {
 
     @NotNull

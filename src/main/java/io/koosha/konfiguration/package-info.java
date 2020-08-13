@@ -2,7 +2,7 @@
  * <h1>Entry Point</h1>
  * Entry point is at {@link io.koosha.konfiguration.Konfiguration#kFactory()}
  * or the versioned alternatives such as
- * {@link io.koosha.konfiguration.KonfigurationFactory#getInstanceV8()}.
+ * {@link io.koosha.konfiguration.KonfigurationFactory#getInstance()}.
  *
  * <h1>Usage</h1>
  * Kombine multiple sources such as plain java map, json file using jackson,

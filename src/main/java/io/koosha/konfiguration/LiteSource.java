@@ -1,8 +1,5 @@
-package io.koosha.konfiguration.lite;
+package io.koosha.konfiguration;
 
-import io.koosha.konfiguration.KfgIllegalStateException;
-import io.koosha.konfiguration.KfgMissingKeyException;
-import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

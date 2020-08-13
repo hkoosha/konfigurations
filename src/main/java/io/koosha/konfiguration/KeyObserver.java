@@ -1,6 +1,5 @@
 package io.koosha.konfiguration;
 
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -12,7 +11,6 @@ import java.util.function.Consumer;
  * change in multiple sources and differentiate between them, you need to use
  * intermediate objects, one listener for each source, yourself.
  */
-@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_1)
 @FunctionalInterface
 public interface KeyObserver extends Consumer<String> {
 

@@ -1,7 +1,6 @@
 package io.koosha.konfiguration;
 
 import net.jcip.annotations.NotThreadSafe;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Unmodifiable;
 
@@ -11,7 +10,6 @@ import java.util.Objects;
 import java.util.concurrent.Executor;
 
 @NotThreadSafe
-@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
 public interface KonfigurationManager {
 
     /**

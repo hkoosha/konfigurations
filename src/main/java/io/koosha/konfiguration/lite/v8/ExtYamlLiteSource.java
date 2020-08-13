@@ -3,8 +3,8 @@ package io.koosha.konfiguration.lite.v8;
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
-import io.koosha.konfiguration.lite.LiteKonfiguration;
-import io.koosha.konfiguration.lite.LiteSource;
+import io.koosha.konfiguration.LiteKonfiguration;
+import io.koosha.konfiguration.LiteSource;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +50,7 @@ import static java.util.stream.Collectors.toList;
  * <p>Thread safe and immutable.
  */
 @ThreadSafe
-public final class ExtYamlLiteSource extends LiteSource {
+final class ExtYamlLiteSource extends LiteSource {
 
     private static final Pattern DOT = Pattern.compile(Pattern.quote("."));
 

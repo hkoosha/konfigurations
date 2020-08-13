@@ -36,30 +36,29 @@ public final class FactoryV8 implements KonfigurationFactory {
     private static final String VERSION = "io.koosha.konfiguration:8.0.0";
 
     private static final boolean DEFAULT_FAIR_LOCK = false;
-
     private static final Long DEFAULT_LOCK_WAIT_TIME_MILLIS = null;
     private static final boolean DEFAULT_LISTENABLE = true;
     private static final boolean DEFAULT_UPDATABLE = true;
 
     @Contract(pure = true)
     @NotNull
-    public static KonfigurationFactory getInstance() {
+    public static KonfigurationFactory getInstanceV8() {
         return new FactoryV8();
     }
 
     @Contract(pure = true)
     @NotNull
-    public static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
-                                                   final boolean fairLock) {
-        return getInstance(lockWaitTime, fairLock, DEFAULT_LISTENABLE, DEFAULT_UPDATABLE);
+    public static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
+                                                     final boolean fairLock) {
+        return getInstanceV8(lockWaitTime, fairLock, DEFAULT_LISTENABLE, DEFAULT_UPDATABLE);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
-                                                   final boolean fairLock,
-                                                   final boolean listentable,
-                                                   final boolean updatable) {
+    public static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
+                                                     final boolean fairLock,
+                                                     final boolean listentable,
+                                                     final boolean updatable) {
         return new FactoryV8(lockWaitTime, fairLock, listentable, updatable);
     }
 

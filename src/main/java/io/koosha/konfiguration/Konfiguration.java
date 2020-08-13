@@ -2,7 +2,6 @@ package io.koosha.konfiguration;
 
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,11 +12,10 @@ import java.util.Set;
 /**
  * All methods are thread-safe (and should be implemented as such).
  * <p>
- * Entry point to this library is at {@link KonfigurationFactory#getInstanceV8()}.
+ * Entry point to this library is at {@link KonfigurationFactory#getInstance()}.
  */
 @SuppressWarnings("unused")
 @ThreadSafe
-@ApiStatus.AvailableSince(KonfigurationFactory.VERSION_1)
 public interface Konfiguration {
 
     /**
@@ -28,7 +26,7 @@ public interface Konfiguration {
     @NotNull
     @Contract(pure = true)
     static KonfigurationFactory kFactory() {
-        return KonfigurationFactory.getInstanceV8();
+        return KonfigurationFactory.getInstance();
     }
 
 
@@ -123,7 +121,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     <U> K<List<U>> list(@NotNull String key,
                         @NotNull Kind<U> type);
 
@@ -136,7 +133,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     <U> K<Set<U>> set(@NotNull String key,
                       @NotNull Kind<U> type);
 
@@ -156,7 +152,6 @@ public interface Konfiguration {
      * @return konfiguration value wrapper for the requested key.
      */
     @NotNull
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     <U> K<U> custom(@NotNull String key,
                     @NotNull Kind<U> type);
 
@@ -171,7 +166,6 @@ public interface Konfiguration {
      * @return true if the key exists, false otherwise.
      */
     @Contract(pure = true)
-    @ApiStatus.AvailableSince(KonfigurationFactory.VERSION_8)
     boolean has(@NotNull String key,
                 @NotNull Kind<?> type);
 
