@@ -40,9 +40,8 @@ public interface KonfigurationFactory {
     @NotNull
     static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
                                             final boolean fairLock,
-                                            final boolean listenable,
                                             final boolean updatable) {
-        return FactoryV8.getInstanceV8(lockWaitTime, fairLock, listenable, updatable);
+        return FactoryV8.getInstanceV8(lockWaitTime, fairLock, updatable);
     }
 
 

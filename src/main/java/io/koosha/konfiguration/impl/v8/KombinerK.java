@@ -102,7 +102,7 @@ final class KombinerK<U> implements K<U> {
 
     @Override
     public boolean supportsRegister() {
-        return this.origin.listenable;
+        return this.origin.updatable;
     }
 
 

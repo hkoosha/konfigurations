@@ -14,7 +14,15 @@ final class HandleImpl implements Handle {
 
     private static final AtomicLong id_pool = new AtomicLong(Long.MAX_VALUE);
 
-    private final long id = id_pool.incrementAndGet();
+    private final long id;
+
+    HandleImpl() {
+        this(id_pool.incrementAndGet());
+    }
+
+    private HandleImpl(final long id) {
+        this.id = id;
+    }
 
 
     @Override
@@ -36,5 +44,8 @@ final class HandleImpl implements Handle {
     public int hashCode() {
         return 59 + (int) (this.id >>> 32 ^ this.id);
     }
+
+
+    static final Handle NONE = new HandleImpl(-1);
 
 }

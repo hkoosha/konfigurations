@@ -225,7 +225,7 @@ final class ExtJacksonJsonLiteSource extends LiteSource {
     @Override
     public String serialize() {
         synchronized (LOCK) {
-            return this.root.toString();
+            return this.root.toPrettyString();
         }
     }
 

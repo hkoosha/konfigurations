@@ -51,20 +51,17 @@ final class Kombiner implements Konfiguration {
     final Set<Kind<?>> issuedKeys = new HashSet<>();
     private final Map<Kind<?>, ? super Object> cache = new HashMap<>();
 
-    final boolean listenable;
     final boolean updatable;
 
     Kombiner(@NotNull final String name,
              @NotNull final Collection<Konfiguration> sources,
              @Nullable final Long lockWaitTimeMillis,
              final boolean fairLock,
-             final boolean listenable,
              final boolean updatable) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(sources, "sources");
 
         this.name = name;
-        this.listenable = listenable;
         this.updatable = updatable;
 
         final Map<Handle, Konfiguration> newSources = new HashMap<>();
@@ -314,8 +311,8 @@ final class Kombiner implements Konfiguration {
                                @Nullable final String key) {
         Objects.requireNonNull(observer, "observer");
 
-        if (!listenable)
-            throw new KfgIllegalArgumentException(this.name, "register not supported");
+        if (!this.updatable)
+            return HandleImpl.NONE;
 
         return w(() -> observers.registerSoft(observer, key));
     }
@@ -327,8 +324,8 @@ final class Kombiner implements Konfiguration {
         Objects.requireNonNull(observer, "observer");
         Objects.requireNonNull(key, "key");
 
-        if (!listenable)
-            throw new KfgIllegalArgumentException(this.name, "register not supported");
+        if (!this.updatable)
+            return HandleImpl.NONE;
 
         return w(() -> observers.registerHard(observer, key));
     }
@@ -339,8 +336,8 @@ final class Kombiner implements Konfiguration {
         Objects.requireNonNull(observer, "observer");
         Objects.requireNonNull(key, "key");
 
-        if (!listenable)
-            throw new KfgIllegalArgumentException(this.name, "deregister not supported");
+        if (!this.updatable)
+            return;
 
         w(() -> {
             if (Objects.equals(KeyObserver.LISTEN_TO_ALL, key))

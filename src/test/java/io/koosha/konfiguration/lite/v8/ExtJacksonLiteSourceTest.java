@@ -11,7 +11,7 @@ public class ExtJacksonLiteSourceTest {
             new ExtJacksonJsonLiteSource("testSource", "{}");
         testSource.put("my.key", 99L);
         final String serialize = testSource.serialize();
-        Assert.assertEquals(serialize, "{\"my\":{\"key\":99}}");
+        Assert.assertEquals(serialize, "{\n  \"my\" : {\n    \"key\" : 99\n  }\n}");
     }
 
 }

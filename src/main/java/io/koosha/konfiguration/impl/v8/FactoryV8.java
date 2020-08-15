@@ -37,7 +37,6 @@ public final class FactoryV8 implements KonfigurationFactory {
 
     private static final boolean DEFAULT_FAIR_LOCK = false;
     private static final Long DEFAULT_LOCK_WAIT_TIME_MILLIS = null;
-    private static final boolean DEFAULT_LISTENABLE = true;
     private static final boolean DEFAULT_UPDATABLE = true;
 
     @Contract(pure = true)
@@ -50,38 +49,33 @@ public final class FactoryV8 implements KonfigurationFactory {
     @NotNull
     public static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
                                                      final boolean fairLock) {
-        return getInstanceV8(lockWaitTime, fairLock, DEFAULT_LISTENABLE, DEFAULT_UPDATABLE);
+        return getInstanceV8(lockWaitTime, fairLock, DEFAULT_UPDATABLE);
     }
 
     @Contract(pure = true)
     @NotNull
     public static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
                                                      final boolean fairLock,
-                                                     final boolean listentable,
                                                      final boolean updatable) {
-        return new FactoryV8(lockWaitTime, fairLock, listentable, updatable);
+        return new FactoryV8(lockWaitTime, fairLock, updatable);
     }
 
     @Nullable
     private final Long lockWaitTime;
     private final boolean fairLock;
-    private final boolean listentable;
     private final boolean updatable;
 
     private FactoryV8() {
         this(DEFAULT_LOCK_WAIT_TIME_MILLIS,
             DEFAULT_FAIR_LOCK,
-            DEFAULT_LISTENABLE,
             DEFAULT_UPDATABLE);
     }
 
     private FactoryV8(@Nullable final Long lockWaitTime,
                       final boolean fairLock,
-                      final boolean listentable,
                       final boolean updatable) {
         this.lockWaitTime = lockWaitTime;
         this.fairLock = fairLock;
-        this.listentable = listentable;
         this.updatable = updatable;
     }
 
@@ -121,7 +115,6 @@ public final class FactoryV8 implements KonfigurationFactory {
             l,
             this.lockWaitTime,
             this.fairLock,
-            this.listentable,
             this.updatable);
     }
 
@@ -136,7 +129,6 @@ public final class FactoryV8 implements KonfigurationFactory {
             sources,
             this.lockWaitTime,
             this.fairLock,
-            this.listentable,
             this.updatable);
     }
 
