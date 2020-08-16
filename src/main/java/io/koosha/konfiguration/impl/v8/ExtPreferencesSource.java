@@ -37,7 +37,7 @@ import java.util.prefs.Preferences;
  */
 @ApiStatus.Internal
 @ThreadSafe
-final class ExtFullPreferencesSource extends Source {
+final class ExtPreferencesSource extends Source {
 
     private final Preferences source;
     private final int lastHash;
@@ -47,8 +47,8 @@ final class ExtFullPreferencesSource extends Source {
 
     private final Object LOCK = new Object();
 
-    public ExtFullPreferencesSource(@NotNull final String name,
-                                    @NotNull final Preferences preferences) {
+    public ExtPreferencesSource(@NotNull final String name,
+                                @NotNull final Preferences preferences) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(preferences, "preferences");
 

@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
 @ApiStatus.Internal
-final class ExtFullMapSource extends Source {
+final class ExtMapSource extends Source {
 
     private final Supplier<Map<String, ?>> map;
     private final Map<String, ?> root;
@@ -51,8 +51,8 @@ final class ExtFullMapSource extends Source {
         return t;
     }
 
-    public ExtFullMapSource(@NotNull final String name,
-                            @NotNull final Supplier<Map<String, ?>> mapSupplier) {
+    public ExtMapSource(@NotNull final String name,
+                        @NotNull final Supplier<Map<String, ?>> mapSupplier) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(mapSupplier, "mapSupplier");
 
@@ -184,7 +184,7 @@ final class ExtFullMapSource extends Source {
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-            ? new ExtFullMapSource(name(), map)
+            ? new ExtMapSource(name(), map)
             : this;
     }
 

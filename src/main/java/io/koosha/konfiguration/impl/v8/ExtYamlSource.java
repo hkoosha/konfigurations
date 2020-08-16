@@ -54,7 +54,7 @@ import static java.util.stream.Collectors.toList;
 @ApiStatus.Internal
 @Immutable
 @ThreadSafe
-final class ExtFullYamlSource extends Source {
+final class ExtYamlSource extends Source {
 
     private static final Pattern DOT = Pattern.compile(Pattern.quote("."));
 
@@ -371,9 +371,9 @@ final class ExtFullYamlSource extends Source {
      *                     that {@link #custom(String, Kind)} works as well.
      * @throws NullPointerException if any of its arguments are null.
      */
-    public ExtFullYamlSource(@NotNull final String name,
-                             @NotNull final Supplier<String> yamlSupplier,
-                             @NotNull final Supplier<Yaml> mapper) {
+    public ExtYamlSource(@NotNull final String name,
+                         @NotNull final Supplier<String> yamlSupplier,
+                         @NotNull final Supplier<Yaml> mapper) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yamlSupplier, "yamlSupplier");
         Objects.requireNonNull(mapper, "mapper");
@@ -530,7 +530,7 @@ final class ExtFullYamlSource extends Source {
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-            ? new ExtFullYamlSource(name(), yaml, mapper)
+            ? new ExtYamlSource(name(), yaml, mapper)
             : this;
     }
 

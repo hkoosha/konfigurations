@@ -42,7 +42,7 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 @ThreadSafe
 @ApiStatus.Internal
-final class ExtFullJacksonSource extends Source {
+final class ExtJacksonSource extends Source {
 
     private final Supplier<ObjectMapper> mapperSupplier;
     private final Supplier<String> jsonSupplier;
@@ -133,31 +133,20 @@ final class ExtFullJacksonSource extends Source {
      * @throws KfgSourceException   if the provided json string can not be parsed by jackson.
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
-    ExtFullJacksonSource(@NotNull final String name,
-                         @NotNull final Supplier<String> jsonSupplier,
-                         @NotNull final Supplier<ObjectMapper> objectMapper) {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(jsonSupplier, "jsonSupplier");
-        Objects.requireNonNull(objectMapper, "objectMapper");
+    ExtJacksonSource(@NotNull final String name,
+                     @NotNull final Supplier<String> jsonSupplier,
+                     @NotNull final Supplier<ObjectMapper> objectMapper) {
+        requireNonNull(name, "name");
+        requireNonNull(jsonSupplier, "jsonSupplier");
+        requireNonNull(objectMapper, "objectMapper");
+        requireNonNull(objectMapper.get(), "supplied mapper is null");
 
         this.name = name;
-        // Check early, so we're not fooled with a dummy object reader.
-        try {
-            Class.forName("com.fasterxml.jackson.databind.JsonNode");
-        }
-        catch (final ClassNotFoundException e) {
-            throw new KfgSourceException(this.name(),
-                "jackson library is required to be present in " +
-                    "the class path, can not find the class: " +
-                    "com.fasterxml.jackson.databind.JsonNode", e);
-        }
-
         this.jsonSupplier = jsonSupplier;
         this.mapperSupplier = objectMapper;
-        this.lastJson = this.jsonSupplier.get();
 
+        this.lastJson = this.jsonSupplier.get();
         requireNonNull(this.lastJson, "supplied json is null");
-        requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
 
         final JsonNode update;
         try {
@@ -366,7 +355,7 @@ final class ExtFullJacksonSource extends Source {
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-            ? new ExtFullJacksonSource(this.name(), this.jsonSupplier, this.mapperSupplier)
+            ? new ExtJacksonSource(this.name(), this.jsonSupplier, this.mapperSupplier)
             : this;
     }
 

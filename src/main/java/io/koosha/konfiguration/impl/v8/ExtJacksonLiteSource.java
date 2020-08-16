@@ -1,7 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
@@ -19,7 +17,6 @@ import io.koosha.konfiguration.LiteSource;
 import io.koosha.konfiguration.LiteSubsetView;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
-import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -35,28 +32,18 @@ import java.util.regex.Pattern;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Reads konfig from a json source (supplied as string).
+ * Reads konfig from a json/yaml source (supplied as string).
  *
- * <p>for {@link #custom(String, Kind)} to work, the supplied json reader must
+ * <p>for {@link #custom(String, Kind)} to work, the supplied mapper must
  * be configured to handle arbitrary types accordingly.
  *
- * <p>Thread safe and immutable.
+ * <p>Thread safe.
  */
 @ThreadSafe
-final class ExtLiteJacksonJsonSource extends LiteSource {
+final class ExtJacksonLiteSource extends LiteSource {
 
     private static final Pattern DOT_PATTERN = Pattern.compile("\\.");
     private static final String DOT_PATTERN_QUOTED = Pattern.quote(".");
-
-    @Contract(pure = true,
-              value = "->new")
-    @NotNull
-    private static ObjectMapper defaultJacksonObjectMapper() {
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        mapper.findAndRegisterModules();
-        return mapper;
-    }
 
     private final Supplier<ObjectMapper> mapperSupplier;
     private final ObjectNode root;
@@ -154,13 +141,6 @@ final class ExtLiteJacksonJsonSource extends LiteSource {
     }
 
 
-    public ExtLiteJacksonJsonSource(@NotNull final String name,
-                                    @NotNull final String json) {
-        this(name,
-            json,
-            ExtLiteJacksonJsonSource::defaultJacksonObjectMapper);
-    }
-
     /**
      * Creates an instance with a with the given json
      * provider and object mapper provider.
@@ -179,31 +159,17 @@ final class ExtLiteJacksonJsonSource extends LiteSource {
      * @throws KfgSourceException   if the provided json string can not be parsed by jackson.
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
-    public ExtLiteJacksonJsonSource(@NotNull final String name,
-                                    @NotNull final String json,
-                                    @NotNull final Supplier<ObjectMapper> objectMapper) {
+    public ExtJacksonLiteSource(@NotNull final String name,
+                                @NotNull final String json,
+                                @NotNull final Supplier<ObjectMapper> objectMapper) {
         requireNonNull(name, "name");
         requireNonNull(json, "json");
         requireNonNull(objectMapper, "objectMapper");
+        requireNonNull(objectMapper.get(), "supplied mapper is null");
 
         this.name = name;
         this.json = json;
-
-        // Check early, so we're not fooled with a dummy object reader.
-        try {
-            Class.forName("com.fasterxml.jackson.databind.JsonNode");
-        }
-        catch (final ClassNotFoundException e) {
-            throw new KfgSourceException(this.name(),
-                "jackson library is required to be present in " +
-                    "the class path, can not find the class: " +
-                    "com.fasterxml.jackson.databind.JsonNode", e);
-        }
-
         this.mapperSupplier = objectMapper;
-
-        requireNonNull(json, "supplied json is null");
-        requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
 
         final JsonNode update;
         try {
@@ -246,7 +212,7 @@ final class ExtLiteJacksonJsonSource extends LiteSource {
 
     @Override
     public LiteKonfiguration toWritableCopy() {
-        return new ExtLiteJacksonJsonSource(this.name, this.serialize(), this.mapperSupplier);
+        return new ExtJacksonLiteSource(this.name, this.serialize(), this.mapperSupplier);
     }
 
     @Override

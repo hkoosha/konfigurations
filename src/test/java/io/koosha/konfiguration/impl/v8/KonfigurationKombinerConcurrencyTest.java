@@ -39,13 +39,13 @@ public class KonfigurationKombinerConcurrencyTest {
     @BeforeClass
     public void init() throws Exception {
         //noinspection ConstantConditions
-        final URI uri0 = ExtFullJacksonSource.class.getClassLoader()
-                                                   .getResource("sample0.json")
-                                                   .toURI();
+        final URI uri0 = ExtJacksonSource.class.getClassLoader()
+                                               .getResource("sample0.json")
+                                               .toURI();
         //noinspection ConstantConditions
-        final URI uri1 = ExtFullJacksonSource.class.getClassLoader()
-                                                   .getResource("sample1.json")
-                                                   .toURI();
+        final URI uri1 = ExtJacksonSource.class.getClassLoader()
+                                               .getResource("sample1.json")
+                                               .toURI();
         JSON0 = new String(Files.readAllBytes(Paths.get(uri0)));
         JSON1 = new String(Files.readAllBytes(Paths.get(uri1)));
 

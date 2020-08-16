@@ -20,7 +20,11 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
     @Override
     public @NotNull LiteKonfiguration jacksonJson(@NotNull final String name,
                                                   @NotNull final String json) {
-        return new ExtLiteJacksonJsonSource(name, json);
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(json, "json");
+        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
+
+        return jacksonJson(name, json, ExtJacksonSourceJsonHelper::mapper);
     }
 
     @Override
@@ -30,6 +34,31 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        return new ExtLiteJacksonJsonSource(name, json, objectMapper);
+        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
+
+        return new ExtJacksonLiteSource(name, json, objectMapper);
     }
+
+    @Override
+    public @NotNull LiteKonfiguration jacksonYaml(@NotNull final String name,
+                                                  @NotNull final String yaml) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(yaml, "yaml");
+        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
+
+        return jacksonYaml(name, yaml, ExtJacksonSourceYamlHelper::mapper);
+    }
+
+    @Override
+    public @NotNull LiteKonfiguration jacksonYaml(@NotNull final String name,
+                                                  @NotNull final String yaml,
+                                                  @NotNull final Supplier<ObjectMapper> objectMapper) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(yaml, "yaml");
+        Objects.requireNonNull(objectMapper, "objectMapper");
+        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
+
+        return new ExtJacksonLiteSource(name, yaml, objectMapper);
+    }
+
 }

@@ -22,27 +22,27 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
-public class ExtFullJacksonSourceTest {
+public class ExtJacksonSourceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExtFullJacksonSourceTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExtJacksonSourceTest.class);
 
     static String SAMPLE_0;
     static String SAMPLE_1;
 
     private String json;
 
-    private ExtFullJacksonSource k;
+    private ExtJacksonSource k;
 
     @BeforeClass
     public void init() throws Exception {
         //noinspection ConstantConditions
-        final URI uri0 = ExtFullJacksonSource.class.getClassLoader()
-                                                   .getResource("sample0.json")
-                                                   .toURI();
+        final URI uri0 = ExtJacksonSource.class.getClassLoader()
+                                               .getResource("sample0.json")
+                                               .toURI();
         //noinspection ConstantConditions
-        final URI uri1 = ExtFullJacksonSource.class.getClassLoader()
-                                                   .getResource("sample1.json")
-                                                   .toURI();
+        final URI uri1 = ExtJacksonSource.class.getClassLoader()
+                                               .getResource("sample1.json")
+                                               .toURI();
         SAMPLE_0 = new String(Files.readAllBytes(Paths.get(uri0)));
         SAMPLE_1 = new String(Files.readAllBytes(Paths.get(uri1)));
     }
@@ -50,17 +50,17 @@ public class ExtFullJacksonSourceTest {
     @BeforeMethod
     public void setup() throws Exception {
         this.json = SAMPLE_0;
-        this.k = new ExtFullJacksonSource("testJacksonSource",
+        this.k = new ExtJacksonSource("testJacksonSource",
             () -> json,
-            ExtFullJacksonSourceJsonHelper::mapper);
+            ExtJacksonSourceJsonHelper::mapper);
     }
 
     private void update() {
         this.json = SAMPLE_1;
-        this.k = (ExtFullJacksonSource) this.k.updatedCopy();
+        this.k = (ExtJacksonSource) this.k.updatedCopy();
     }
 
-    private ExtFullJacksonSource k() {
+    private ExtJacksonSource k() {
         return this.k;
     }
 
