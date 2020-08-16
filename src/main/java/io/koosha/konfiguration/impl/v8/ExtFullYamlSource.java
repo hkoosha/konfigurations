@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.ext.v8;
+package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgSourceException;
@@ -54,7 +54,7 @@ import static java.util.stream.Collectors.toList;
 @ApiStatus.Internal
 @Immutable
 @ThreadSafe
-public final class ExtYamlSource extends Source {
+final class ExtFullYamlSource extends Source {
 
     private static final Pattern DOT = Pattern.compile(Pattern.quote("."));
 
@@ -361,9 +361,9 @@ public final class ExtYamlSource extends Source {
     private final String name;
 
 
-    public ExtYamlSource(@NotNull final String name,
-                         @NotNull final Supplier<String> yamlSupplier) {
-        this(name, yamlSupplier, ExtYamlSource.defaultYamlSupplier::get);
+    public ExtFullYamlSource(@NotNull final String name,
+                             @NotNull final Supplier<String> yamlSupplier) {
+        this(name, yamlSupplier, ExtFullYamlSource.defaultYamlSupplier::get);
     }
 
     /**
@@ -377,9 +377,9 @@ public final class ExtYamlSource extends Source {
      *                     that {@link #custom(String, Kind)} works as well.
      * @throws NullPointerException if any of its arguments are null.
      */
-    public ExtYamlSource(@NotNull final String name,
-                         @NotNull final Supplier<String> yamlSupplier,
-                         @NotNull final Supplier<Yaml> mapper) {
+    public ExtFullYamlSource(@NotNull final String name,
+                             @NotNull final Supplier<String> yamlSupplier,
+                             @NotNull final Supplier<Yaml> mapper) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yamlSupplier, "yamlSupplier");
         Objects.requireNonNull(mapper, "mapper");
@@ -536,7 +536,7 @@ public final class ExtYamlSource extends Source {
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-            ? new ExtYamlSource(name(), yaml, mapper)
+            ? new ExtFullYamlSource(name(), yaml, mapper)
             : this;
     }
 

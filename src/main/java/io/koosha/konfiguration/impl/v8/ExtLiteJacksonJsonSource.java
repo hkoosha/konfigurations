@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.ext.v8;
+package io.koosha.konfiguration.impl.v8;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -7,17 +7,18 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
-import io.koosha.konfiguration.Source;
+import io.koosha.konfiguration.LiteKonfiguration;
+import io.koosha.konfiguration.LiteSource;
+import io.koosha.konfiguration.LiteSubsetView;
 import io.koosha.konfiguration.type.Kind;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
-import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +28,6 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -42,10 +42,11 @@ import static java.util.Objects.requireNonNull;
  *
  * <p>Thread safe and immutable.
  */
-@Immutable
 @ThreadSafe
-@ApiStatus.Internal
-public final class ExtJacksonJsonSource extends Source {
+final class ExtLiteJacksonJsonSource extends LiteSource {
+
+    private static final Pattern DOT_PATTERN = Pattern.compile("\\.");
+    private static final String DOT_PATTERN_QUOTED = Pattern.quote(".");
 
     @Contract(pure = true,
               value = "->new")
@@ -53,28 +54,29 @@ public final class ExtJacksonJsonSource extends Source {
     private static ObjectMapper defaultJacksonObjectMapper() {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        mapper.findAndRegisterModules();
         return mapper;
     }
 
     private final Supplier<ObjectMapper> mapperSupplier;
-    private final Supplier<String> jsonSupplier;
-    private final String lastJson;
-    private final JsonNode root;
+    private final ObjectNode root;
     private final Object LOCK = new Object();
 
     @NotNull
     private final String name;
 
+    @SuppressWarnings({"FieldCanBeLocal", "unused"})
+    @NotNull
+    private final String json;
+
     private JsonNode node_(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
+        requireNonNull(key, "key");
         if (key.isEmpty())
             throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
 
-        final String[] split = key.split(DOT_PATTERN);
-
         synchronized (LOCK) {
             JsonNode node = this.root;
-            for (final String sub : split) {
+            for (final String sub : key.split(DOT_PATTERN_QUOTED)) {
                 if (node.isMissingNode())
                     return node;
                 node = root.findPath(sub);
@@ -85,7 +87,7 @@ public final class ExtJacksonJsonSource extends Source {
 
     @NotNull
     private JsonNode node(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
+        requireNonNull(key, "key");
         if (key.isEmpty())
             throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
 
@@ -94,6 +96,31 @@ public final class ExtJacksonJsonSource extends Source {
             if (node.isMissingNode())
                 throw new KfgMissingKeyException(this.name(), key);
             return node;
+        }
+    }
+
+    @NotNull
+    private ObjectNode ensureIntermediateNodes(@NotNull final String key) {
+        requireNonNull(key, "key");
+        if (key.isEmpty())
+            throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
+
+        final String[] split = DOT_PATTERN.split(key);
+
+        synchronized (LOCK) {
+            ObjectNode from = this.root;
+            for (int i = 0; i < split.length - 1; i++) {
+                JsonNode next = from.findPath(split[i]);
+                if (next.isMissingNode()) {
+                    from.set(split[i], from.objectNode());
+                    next = from.findPath(split[i]);
+                }
+                else if (!next.isObject())
+                    throw new KfgTypeException(this.name, key, null, null, "expected all objects in path, found=" + next + " at=" + split[i]);
+                from = (ObjectNode) next;
+            }
+
+            return from;
         }
     }
 
@@ -127,9 +154,11 @@ public final class ExtJacksonJsonSource extends Source {
     }
 
 
-    public ExtJacksonJsonSource(@NotNull final String name,
-                                @NotNull final Supplier<String> jsonSupplier) {
-        this(name, jsonSupplier, ExtJacksonJsonSource::defaultJacksonObjectMapper);
+    public ExtLiteJacksonJsonSource(@NotNull final String name,
+                                    @NotNull final String json) {
+        this(name,
+            json,
+            ExtLiteJacksonJsonSource::defaultJacksonObjectMapper);
     }
 
     /**
@@ -137,7 +166,7 @@ public final class ExtJacksonJsonSource extends Source {
      * provider and object mapper provider.
      *
      * @param name         name of this source
-     * @param jsonSupplier backing store provider. Must always return a non-null valid json
+     * @param json         backing store provider. Must always return a non-null valid json
      *                     string.
      * @param objectMapper {@link ObjectMapper} provider. Must always return a valid
      *                     non-null ObjectMapper, and if required, it must be able to
@@ -150,14 +179,16 @@ public final class ExtJacksonJsonSource extends Source {
      * @throws KfgSourceException   if the provided json string can not be parsed by jackson.
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
-    public ExtJacksonJsonSource(@NotNull final String name,
-                                @NotNull final Supplier<String> jsonSupplier,
-                                @NotNull final Supplier<ObjectMapper> objectMapper) {
-        Objects.requireNonNull(name, "name");
-        Objects.requireNonNull(jsonSupplier, "jsonSupplier");
-        Objects.requireNonNull(objectMapper, "objectMapper");
+    public ExtLiteJacksonJsonSource(@NotNull final String name,
+                                    @NotNull final String json,
+                                    @NotNull final Supplier<ObjectMapper> objectMapper) {
+        requireNonNull(name, "name");
+        requireNonNull(json, "json");
+        requireNonNull(objectMapper, "objectMapper");
 
         this.name = name;
+        this.json = json;
+
         // Check early, so we're not fooled with a dummy object reader.
         try {
             Class.forName("com.fasterxml.jackson.databind.JsonNode");
@@ -169,23 +200,24 @@ public final class ExtJacksonJsonSource extends Source {
                     "com.fasterxml.jackson.databind.JsonNode", e);
         }
 
-        this.jsonSupplier = jsonSupplier;
         this.mapperSupplier = objectMapper;
-        this.lastJson = this.jsonSupplier.get();
 
-        requireNonNull(this.lastJson, "supplied json is null");
+        requireNonNull(json, "supplied json is null");
         requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
 
         final JsonNode update;
         try {
-            update = this.mapperSupplier.get().readTree(this.lastJson);
+            update = this.mapperSupplier.get().readTree(json);
         }
         catch (final IOException e) {
             throw new KfgSourceException(this.name(), "error parsing json string", e);
         }
         requireNonNull(update, "root element is null");
 
-        this.root = update;
+        if (!(update instanceof ObjectNode))
+            throw new KfgSourceException(this.name(), "root node is not object");
+
+        this.root = (ObjectNode) update;
     }
 
 
@@ -196,9 +228,58 @@ public final class ExtJacksonJsonSource extends Source {
     }
 
     @Override
+    public String serialize() {
+        synchronized (LOCK) {
+            return this.root.toPrettyString();
+        }
+    }
+
+    @Override
+    public boolean isReadonly() {
+        return false;
+    }
+
+    @Override
+    public LiteKonfiguration toReadonly() {
+        return new LiteSubsetView(this.name(), this, "", true);
+    }
+
+    @Override
+    public LiteKonfiguration toWritableCopy() {
+        return new ExtLiteJacksonJsonSource(this.name, this.serialize(), this.mapperSupplier);
+    }
+
+    @Override
+    public boolean has(@NotNull final String key,
+                       @Nullable final Kind<?> type) {
+        requireNonNull(key, "key");
+
+        synchronized (LOCK) {
+            if (this.node_(key).isMissingNode())
+                return false;
+            if (type == null)
+                return true;
+
+            final JsonNode node = this.node(key);
+
+            if (this.typeMatches(type, node))
+                return true;
+
+            try {
+                this.custom0(key, type);
+                return true;
+            }
+            catch (Throwable t) {
+                return false;
+            }
+        }
+    }
+
+
+    @Override
     @NotNull
     protected Boolean bool0(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
+        requireNonNull(key, "key");
 
         synchronized (LOCK) {
             final JsonNode at = node(key);
@@ -209,7 +290,7 @@ public final class ExtJacksonJsonSource extends Source {
     @Override
     @NotNull
     protected Character char0(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
+        requireNonNull(key, "key");
 
         synchronized (LOCK) {
             final JsonNode at = node(key);
@@ -222,7 +303,7 @@ public final class ExtJacksonJsonSource extends Source {
     @Override
     @NotNull
     protected String string0(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
+        requireNonNull(key, "key");
 
         synchronized (LOCK) {
             final JsonNode at = node(key);
@@ -233,7 +314,7 @@ public final class ExtJacksonJsonSource extends Source {
     @NotNull
     @Override
     protected Number number0(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
+        requireNonNull(key, "key");
 
         synchronized (LOCK) {
             final JsonNode at = node(key);
@@ -246,7 +327,7 @@ public final class ExtJacksonJsonSource extends Source {
     @NotNull
     @Override
     protected Number numberDouble0(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
+        requireNonNull(key, "key");
 
         synchronized (LOCK) {
             final JsonNode at = node(key);
@@ -264,8 +345,8 @@ public final class ExtJacksonJsonSource extends Source {
     @Override
     protected List<?> list0(@NotNull final String key,
                             @NotNull final Kind<?> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
+        requireNonNull(key, "key");
+        requireNonNull(type, "type");
 
         final ObjectMapper reader = this.mapperSupplier.get();
         final TypeFactory tf = reader.getTypeFactory();
@@ -290,8 +371,8 @@ public final class ExtJacksonJsonSource extends Source {
     @Override
     protected Set<?> set0(@NotNull final String key,
                           @NotNull final Kind<?> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
+        requireNonNull(key, "key");
+        requireNonNull(type, "type");
 
         final List<?> asList = this.list0(key, type);
         final Set<?> asSet = new HashSet<>(asList);
@@ -304,8 +385,8 @@ public final class ExtJacksonJsonSource extends Source {
     @NotNull
     protected Object custom0(@NotNull final String key,
                              @NotNull final Kind<?> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
+        requireNonNull(key, "key");
+        requireNonNull(type, "type");
 
         synchronized (LOCK) {
             final ObjectMapper reader = this.mapperSupplier.get();
@@ -336,55 +417,138 @@ public final class ExtJacksonJsonSource extends Source {
 
     @Override
     protected boolean isNull(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
+        requireNonNull(key, "key");
 
         synchronized (LOCK) {
             return node(key).isNull();
         }
     }
 
-    @Override
-    public boolean has(@NotNull final String key,
-                       @Nullable final Kind<?> type) {
-        Objects.requireNonNull(key, "key");
 
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Boolean value) {
+        final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
-            if (this.node_(key).isMissingNode())
-                return false;
-            if (type == null)
-                return true;
-
-            final JsonNode node = this.node(key);
-
-            if (this.typeMatches(type, node))
-                return true;
-
-            try {
-                this.custom0(key, type);
-                return true;
-            }
-            catch (Throwable t) {
-                return false;
-            }
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
         }
+        return this;
     }
 
-
     @Override
-    @Contract(pure = true)
-    public boolean hasUpdate() {
-        final String newJson = jsonSupplier.get();
-        return newJson != null && !Objects.equals(newJson, lastJson);
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Byte value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+        }
+        return this;
     }
 
-    @Contract(pure = true,
-              value = "-> new")
     @Override
-    @NotNull
-    public Source updatedCopy() {
-        return this.hasUpdate()
-            ? new ExtJacksonJsonSource(this.name(), this.jsonSupplier, this.mapperSupplier)
-            : this;
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Character value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Short value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Integer value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Long value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Float value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Double value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final String value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final List<?> value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key)
+                .set(split[split.length - 1],
+                    this.mapperSupplier.get().valueToTree(value));
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration put(@NotNull final String key,
+                                 final Set<?> value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key)
+                .set(split[split.length - 1],
+                    this.mapperSupplier.get().valueToTree(value));
+        }
+        return this;
+    }
+
+    @Override
+    public LiteKonfiguration putCustom(@NotNull final String key,
+                                       final Object value) {
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            this.ensureIntermediateNodes(key)
+                .set(split[split.length - 1],
+                    this.mapperSupplier.get().valueToTree(value));
+        }
+        return this;
     }
 
 }

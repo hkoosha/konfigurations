@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.lite.v8;
+package io.koosha.konfiguration.impl.v8;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.koosha.konfiguration.LiteKonfiguration;
@@ -20,7 +20,7 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
     @Override
     public @NotNull LiteKonfiguration jacksonJson(@NotNull final String name,
                                                   @NotNull final String json) {
-        return new ExtJacksonJsonLiteSource(name, json);
+        return new ExtLiteJacksonJsonSource(name, json);
     }
 
     @Override
@@ -30,6 +30,6 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        return new ExtJacksonJsonLiteSource(name, json, objectMapper);
+        return new ExtLiteJacksonJsonSource(name, json, objectMapper);
     }
 }

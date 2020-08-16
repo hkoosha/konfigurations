@@ -9,16 +9,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Special version of {@link LiteKonfiguration}, intended to go into a Kombiner.
  */
 public abstract class LiteSource implements LiteKonfiguration {
-
-    protected final static Pattern DOT_PATTERN = Pattern.compile("\\.");
-
-    protected final static String DOT_PATTERN_QUOTED = Pattern.quote(".");
 
     @Override
     public final Boolean bool(@NotNull final String key) {

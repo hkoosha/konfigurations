@@ -77,7 +77,6 @@ final class KombinerK<U> implements K<U> {
         return this.origin.has(this.key, this.type);
     }
 
-
     @Override
     @NotNull
     public Handle registerSoft(@NotNull final KeyObserver keyObserver) {

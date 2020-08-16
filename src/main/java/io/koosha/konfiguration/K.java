@@ -7,6 +7,8 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * Konfig value wrapper.
  *
@@ -107,6 +109,20 @@ public interface K<U> {
     @Contract(pure = true)
     boolean exists();
 
+    /**
+     * If the value denoted by {@link #key()} in the original source exists and
+     * it's value is not null.
+     *
+     * <p>Thread-safe.
+     *
+     * @return If the value denoted by {@link #key()} in the original source
+     * exists and is not null.
+     */
+    @Contract(pure = true)
+    default boolean existsNonNull() {
+        return this.exists() && this.v() != null;
+    }
+
 
     /**
      * Actual value of this konfiguration.
@@ -144,9 +160,24 @@ public interface K<U> {
      */
     @Nullable
     default U v(@Nullable final U defaultValue) {
-        // Operation is not atomic.
+        // this.exits() is not atomic.
         try {
-            return this.exists() ? this.v() : defaultValue;
+            return this.v();
+        }
+        catch (final KfgMissingKeyException mk) {
+            return defaultValue;
+        }
+    }
+
+    @Nullable
+    default U vn(@NotNull final U defaultValue) {
+        Objects.requireNonNull(defaultValue,
+            "defaultValue for vn() can not be null, you may use the v() variant instead");
+
+        // this.exits() is not atomic.
+        try {
+            final U v = this.v();
+            return v == null ? defaultValue : v;
         }
         catch (final KfgMissingKeyException mk) {
             return defaultValue;

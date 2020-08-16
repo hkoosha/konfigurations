@@ -1,8 +1,8 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.KonfigurationFactory;
 import io.koosha.konfiguration.KonfigurationManager;
-import io.koosha.konfiguration.ext.v8.ExtJacksonJsonSource;
 import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -16,7 +16,6 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static io.koosha.konfiguration.TestUtil.mapOf;
 import static java.util.Arrays.asList;
 
@@ -40,13 +39,13 @@ public class KonfigurationKombinerConcurrencyTest {
     @BeforeClass
     public void init() throws Exception {
         //noinspection ConstantConditions
-        final URI uri0 = ExtJacksonJsonSource.class.getClassLoader()
-                                                   .getResource("sample0.json")
-                                                   .toURI();
+        final URI uri0 = ExtFullJacksonJsonSource.class.getClassLoader()
+                                                       .getResource("sample0.json")
+                                                       .toURI();
         //noinspection ConstantConditions
-        final URI uri1 = ExtJacksonJsonSource.class.getClassLoader()
-                                                   .getResource("sample1.json")
-                                                   .toURI();
+        final URI uri1 = ExtFullJacksonJsonSource.class.getClassLoader()
+                                                       .getResource("sample1.json")
+                                                       .toURI();
         JSON0 = new String(Files.readAllBytes(Paths.get(uri0)));
         JSON1 = new String(Files.readAllBytes(Paths.get(uri1)));
 
@@ -60,11 +59,11 @@ public class KonfigurationKombinerConcurrencyTest {
         this.map = this.MAP0;
         this.json = this.JSON0;
 
-        this.k = kFactory().kombine(
+        this.k = KonfigurationFactory.getInstance().kombine(
             "kombine",
-            kFactory().map("map", () -> this.map),
-            kFactory().map("map", () -> this.MAP2),
-            kFactory().jacksonJson("json", () -> this.json)
+            KonfigurationFactory.getInstance().map("map", () -> this.map),
+            KonfigurationFactory.getInstance().map("map", () -> this.MAP2),
+            KonfigurationFactory.getInstance().jacksonJson("json", () -> this.json)
         );
         //noinspection OptionalGetWithoutIsPresent
         this.man = this.k.manager().get();

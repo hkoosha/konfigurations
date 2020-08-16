@@ -1,8 +1,8 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Handle;
+import io.koosha.konfiguration.KeyObserver;
 import io.koosha.konfiguration.KfgAssertionException;
-import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
@@ -12,16 +12,16 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 @NotThreadSafe
 @ApiStatus.Internal
@@ -30,7 +30,7 @@ final class KombinerManager implements KonfigurationManager {
     @NotNull
     private final Kombiner origin;
 
-    public KombinerManager(@NotNull final Kombiner kombiner) {
+    KombinerManager(@NotNull final Kombiner kombiner) {
         Objects.requireNonNull(kombiner, "kombiner");
         this.origin = kombiner;
     }
@@ -41,99 +41,68 @@ final class KombinerManager implements KonfigurationManager {
         if (!this.origin.updatable)
             throw new KfgAssertionException(this.origin.name(), null, null, null, "update is not supported");
 
-        final Map<Handle, Konfiguration> newSources = new HashMap<>();
-        final Set<Kind<?>> updated = new HashSet<>();
+        final LinkedHashMap<Handle, Source> newSources = new LinkedHashMap<>();
         final Map<Kind<?>, Object> newCache = new HashMap<>();
-        final Map<String, Collection<Runnable>> result = new HashMap<>();
+        final Set<Kind<?>> updatedKeys = new HashSet<>();
+        final Map<String, Collection<Runnable>> toBeNotifiedListeners = new HashMap<>();
 
-        final Map<String, Collection<Runnable>> ret = this.origin.r(() -> {
+        final boolean noneMatched = this.origin.r(() -> {
             if (this.origin.sources
                 .sources()
                 .stream()
-                .noneMatch(x -> ((Source) x).hasUpdate()))
-                return emptyMap();
+                .noneMatch(Source::hasUpdate))
+                return true;
 
-
-            newSources.putAll(this.origin.sources.sourcesCopy());
-            newSources.entrySet().forEach(x -> x.setValue(((Source) x.getValue()).updatedCopy()));
+            this.origin.sources.sourcesCopy().forEach((handle, konfiguration) ->
+                newSources.put(handle, konfiguration.updatedCopy()));
 
             newCache.putAll(this.origin.cacheCopy());
 
             this.origin.issuedKeys.forEach(q -> {
                 final String key = requireNonNull(
-                    q.key(), "ket passed through kombiner is null");
+                    q.key(), "key passed through kombiner is null: " + q);
 
-                final Optional<Konfiguration> first = newSources
+                final Optional<?> oldValue = this.origin.getCachedValue(q.key(), q);
+
+                final Optional<Source> newValue = newSources
                     .values()
                     .stream()
-                    .filter(x -> x.has(key, q))
+                    .filter(it -> it.has(key, q))
                     .findFirst();
 
-                final Object newV = first
-                    .map(konfiguration -> konfiguration.custom(q.key(), q).v())
-                    .orElse(null);
+                final Object newValueGet = newValue.map(source -> source.custom(q.key(), q).v())
+                                                   .orElse(null);
 
-                final Object oldV = this.origin.has(q.key(), q)
-                    ? this.origin.issueValue(q)
-                    : null;
+                //noinspection ConstantConditions
+                if (oldValue.isPresent() != newValue.isPresent()
+                    || newValue.isPresent() && oldValue.isPresent() && !Objects.equals(newValueGet, oldValue.get()))
+                    updatedKeys.add(q);
 
-                // Went missing or came into existence.
-                if (this.origin.hasInCache(q) != first.isPresent()
-                    || !Objects.equals(newV, oldV))
-                    updated.add(q);
-
-                if (first.isPresent())
-                    newCache.put(q, newV);
+                if (newValue.isPresent())
+                    newCache.put(q, newValueGet);
             });
 
-            //noinspection OptionalGetWithoutIsPresent
-            final Map<String, Collection<Runnable>> result0 = this
-                .origin
-                .sources
-                .sources()
-                .stream()
-                // External non-optimizable konfig sources.
-                .filter(target -> !(target instanceof Source))
-                .map(Konfiguration::manager)
-                .map(it -> it.get().update())
-                .peek(x -> x.entrySet().forEach(e -> e.setValue(
-                    // just to wrap!
-                    e.getValue().stream().map(r -> {
-                        requireNonNull(r, "ret");
-                        //noinspection Convert2Lambda,Anonymous2MethodRef
-                        return new Runnable() {
-                            @Override
-                            public void run() {
-                                r.run();
-                            }
-                        };
-                    })
-                     .collect(toList())
-                )))
-                .reduce(new HashMap<>(), (m0, m1) -> {
-                    m1.forEach((m1k, m1c) -> m0.computeIfAbsent(
-                        m1k, m1k_ -> new ArrayList<>()).addAll(m1c));
-                    return m0;
-                });
+            toBeNotifiedListeners.computeIfAbsent(KeyObserver.LISTEN_TO_ALL, q_ -> new ArrayList<>())
+                                 .addAll(this.origin.observers.getKeyListeners(KeyObserver.LISTEN_TO_ALL));
 
-            result.putAll(result0);
-
-            for (final Kind<?> kind : updated)
+            for (final Kind<?> kind : updatedKeys)
                 //noinspection ConstantConditions
-                result.computeIfAbsent(kind.key(), (q_) -> new ArrayList<>())
-                      .addAll(this.origin.observers.get(kind.key()));
+                toBeNotifiedListeners.computeIfAbsent(kind.key(), q_ -> new ArrayList<>())
+                                     .addAll(this.origin.observers.getKeyListeners(kind.key()));
 
+            return false;
+        });
+
+        if (noneMatched)
+            return Collections.emptyMap();
+
+        this.origin.w(() -> {
+            this.origin.sources.replaceSources(newSources);
+            this.origin.replaceCache(newCache);
             return null;
         });
 
-        if (ret != null)
-            return ret;
-
-        return this.origin.w(() -> {
-            this.origin.sources.replaceSources(newSources);
-            this.origin.replaceCache(newCache);
-            return result;
-        });
+        return toBeNotifiedListeners;
     }
 
     @Override
@@ -141,12 +110,12 @@ final class KombinerManager implements KonfigurationManager {
         if (!this.origin.updatable)
             return false;
 
-        return this.origin.r(() -> this
+        return this
             .origin
             .sources
             .sources()
             .stream()
-            .anyMatch(x -> ((Source) x).hasUpdate()));
+            .anyMatch(Source::hasUpdate);
     }
 
 }

@@ -2,6 +2,7 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.KonfigurationFactory;
 import io.koosha.konfiguration.KonfigurationManager;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -10,7 +11,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 
-import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static java.util.Collections.singletonMap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
@@ -31,7 +31,7 @@ public final class KonfigurationKombinerTest {
     @BeforeMethod
     public void setup() {
         this.flag.set(true);
-        this.k = kFactory().kombine("def", kFactory().map("map", sup));
+        this.k = KonfigurationFactory.getInstance().map("map", sup);
         //noinspection OptionalGetWithoutIsPresent
         this.man = k.manager().get();
     }

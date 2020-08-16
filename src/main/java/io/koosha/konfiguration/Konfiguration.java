@@ -19,18 +19,6 @@ import java.util.Set;
 public interface Konfiguration {
 
     /**
-     * Always refers to latest factory.
-     *
-     * @return latest konfiguration factory.
-     */
-    @NotNull
-    @Contract(pure = true)
-    static KonfigurationFactory kFactory() {
-        return KonfigurationFactory.getInstance();
-    }
-
-
-    /**
      * Get a boolean konfiguration value.
      *
      * @param key unique key of the konfiguration being requested.

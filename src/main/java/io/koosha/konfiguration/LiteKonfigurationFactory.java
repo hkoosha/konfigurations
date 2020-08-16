@@ -1,7 +1,7 @@
 package io.koosha.konfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.koosha.konfiguration.lite.v8.LiteFactoryV8;
+import io.koosha.konfiguration.impl.v8.LiteFactoryV8;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;

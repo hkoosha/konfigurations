@@ -1,6 +1,7 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.Handle;
+import io.koosha.konfiguration.KfgException;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -12,12 +13,16 @@ import java.util.concurrent.atomic.AtomicLong;
 @ApiStatus.Internal
 final class HandleImpl implements Handle {
 
-    private static final AtomicLong id_pool = new AtomicLong(Long.MAX_VALUE);
+    private static final AtomicLong ID_POOL = new AtomicLong(Long.MIN_VALUE);
 
     private final long id;
 
     HandleImpl() {
-        this(id_pool.incrementAndGet());
+        this.id = ID_POOL.updateAndGet(it -> {
+            if (it == NONE.id())
+                throw new KfgException(null, "the id pool is exhausted.");
+            return it + 1;
+        });
     }
 
     private HandleImpl(final long id) {
@@ -46,6 +51,6 @@ final class HandleImpl implements Handle {
     }
 
 
-    static final Handle NONE = new HandleImpl(-1);
+    static final Handle NONE = new HandleImpl(Long.MAX_VALUE);
 
 }

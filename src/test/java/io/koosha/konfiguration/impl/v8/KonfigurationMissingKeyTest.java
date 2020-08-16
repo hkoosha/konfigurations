@@ -2,13 +2,13 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
+import io.koosha.konfiguration.KonfigurationFactory;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static io.koosha.konfiguration.Konfiguration.kFactory;
 import static java.util.Collections.singletonMap;
 
 public class KonfigurationMissingKeyTest {
@@ -24,7 +24,7 @@ public class KonfigurationMissingKeyTest {
     @BeforeMethod
     public void setup() {
         this.returnFour = true;
-        this.k = kFactory().map("map", sup);
+        this.k = KonfigurationFactory.getInstance().map("map", sup);
     }
 
     @Test

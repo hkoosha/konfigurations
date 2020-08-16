@@ -1,7 +1,6 @@
 package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgMissingKeyException;
-import io.koosha.konfiguration.ext.v8.ExtJacksonJsonSource;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
@@ -23,27 +22,27 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
-public class ExtJacksonJsonSourceTest {
+public class ExtFullJacksonJsonSourceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExtJacksonJsonSourceTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExtFullJacksonJsonSourceTest.class);
 
     static String SAMPLE_0;
     static String SAMPLE_1;
 
     private String json;
 
-    private ExtJacksonJsonSource k;
+    private ExtFullJacksonJsonSource k;
 
     @BeforeClass
     public void init() throws Exception {
         //noinspection ConstantConditions
-        final URI uri0 = ExtJacksonJsonSource.class.getClassLoader()
-                                                   .getResource("sample0.json")
-                                                   .toURI();
+        final URI uri0 = ExtFullJacksonJsonSource.class.getClassLoader()
+                                                       .getResource("sample0.json")
+                                                       .toURI();
         //noinspection ConstantConditions
-        final URI uri1 = ExtJacksonJsonSource.class.getClassLoader()
-                                                   .getResource("sample1.json")
-                                                   .toURI();
+        final URI uri1 = ExtFullJacksonJsonSource.class.getClassLoader()
+                                                       .getResource("sample1.json")
+                                                       .toURI();
         SAMPLE_0 = new String(Files.readAllBytes(Paths.get(uri0)));
         SAMPLE_1 = new String(Files.readAllBytes(Paths.get(uri1)));
     }
@@ -51,15 +50,15 @@ public class ExtJacksonJsonSourceTest {
     @BeforeMethod
     public void setup() throws Exception {
         this.json = SAMPLE_0;
-        this.k = new ExtJacksonJsonSource("testJacksonSource", () -> json);
+        this.k = new ExtFullJacksonJsonSource("testJacksonSource", () -> json);
     }
 
     private void update() {
         this.json = SAMPLE_1;
-        this.k = (ExtJacksonJsonSource) this.k.updatedCopy();
+        this.k = (ExtFullJacksonJsonSource) this.k.updatedCopy();
     }
 
-    private ExtJacksonJsonSource k() {
+    private ExtFullJacksonJsonSource k() {
         return this.k;
     }
 

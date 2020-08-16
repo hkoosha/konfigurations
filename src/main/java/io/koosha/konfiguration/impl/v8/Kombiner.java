@@ -8,6 +8,7 @@ import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationManager;
+import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.SubsetView;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.ApiStatus;
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -53,6 +55,32 @@ final class Kombiner implements Konfiguration {
 
     final boolean updatable;
 
+    private LinkedHashMap<Handle, Source> unwrap(@NotNull final Collection<Konfiguration> sources) {
+        Objects.requireNonNull(sources, "sources");
+
+        final LinkedHashMap<Handle, Source> newSources = new LinkedHashMap<>();
+        sources.stream()
+               .flatMap(source ->
+                   source instanceof Kombiner
+                       ? ((Kombiner) source).sources.sources().stream()
+                       : Stream.of(source))
+               .peek(source -> Objects.requireNonNull(source, "null in config sources"))
+               .peek(source -> {
+                   if (source instanceof SubsetView)
+                       throw new KfgIllegalArgumentException(
+                           name, "can not kombine a " + source.getClass().getName() + " konfiguration.");
+               })
+               .peek(source -> {
+                   if (!(source instanceof Source))
+                       throw new KfgIllegalArgumentException(
+                           name, "can not kombine a " + source.getClass().getName() + " konfiguration, only" +
+                           " " + Source.class.getName() + " can be accepted.");
+               })
+               .forEach(source -> newSources.put(new HandleImpl(), (Source) source));
+
+        return newSources;
+    }
+
     Kombiner(@NotNull final String name,
              @NotNull final Collection<Konfiguration> sources,
              @Nullable final Long lockWaitTimeMillis,
@@ -64,29 +92,19 @@ final class Kombiner implements Konfiguration {
         this.name = name;
         this.updatable = updatable;
 
-        final Map<Handle, Konfiguration> newSources = new HashMap<>();
-        sources.stream()
-               .peek(source -> Objects.requireNonNull(source, "null in config sources"))
-               .peek(source -> {
-                   if (source instanceof SubsetView)
-                       throw new KfgIllegalArgumentException(
-                           name, "can not kombine a " + source.getClass().getName() + " konfiguration.");
-               })
-               .flatMap(source ->
-                   source instanceof Kombiner
-                       ? ((Kombiner) source).sources.sources().stream()
-                       : Stream.of(source))
-               .forEach(source -> newSources.put(new HandleImpl(), source));
+        final LinkedHashMap<Handle, Source> newSources = this.unwrap(sources);
         if (newSources.isEmpty())
             throw new KfgIllegalArgumentException(name, "no source given");
 
         this.lock = new KombinerLock(name, lockWaitTimeMillis, fairLock);
-        this.observers = new KombinerObservers(this.name);
+        this.observers = new KombinerObservers(this);
         this.man = new KombinerManager(this);
-        this.sources = new KombinerSources(this);
+        this.sources = new KombinerSources();
 
         this.sources.replaceSources(newSources);
     }
+
+    // =========================================================================
 
     <T> T r(@NotNull final Supplier<T> func) {
         Objects.requireNonNull(func, "func");
@@ -98,23 +116,16 @@ final class Kombiner implements Konfiguration {
         return lock.doWriteLocked(func);
     }
 
-    // =========================================================================
-
     <U> K<U> k(@NotNull final String key,
                @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
-        final Kind<?> withKey = ((Kind<?>) type).withKey(key);
-        final AtomicBoolean contains = new AtomicBoolean(false);
+        final Kind<U> withKey = type.withKey(key);
 
-        this.r(() -> {
-            if (this.issuedKeys.contains(withKey))
-                contains.set(true);
-            return null;
-        });
+        final boolean contains = this.r(() -> this.issuedKeys.contains(withKey));
 
-        if (!contains.get())
+        if (!contains)
             this.w(() -> {
                 this.issuedKeys.add(withKey);
                 return null;
@@ -143,31 +154,49 @@ final class Kombiner implements Konfiguration {
         if (hadValue.get())
             return value;
 
-        return this.w(() -> (U) this.issueValue(t));
+        return this.w(() -> cache.containsKey(t)
+            ? (U) cache.get(t)
+            : (U) this.issueValue(t));
     }
 
-    // @NotThreadSafe
+    @SuppressWarnings("unchecked")
+    <U> Optional<U> getCachedValue(@NotNull final String key,
+                                   @NotNull final Kind<U> type) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
+        final Kind<U> t = type.withKey(key);
+
+        return cache.containsKey(t)
+            ? Optional.ofNullable((U) cache.get(t))
+            : Optional.empty();
+    }
+
     @Nullable
     Object issueValue(@NotNull final Kind<?> key) {
-        final String keyStr = key.key();
-        Objects.requireNonNull(keyStr, "key passed through kombiner is null");
-        final Optional<Konfiguration> find = this
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(key.key(), "key's text key");
+
+        final Optional<Source> find = this
             .sources
             .sources()
             .stream()
-            .filter(source -> source.has(keyStr, key))
+            .filter(source -> source.has(key.key(), key))
             .findFirst();
+
         if (!find.isPresent())
-            throw new KfgMissingKeyException(this.name(), keyStr, key);
-        this.issuedKeys.add(key.withKey(keyStr));
-        final Object value = find.get().custom(keyStr, key).v();
+            throw new KfgMissingKeyException(this.name(), key.key(), key);
+
+        this.issuedKeys.add(key.withKey(key.key()));
+        final Object value = find.get().custom(key.key(), key).v();
         this.cache.put(key, value);
         return value;
     }
 
-    boolean hasInCache(@NotNull final Kind<?> t) {
-        Objects.requireNonNull(t.key());
-        return this.cache.containsKey(t);
+    boolean hasInCache(@NotNull final Kind<?> key) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(key.key(), "key's text key");
+        return this.cache.containsKey(key);
     }
 
     @NotNull
@@ -204,8 +233,6 @@ final class Kombiner implements Konfiguration {
             return Optional.ofNullable(m);
         });
     }
-
-    // =========================================================================
 
     @Override
     @NotNull
@@ -275,6 +302,7 @@ final class Kombiner implements Konfiguration {
     public <U> K<List<U>> list(@NotNull final String key,
                                @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
         return this.k(key, type.asList());
     }
 
@@ -283,6 +311,7 @@ final class Kombiner implements Konfiguration {
     public <U> K<Set<U>> set(@NotNull final String key,
                              @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
         return this.k(key, type.asSet());
     }
 
@@ -291,6 +320,7 @@ final class Kombiner implements Konfiguration {
     public <U> K<U> custom(@NotNull final String key,
                            @NotNull final Kind<U> type) {
         Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
         return this.k(key, type);
     }
 
@@ -298,23 +328,23 @@ final class Kombiner implements Konfiguration {
     public boolean has(@NotNull final String key,
                        @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(key, "key");
-        final Kind<?> t = type.withKey(key);
-        return r(() -> this.hasInCache(t) || this.sources.has(key, type));
-    }
+        Objects.requireNonNull(type, "type");
 
-    // =========================================================================
+        final Kind<?> t = type.withKey(key);
+        return this.r(() -> this.hasInCache(t) || this.sources.has(key, type));
+    }
 
     @NotNull
     @Override
     public Handle registerSoft(@NotNull final KeyObserver observer,
-                               @Nullable final String key) {
+                               @NotNull final String key) {
         Objects.requireNonNull(observer, "observer");
+        Objects.requireNonNull(key, "key");
 
         if (!this.updatable)
             return HandleImpl.NONE;
 
-        return w(() -> observers.registerSoft(observer, key));
+        return observers.registerSoft(observer, key);
     }
 
     @Override
@@ -327,7 +357,7 @@ final class Kombiner implements Konfiguration {
         if (!this.updatable)
             return HandleImpl.NONE;
 
-        return w(() -> observers.registerHard(observer, key));
+        return observers.registerHard(observer, key);
     }
 
     @Override
@@ -339,13 +369,10 @@ final class Kombiner implements Konfiguration {
         if (!this.updatable)
             return;
 
-        w(() -> {
-            if (Objects.equals(KeyObserver.LISTEN_TO_ALL, key))
-                this.observers.remove(observer);
-            else
-                this.observers.deregister(observer, key);
-            return this;
-        });
+        if (Objects.equals(KeyObserver.LISTEN_TO_ALL, key))
+            this.observers.remove(observer);
+        else
+            this.observers.deregister(observer, key);
     }
 
     @Override

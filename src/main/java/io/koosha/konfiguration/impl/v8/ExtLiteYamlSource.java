@@ -1,10 +1,11 @@
-package io.koosha.konfiguration.lite.v8;
+package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.LiteKonfiguration;
 import io.koosha.konfiguration.LiteSource;
+import io.koosha.konfiguration.LiteSubsetView;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.NotNull;
@@ -50,7 +51,7 @@ import static java.util.stream.Collectors.toList;
  * <p>Thread safe and immutable.
  */
 @ThreadSafe
-abstract class ExtYamlLiteSource extends LiteSource {
+final class ExtLiteYamlSource extends LiteSource {
 
     private static final Pattern DOT = Pattern.compile(Pattern.quote("."));
 
@@ -356,9 +357,9 @@ abstract class ExtYamlLiteSource extends LiteSource {
     private final String name;
 
 
-    public ExtYamlLiteSource(@NotNull final String name,
+    public ExtLiteYamlSource(@NotNull final String name,
                              @NotNull final String yaml) {
-        this(name, yaml, ExtYamlLiteSource.defaultYamlSupplier::get);
+        this(name, yaml, ExtLiteYamlSource.defaultYamlSupplier::get);
     }
 
     /**
@@ -372,7 +373,7 @@ abstract class ExtYamlLiteSource extends LiteSource {
      *               that {@link #custom(String, Kind)} works as well.
      * @throws NullPointerException if any of its arguments are null.
      */
-    public ExtYamlLiteSource(@NotNull final String name,
+    public ExtLiteYamlSource(@NotNull final String name,
                              @NotNull final String yaml,
                              @NotNull final Supplier<Yaml> mapper) {
         Objects.requireNonNull(name, "name");
@@ -420,7 +421,12 @@ abstract class ExtYamlLiteSource extends LiteSource {
 
     @Override
     public LiteKonfiguration toReadonly() {
-        return null;
+        return new LiteSubsetView(this.name(), this, "", true);
+    }
+
+    @Override
+    public LiteKonfiguration toWritableCopy() {
+        return new ExtLiteYamlSource(this.name, this.serialize(), this.mapper);
     }
 
 

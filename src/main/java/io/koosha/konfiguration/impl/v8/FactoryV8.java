@@ -3,10 +3,6 @@ package io.koosha.konfiguration.impl.v8;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationFactory;
-import io.koosha.konfiguration.ext.v8.ExtJacksonJsonSource;
-import io.koosha.konfiguration.ext.v8.ExtMapSource;
-import io.koosha.konfiguration.ext.v8.ExtPreferencesSource;
-import io.koosha.konfiguration.ext.v8.ExtYamlSource;
 import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
@@ -42,7 +38,10 @@ public final class FactoryV8 implements KonfigurationFactory {
     @Contract(pure = true)
     @NotNull
     public static KonfigurationFactory getInstanceV8() {
-        return new FactoryV8();
+        return getInstanceV8(
+            DEFAULT_LOCK_WAIT_TIME_MILLIS,
+            DEFAULT_FAIR_LOCK,
+            DEFAULT_UPDATABLE);
     }
 
     @Contract(pure = true)
@@ -64,12 +63,6 @@ public final class FactoryV8 implements KonfigurationFactory {
     private final Long lockWaitTime;
     private final boolean fairLock;
     private final boolean updatable;
-
-    private FactoryV8() {
-        this(DEFAULT_LOCK_WAIT_TIME_MILLIS,
-            DEFAULT_FAIR_LOCK,
-            DEFAULT_UPDATABLE);
-    }
 
     private FactoryV8(@Nullable final Long lockWaitTime,
                       final boolean fairLock,
@@ -142,7 +135,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                              @NotNull final Supplier<Map<String, ?>> storage) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(storage, "storage");
-        final ExtMapSource k = new ExtMapSource(name, storage);
+        final ExtFullMapSource k = new ExtFullMapSource(name, storage);
         return kombine(name, k);
     }
 
@@ -167,7 +160,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final Preferences storage) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(storage, "storage");
-        final Konfiguration k = new ExtPreferencesSource(name, storage);
+        final Konfiguration k = new ExtFullPreferencesSource(name, storage);
         return kombine(name, k);
     }
 
@@ -180,7 +173,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final Supplier<String> json) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
-        final ExtJacksonJsonSource k = new ExtJacksonJsonSource(name, json);
+        final ExtFullJacksonJsonSource k = new ExtFullJacksonJsonSource(name, json);
         return kombine(name, k);
     }
 
@@ -215,7 +208,7 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        final ExtJacksonJsonSource k = new ExtJacksonJsonSource(name, json, objectMapper);
+        final ExtFullJacksonJsonSource k = new ExtFullJacksonJsonSource(name, json, objectMapper);
         return kombine(name, k);
     }
 
@@ -250,7 +243,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                                    @NotNull final Supplier<String> yaml) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
-        final ExtYamlSource k = new ExtYamlSource(name, yaml);
+        final ExtFullYamlSource k = new ExtFullYamlSource(name, yaml);
         return kombine(name, k);
     }
 
@@ -263,7 +256,7 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        final ExtYamlSource k = new ExtYamlSource(name, yaml, objectMapper);
+        final ExtFullYamlSource k = new ExtFullYamlSource(name, yaml, objectMapper);
         return kombine(name, k);
     }
 
