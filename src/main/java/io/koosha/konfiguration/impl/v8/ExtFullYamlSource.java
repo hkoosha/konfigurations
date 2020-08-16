@@ -348,7 +348,7 @@ final class ExtFullYamlSource extends Source {
         ConstructorProperties::value
     );
 
-    private static final ThreadLocal<Yaml> defaultYamlSupplier =
+    static final ThreadLocal<Yaml> defaultYamlSupplier =
         ThreadLocal.withInitial(() -> new Yaml(defaultBaseConstructor));
 
     private final Supplier<Yaml> mapper;
@@ -359,12 +359,6 @@ final class ExtFullYamlSource extends Source {
 
     @NotNull
     private final String name;
-
-
-    public ExtFullYamlSource(@NotNull final String name,
-                             @NotNull final Supplier<String> yamlSupplier) {
-        this(name, yamlSupplier, ExtFullYamlSource.defaultYamlSupplier::get);
-    }
 
     /**
      * Creates an instance with the given Yaml parser.

@@ -47,7 +47,8 @@ public class ExtFullYamlSourceTest {
     @BeforeMethod
     public void setup() throws Exception {
         this.yaml = SAMPLE_0;
-        this.k = new ExtFullYamlSource("yamlSourceTest", () -> this.yaml);
+        this.k = new ExtFullYamlSource("yamlSourceTest", () -> this.yaml,
+            ExtFullYamlSource.defaultYamlSupplier::get);
     }
 
     private Konfiguration k() {
@@ -172,7 +173,8 @@ public class ExtFullYamlSourceTest {
     public void testCustomValue() {
         final String yamlString = "bang:\n  str : hello\n  i: 99";
 
-        final ExtFullYamlSource y = new ExtFullYamlSource("testYamlSource", () -> yamlString);
+        final ExtFullYamlSource y = new ExtFullYamlSource("testYamlSource", () -> yamlString,
+            ExtFullYamlSource.defaultYamlSupplier::get);
 
         final TestUtil.DummyCustom bang = y.custom(
             "bang", Kind.of(TestUtil.DummyCustom.class)).vn();
@@ -195,7 +197,7 @@ public class ExtFullYamlSourceTest {
         };
 
         final ExtFullYamlSource y = new ExtFullYamlSource(
-            "testYamlSource", yamlString);
+            "testYamlSource", yamlString, ExtFullYamlSource.defaultYamlSupplier::get);
 
         final TestUtil.DummyCustom2 bang = y.custom(
             "bang", Kind.of(TestUtil.DummyCustom2.class)).vn();

@@ -135,7 +135,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                              @NotNull final Supplier<Map<String, ?>> storage) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(storage, "storage");
-        final ExtFullMapSource k = new ExtFullMapSource(name, storage);
+        final Konfiguration k = new ExtFullMapSource(name, storage);
         return kombine(name, k);
     }
 
@@ -173,8 +173,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final Supplier<String> json) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
-        final ExtFullJacksonJsonSource k = new ExtFullJacksonJsonSource(name, json);
-        return kombine(name, k);
+        return jacksonJson(name, json, ExtFullJacksonSourceJsonHelper::mapper);
     }
 
     @Override
@@ -208,7 +207,53 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        final ExtFullJacksonJsonSource k = new ExtFullJacksonJsonSource(name, json, objectMapper);
+        final Konfiguration k = new ExtFullJacksonSource(name, json, objectMapper);
+        return kombine(name, k);
+    }
+
+
+    @Override
+    @NotNull
+    @Contract("_, _ -> new")
+    public Konfiguration jacksonYaml(@NotNull final String name,
+                                     @NotNull final Supplier<String> yaml) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(yaml, "yaml");
+        return jacksonYaml(name, yaml, ExtFullJacksonSourceYamlHelper::mapper);
+    }
+
+    @Override
+    @NotNull
+    @Contract("_, _ -> new")
+    public Konfiguration jacksonYaml(@NotNull final String name,
+                                     @NotNull final String yaml) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(yaml, "yaml");
+        return jacksonYaml(name, () -> yaml);
+    }
+
+    @Override
+    @NotNull
+    @Contract("_, _, _ -> new")
+    public Konfiguration jacksonYaml(@NotNull final String name,
+                                     @NotNull final String yaml,
+                                     @NotNull final Supplier<ObjectMapper> objectMapper) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(yaml, "yaml");
+        Objects.requireNonNull(objectMapper, "objectMapper");
+        return jacksonYaml(name, () -> yaml, objectMapper);
+    }
+
+    @Override
+    @NotNull
+    @Contract("_, _, _ -> new")
+    public Konfiguration jacksonYaml(@NotNull final String name,
+                                     @NotNull final Supplier<String> yaml,
+                                     @NotNull final Supplier<ObjectMapper> objectMapper) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(yaml, "yaml");
+        Objects.requireNonNull(objectMapper, "objectMapper");
+        final Konfiguration k = new ExtFullJacksonSource(name, yaml, objectMapper);
         return kombine(name, k);
     }
 
@@ -243,8 +288,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                                    @NotNull final Supplier<String> yaml) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
-        final ExtFullYamlSource k = new ExtFullYamlSource(name, yaml);
-        return kombine(name, k);
+        return snakeYaml(name, yaml, ExtFullYamlSource.defaultYamlSupplier::get);
     }
 
     @Override
@@ -256,7 +300,7 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        final ExtFullYamlSource k = new ExtFullYamlSource(name, yaml, objectMapper);
+        final Konfiguration k = new ExtFullYamlSource(name, yaml, objectMapper);
         return kombine(name, k);
     }
 

@@ -1,7 +1,5 @@
 package io.koosha.konfiguration.impl.v8;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
@@ -34,9 +32,9 @@ import java.util.function.Supplier;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Reads konfig from a json source (supplied as string).
+ * Reads konfig from a json/yaml source (supplied as string).
  *
- * <p>for {@link #custom(String, Kind)} to work, the supplied json reader must
+ * <p>for {@link #custom(String, Kind)} to work, the supplied mapper must
  * be configured to handle arbitrary types accordingly.
  *
  * <p>Thread safe and immutable.
@@ -44,16 +42,7 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 @ThreadSafe
 @ApiStatus.Internal
-final class ExtFullJacksonJsonSource extends Source {
-
-    @Contract(pure = true,
-              value = "->new")
-    @NotNull
-    private static ObjectMapper defaultJacksonObjectMapper() {
-        final ObjectMapper mapper = new ObjectMapper();
-        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        return mapper;
-    }
+final class ExtFullJacksonSource extends Source {
 
     private final Supplier<ObjectMapper> mapperSupplier;
     private final Supplier<String> jsonSupplier;
@@ -126,11 +115,6 @@ final class ExtFullJacksonJsonSource extends Source {
     }
 
 
-    public ExtFullJacksonJsonSource(@NotNull final String name,
-                                    @NotNull final Supplier<String> jsonSupplier) {
-        this(name, jsonSupplier, ExtFullJacksonJsonSource::defaultJacksonObjectMapper);
-    }
-
     /**
      * Creates an instance with a with the given json
      * provider and object mapper provider.
@@ -149,9 +133,9 @@ final class ExtFullJacksonJsonSource extends Source {
      * @throws KfgSourceException   if the provided json string can not be parsed by jackson.
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
-    public ExtFullJacksonJsonSource(@NotNull final String name,
-                                    @NotNull final Supplier<String> jsonSupplier,
-                                    @NotNull final Supplier<ObjectMapper> objectMapper) {
+    ExtFullJacksonSource(@NotNull final String name,
+                         @NotNull final Supplier<String> jsonSupplier,
+                         @NotNull final Supplier<ObjectMapper> objectMapper) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(jsonSupplier, "jsonSupplier");
         Objects.requireNonNull(objectMapper, "objectMapper");
@@ -382,7 +366,7 @@ final class ExtFullJacksonJsonSource extends Source {
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()
-            ? new ExtFullJacksonJsonSource(this.name(), this.jsonSupplier, this.mapperSupplier)
+            ? new ExtFullJacksonSource(this.name(), this.jsonSupplier, this.mapperSupplier)
             : this;
     }
 
