@@ -3,10 +3,10 @@ package io.koosha.konfiguration.impl.v8;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.koosha.konfiguration.KfgSourceException;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 final class ExtJacksonSourceJsonHelper {
 
@@ -20,6 +20,7 @@ final class ExtJacksonSourceJsonHelper {
     static ObjectMapper mapper() {
         final ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         mapper.findAndRegisterModules();
         return mapper;
     }

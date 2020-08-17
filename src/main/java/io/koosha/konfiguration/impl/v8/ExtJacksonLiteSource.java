@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import io.koosha.konfiguration.KfgAssertionException;
+import io.koosha.konfiguration.KfgException;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
@@ -21,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
@@ -195,9 +197,17 @@ final class ExtJacksonLiteSource extends LiteSource {
 
     @Override
     public String serialize() {
-        synchronized (LOCK) {
-            return this.root.toPrettyString();
+        final StringWriter sw = new StringWriter();
+        final ObjectMapper mapper = this.mapperSupplier.get();
+        try {
+            synchronized (LOCK) {
+                mapper.writeValue(sw, this.root);
+            }
         }
+        catch (final IOException e) {
+            throw new KfgException(this.name(), e);
+        }
+        return sw.toString();
     }
 
     @Override
@@ -406,17 +416,8 @@ final class ExtJacksonLiteSource extends LiteSource {
                                  final Byte value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
-        }
-        return this;
-    }
-
-    @Override
-    public LiteKonfiguration put(@NotNull final String key,
-                                 final Character value) {
-        final String[] split = DOT_PATTERN.split(key);
-        synchronized (LOCK) {
-            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+            this.ensureIntermediateNodes(key).put(split[split.length - 1],
+                value == null ? null : value.shortValue());
         }
         return this;
     }
@@ -426,7 +427,8 @@ final class ExtJacksonLiteSource extends LiteSource {
                                  final Short value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+            this.ensureIntermediateNodes(key)
+                .put(split[split.length - 1], value);
         }
         return this;
     }
@@ -436,7 +438,8 @@ final class ExtJacksonLiteSource extends LiteSource {
                                  final Integer value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+            this.ensureIntermediateNodes(key)
+                .put(split[split.length - 1], value);
         }
         return this;
     }
@@ -446,7 +449,8 @@ final class ExtJacksonLiteSource extends LiteSource {
                                  final Long value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+            this.ensureIntermediateNodes(key)
+                .put(split[split.length - 1], value);
         }
         return this;
     }
@@ -456,7 +460,8 @@ final class ExtJacksonLiteSource extends LiteSource {
                                  final Float value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+            this.ensureIntermediateNodes(key)
+                .put(split[split.length - 1], value);
         }
         return this;
     }
@@ -466,7 +471,8 @@ final class ExtJacksonLiteSource extends LiteSource {
                                  final Double value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+            this.ensureIntermediateNodes(key)
+                .put(split[split.length - 1], value);
         }
         return this;
     }
@@ -476,7 +482,8 @@ final class ExtJacksonLiteSource extends LiteSource {
                                  final String value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
+            this.ensureIntermediateNodes(key)
+                .put(split[split.length - 1], value);
         }
         return this;
     }
@@ -485,10 +492,11 @@ final class ExtJacksonLiteSource extends LiteSource {
     public LiteKonfiguration put(@NotNull final String key,
                                  final List<?> value) {
         final String[] split = DOT_PATTERN.split(key);
+        final ObjectMapper objectMapper = this.mapperSupplier.get();
+        final JsonNode jsonNode = objectMapper.valueToTree(value);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
-                .set(split[split.length - 1],
-                    this.mapperSupplier.get().valueToTree(value));
+                .set(split[split.length - 1], jsonNode);
         }
         return this;
     }
@@ -497,10 +505,11 @@ final class ExtJacksonLiteSource extends LiteSource {
     public LiteKonfiguration put(@NotNull final String key,
                                  final Set<?> value) {
         final String[] split = DOT_PATTERN.split(key);
+        final ObjectMapper objectMapper = this.mapperSupplier.get();
+        final JsonNode jsonNode = objectMapper.valueToTree(value);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
-                .set(split[split.length - 1],
-                    this.mapperSupplier.get().valueToTree(value));
+                .set(split[split.length - 1], jsonNode);
         }
         return this;
     }
@@ -509,10 +518,11 @@ final class ExtJacksonLiteSource extends LiteSource {
     public LiteKonfiguration putCustom(@NotNull final String key,
                                        final Object value) {
         final String[] split = DOT_PATTERN.split(key);
+        final ObjectMapper objectMapper = this.mapperSupplier.get();
+        final JsonNode jsonNode = objectMapper.valueToTree(value);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
-                .set(split[split.length - 1],
-                    this.mapperSupplier.get().valueToTree(value));
+                .set(split[split.length - 1], jsonNode);
         }
         return this;
     }
