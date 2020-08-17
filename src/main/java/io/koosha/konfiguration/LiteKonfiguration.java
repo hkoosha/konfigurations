@@ -56,9 +56,6 @@ public interface LiteKonfiguration {
     Character char_(@NotNull String key,
                     Character def);
 
-    LiteKonfiguration put(@NotNull String key,
-                          Character value);
-
 
     /**
      * Get a short konfiguration value.

@@ -146,15 +146,6 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return wrapped.char_(key(key), def);
     }
 
-    @Override
-    public LiteKonfiguration put(@NotNull final String key,
-                                 final Character value) {
-        Objects.requireNonNull(key, "key");
-        this.ensureWritable();
-        this.wrapped.put(key(key), value);
-        return this;
-    }
-
     @Contract(pure = true)
     @Override
     public Short short_(@NotNull final String key) {
