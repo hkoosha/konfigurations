@@ -4,6 +4,7 @@ import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -21,13 +22,17 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     Boolean bool(@NotNull String key);
 
+    @Nullable
     Boolean bool(@NotNull String key,
-                 Boolean def);
+                 @Nullable Boolean def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          Boolean value);
+                          @Nullable Boolean value);
 
 
     /**
@@ -36,13 +41,17 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     Byte byte_(@NotNull String key);
 
+    @Nullable
     Byte byte_(@NotNull String key,
-               Byte def);
+               @Nullable Byte def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          Byte value);
+                          @Nullable Byte value);
 
 
     /**
@@ -51,10 +60,12 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     Character char_(@NotNull String key);
 
+    @Nullable
     Character char_(@NotNull String key,
-                    Character def);
+                    @Nullable Character def);
 
 
     /**
@@ -63,13 +74,17 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     Short short_(@NotNull String key);
 
+    @Nullable
     Short short_(@NotNull String key,
-                 Short def);
+                 @Nullable Short def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          Short value);
+                          @Nullable Short value);
 
 
     /**
@@ -78,13 +93,17 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     Integer int_(@NotNull String key);
 
+    @Nullable
     Integer int_(@NotNull String key,
-                 Integer def);
+                 @Nullable Integer def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          Integer value);
+                          @Nullable Integer value);
 
 
     /**
@@ -93,13 +112,17 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     Long long_(@NotNull String key);
 
+    @Nullable
     Long long_(@NotNull String key,
-               Long def);
+               @Nullable Long def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          Long value);
+                          @Nullable Long value);
 
 
     /**
@@ -108,13 +131,17 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     Float float_(@NotNull String key);
 
+    @Nullable
     Float float_(@NotNull String key,
-                 Float def);
+                 @Nullable Float def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          Float value);
+                          @Nullable Float value);
 
 
     /**
@@ -123,13 +150,17 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     Double double_(@NotNull String key);
 
+    @Nullable
     Double double_(@NotNull String key,
-                   Double def);
+                   @Nullable Double def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          Double value);
+                          @Nullable Double value);
 
 
     /**
@@ -138,13 +169,17 @@ public interface LiteKonfiguration {
      * @param key unique key of the konfiguration being requested.
      * @return konfiguration value wrapper for the requested key.
      */
+    @Nullable
     String string(@NotNull String key);
 
-    String string(@NotNull final String key,
-                  final String def);
+    @Nullable
+    String string(@NotNull String key,
+                  @Nullable String def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          String value);
+                          @Nullable String value);
 
 
     /**
@@ -155,15 +190,17 @@ public interface LiteKonfiguration {
      * @param <U>  generic type of elements in the list.
      * @return konfiguration value wrapper for the requested key.
      */
-    <U> List<U> list(@NotNull String key,
-                     @NotNull Kind<U> type);
+    @Nullable <U> List<U> list(@NotNull String key,
+                               @NotNull Kind<U> type);
 
-    <U> List<U> list(@NotNull String key,
-                     @NotNull Kind<U> type,
-                     List<U> def);
+    @Nullable <U> List<U> list(@NotNull String key,
+                               @NotNull Kind<U> type,
+                               @Nullable List<U> def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          List<?> value);
+                          @Nullable List<?> value);
 
 
     /**
@@ -174,15 +211,17 @@ public interface LiteKonfiguration {
      * @param <U>  generic type of elements in the set.
      * @return konfiguration value wrapper for the requested key.
      */
-    <U> Set<U> set(@NotNull String key,
-                   @NotNull Kind<U> type);
+    @Nullable <U> Set<U> set(@NotNull String key,
+                             @NotNull Kind<U> type);
 
-    <U> Set<U> set(@NotNull String key,
-                   @NotNull Kind<U> type,
-                   Set<U> def);
+    @Nullable <U> Set<U> set(@NotNull String key,
+                             @NotNull Kind<U> type,
+                             @Nullable Set<U> def);
 
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration put(@NotNull String key,
-                          Set<?> value);
+                          @Nullable Set<?> value);
 
 
     /**
@@ -200,16 +239,21 @@ public interface LiteKonfiguration {
      * @param <U>  generic type of requested value.
      * @return konfiguration value wrapper for the requested key.
      */
-    <U> U custom(@NotNull String key,
-                 @NotNull Kind<U> type);
+    @Nullable <U> U custom(@NotNull String key,
+                           @NotNull Kind<U> type);
 
-    <U> U custom(@NotNull String key,
-                 @NotNull Kind<U> type,
-                 U def);
+    @Nullable <U> U custom(@NotNull String key,
+                           @NotNull Kind<U> type,
+                           @Nullable U def);
 
-    @SuppressWarnings("UnusedReturnValue")
+    @NotNull
+    @Contract(mutates = "this")
     LiteKonfiguration putCustom(@NotNull String key,
-                                Object value);
+                                @Nullable Object value);
+
+    @NotNull
+    @Contract(mutates = "this")
+    LiteKonfiguration delete(@NotNull final String key);
 
     // =========================================================================
 
@@ -232,7 +276,6 @@ public interface LiteKonfiguration {
      *            limited.
      * @return a konfiguration whose scope is limited to the supplied key.
      */
-    @SuppressWarnings("UnusedReturnValue")
     @NotNull
     @Contract(pure = true)
     LiteKonfiguration subset(@NotNull String key);
@@ -249,12 +292,19 @@ public interface LiteKonfiguration {
     @Contract(pure = true)
     String name();
 
+    @NotNull
+    @Contract(pure = true)
     String serialize();
 
+    @Contract(pure = true)
     boolean isReadonly();
 
+    @NotNull
+    @Contract(pure = true)
     LiteKonfiguration toReadonly();
 
+    @NotNull
+    @Contract(pure = true)
     LiteKonfiguration toWritableCopy();
 
 }

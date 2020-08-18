@@ -15,6 +15,7 @@ import java.util.Set;
  */
 public abstract class LiteSource implements LiteKonfiguration {
 
+    @Nullable
     @Override
     public final Boolean bool(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -34,12 +35,14 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv;
     }
 
+    @Nullable
     @Override
     public final Boolean bool(@NotNull final String key,
-                              final Boolean def) {
+                              @Nullable final Boolean def) {
         return this.has(key, Kind.of(boolean.class).withKey(key)) ? bool(key) : def;
     }
 
+    @Nullable
     @Override
     public final Character char_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -72,19 +75,44 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv;
     }
 
+    @Nullable
     @Override
     public final Character char_(@NotNull final String key,
-                                 final Character def) {
+                                 @Nullable final Character def) {
         return this.has(key, Kind.of(char.class).withKey(key)) ? char_(key) : def;
     }
 
 
+    @Nullable
+    @Override
+    public final Byte byte_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
+        final Kind<Byte> kind = Kind.BYTE;
+
+        if (!this.has(key, kind))
+            throw new KfgMissingKeyException(this.name(), key, kind);
+
+        if (this.isNull(key))
+            return null;
+
+        final Number v = this.number0(key);
+
+        final Long vv = toByte(v);
+        if (vv == null)
+            throw new KfgTypeException(this.name(), key, kind, v);
+
+        return vv.byteValue();
+    }
+
+    @Nullable
     @Override
     public final Byte byte_(@NotNull final String key,
-                            final Byte def) {
+                            @Nullable final Byte def) {
         return this.has(key, Kind.of(byte.class).withKey(key)) ? byte_(key) : def;
     }
 
+    @Nullable
     @Override
     public final String string(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -110,34 +138,14 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv;
     }
 
+    @Nullable
     @Override
     public final String string(@NotNull final String key,
-                               final String def) {
+                               @Nullable final String def) {
         return this.has(key, Kind.of(String.class).withKey(key)) ? string(key) : def;
     }
 
-
-    @Override
-    public final Byte byte_(@NotNull final String key) {
-        Objects.requireNonNull(key, "key");
-
-        final Kind<Byte> kind = Kind.BYTE;
-
-        if (!this.has(key, kind))
-            throw new KfgMissingKeyException(this.name(), key, kind);
-
-        if (this.isNull(key))
-            return null;
-
-        final Number v = this.number0(key);
-
-        final Long vv = toByte(v);
-        if (vv == null)
-            throw new KfgTypeException(this.name(), key, kind, v);
-
-        return vv.byteValue();
-    }
-
+    @Nullable
     @Override
     public final Short short_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -159,12 +167,14 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv.shortValue();
     }
 
+    @Nullable
     @Override
     public final Short short_(@NotNull final String key,
-                              final Short def) {
+                              @Nullable final Short def) {
         return this.has(key, Kind.of(short.class).withKey(key)) ? short_(key) : def;
     }
 
+    @Nullable
     @Override
     public final Integer int_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -186,12 +196,14 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv.intValue();
     }
 
+    @Nullable
     @Override
     public final Integer int_(@NotNull final String key,
-                              final Integer def) {
+                              @Nullable final Integer def) {
         return this.has(key, Kind.of(int.class).withKey(key)) ? int_(key) : def;
     }
 
+    @Nullable
     @Override
     public final Long long_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -213,12 +225,14 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv;
     }
 
+    @Nullable
     @Override
     public final Long long_(@NotNull final String key,
-                            final Long def) {
+                            @Nullable final Long def) {
         return this.has(key, Kind.of(long.class).withKey(key)) ? long_(key) : def;
     }
 
+    @Nullable
     @Override
     public final Float float_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -240,12 +254,14 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv;
     }
 
+    @Nullable
     @Override
     public final Float float_(@NotNull final String key,
-                              final Float def) {
+                              @Nullable final Float def) {
         return this.has(key, Kind.of(float.class).withKey(key)) ? float_(key) : def;
     }
 
+    @Nullable
     @Override
     public final Double double_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
@@ -267,12 +283,14 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv;
     }
 
+    @Nullable
     @Override
     public final Double double_(@NotNull final String key,
-                                final Double def) {
+                                @Nullable final Double def) {
         return this.has(key, Kind.of(double.class).withKey(key)) ? double_(key) : def;
     }
 
+    @Nullable
     @Override
     public final <U> List<U> list(@NotNull final String key,
                                   @NotNull final Kind<U> type) {
@@ -293,6 +311,7 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vv;
     }
 
+    @Nullable
     @Override
     public final <U> List<U> list(@NotNull final String key,
                                   @NotNull final Kind<U> type,
@@ -300,6 +319,7 @@ public abstract class LiteSource implements LiteKonfiguration {
         return this.has(key, type.withKey(key)) ? list(key, type) : def;
     }
 
+    @Nullable
     @Override
     public final <U> Set<U> set(@NotNull final String key,
                                 @NotNull final Kind<U> type) {
@@ -328,13 +348,15 @@ public abstract class LiteSource implements LiteKonfiguration {
         return vvv;
     }
 
+    @Nullable
     @Override
     public final <U> Set<U> set(@NotNull final String key,
                                 @NotNull final Kind<U> type,
-                                final Set<U> def) {
+                                @Nullable final Set<U> def) {
         return this.has(key, type.withKey(key)) ? set(key, type) : def;
     }
 
+    @Nullable
     @SuppressWarnings("unchecked")
     @Override
     public final <U> U custom(@NotNull final String key,
@@ -376,10 +398,11 @@ public abstract class LiteSource implements LiteKonfiguration {
         return (U) this.custom0(key, type);
     }
 
+    @Nullable
     @Override
     public final <U> U custom(@NotNull final String key,
                               @NotNull final Kind<U> type,
-                              final U def) {
+                              @Nullable final U def) {
         return has(key, type.withKey(key)) ? custom(key, type) : def;
     }
 
@@ -512,6 +535,7 @@ public abstract class LiteSource implements LiteKonfiguration {
      * @throws KfgTypeException if the requested type does not match the type
      *                          of value in the given in.
      */
+    @Contract(pure = true)
     private void checkCollectionType(@NotNull final String key,
                                      @NotNull final Kind<?> neededType,
                                      @NotNull final Object value) {
@@ -528,10 +552,18 @@ public abstract class LiteSource implements LiteKonfiguration {
     }
 
     @NotNull
-    @Contract("_ -> fail")
     @Override
+    @Contract(pure = true,
+              value = "_->new")
     public final LiteKonfiguration subset(@NotNull final String key) {
-        return new LiteSubsetView(this.name(), this, key, this.isReadonly());
+        // TODO optimise if this i.wrapped instance of LiteSubsetView.
+        Objects.requireNonNull(key, "key");
+        return key.isEmpty()
+            ? this
+            : new LiteSubsetView(
+            this.name().split("::")[0] + "::" + key,
+            this,
+            key, this.isReadonly());
     }
 
 }

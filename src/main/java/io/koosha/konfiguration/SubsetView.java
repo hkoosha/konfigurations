@@ -197,6 +197,7 @@ public final class SubsetView implements Konfiguration {
     @NotNull
     @Override
     public Konfiguration subset(@NotNull final String key) {
+        // TODO optimise if this i.wrapped instance of LiteSubsetView.
         Objects.requireNonNull(key, "key");
         return key.isEmpty()
             ? this
@@ -207,7 +208,9 @@ public final class SubsetView implements Konfiguration {
         );
     }
 
+    @Contract(pure = true)
     @Override
+    @NotNull
     public Optional<KonfigurationManager> manager() {
         return Optional.empty();
     }

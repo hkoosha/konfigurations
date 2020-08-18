@@ -291,6 +291,7 @@ public interface Konfiguration {
      * method has been already called before.
      */
     @Contract(mutates = "this")
+    @NotNull
     Optional<KonfigurationManager> manager();
 
 }

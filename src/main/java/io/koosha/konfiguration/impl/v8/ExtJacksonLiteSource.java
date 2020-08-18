@@ -18,6 +18,7 @@ import io.koosha.konfiguration.LiteSource;
 import io.koosha.konfiguration.LiteSubsetView;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
+import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,6 +28,8 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
@@ -54,10 +57,8 @@ final class ExtJacksonLiteSource extends LiteSource {
     @NotNull
     private final String name;
 
-    @SuppressWarnings({"FieldCanBeLocal", "unused"})
     @NotNull
-    private final String json;
-
+    @Contract(pure = true)
     private JsonNode node_(@NotNull final String key) {
         requireNonNull(key, "key");
         if (key.isEmpty())
@@ -75,6 +76,7 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @NotNull
+    @Contract(pure = true)
     private JsonNode node(@NotNull final String key) {
         requireNonNull(key, "key");
         if (key.isEmpty())
@@ -89,6 +91,7 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @NotNull
+    @Contract(mutates = "this")
     private ObjectNode ensureIntermediateNodes(@NotNull final String key) {
         requireNonNull(key, "key");
         if (key.isEmpty())
@@ -104,8 +107,9 @@ final class ExtJacksonLiteSource extends LiteSource {
                     from.set(split[i], from.objectNode());
                     next = from.findPath(split[i]);
                 }
-                else if (!next.isObject())
+                else if (!next.isObject()) {
                     throw new KfgTypeException(this.name, key, null, null, "expected all objects in path, found=" + next + " at=" + split[i]);
+                }
                 from = (ObjectNode) next;
             }
 
@@ -113,7 +117,29 @@ final class ExtJacksonLiteSource extends LiteSource {
         }
     }
 
+    private Optional<ObjectNode> ensureIntermediateNodesOrNull(@NotNull final String key) {
+        requireNonNull(key, "key");
+        if (key.isEmpty())
+            throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
+
+        final String[] split = DOT_PATTERN.split(key);
+        synchronized (LOCK) {
+            ObjectNode from = this.root;
+            for (int i = 0; i < split.length - 1; i++) {
+                JsonNode next = from.findPath(split[i]);
+                if (next.isMissingNode())
+                    return Optional.empty();
+                else if (!next.isObject())
+                    throw new KfgTypeException(this.name, key, null, null, "expected all objects in path, found=" + next + " at=" + split[i]);
+                from = (ObjectNode) next;
+            }
+
+            return Optional.of(from);
+        }
+    }
+
     @NotNull
+    @Contract(pure = true)
     private JsonNode checkJsonType(final boolean condition,
                                    @NotNull final Kind<?> required,
                                    @NotNull final JsonNode node,
@@ -125,6 +151,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         return node;
     }
 
+    @Contract(pure = true)
     private boolean typeMatches(@NotNull final Kind<?> type,
                                 @NotNull final JsonNode node) {
 
@@ -170,7 +197,6 @@ final class ExtJacksonLiteSource extends LiteSource {
         requireNonNull(objectMapper.get(), "supplied mapper is null");
 
         this.name = name;
-        this.json = json;
         this.mapperSupplier = objectMapper;
 
         final JsonNode update;
@@ -196,6 +222,8 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @NotNull
+    @Contract(pure = true)
     public String serialize() {
         final StringWriter sw = new StringWriter();
         final ObjectMapper mapper = this.mapperSupplier.get();
@@ -216,11 +244,13 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration toReadonly() {
         return new LiteSubsetView(this.name(), this, "", true);
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration toWritableCopy() {
         return new ExtJacksonLiteSource(this.name, this.serialize(), this.mapperSupplier);
     }
@@ -402,8 +432,10 @@ final class ExtJacksonLiteSource extends LiteSource {
 
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final Boolean value) {
+                                 @Nullable final Boolean value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key).put(split[split.length - 1], value);
@@ -412,8 +444,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final Byte value) {
+                                 @Nullable final Byte value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key).put(split[split.length - 1],
@@ -423,8 +457,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final Short value) {
+                                 @Nullable final Short value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
@@ -434,8 +470,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final Integer value) {
+                                 @Nullable final Integer value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
@@ -445,8 +483,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final Long value) {
+                                 @Nullable final Long value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
@@ -456,8 +496,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final Float value) {
+                                 @Nullable final Float value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
@@ -467,8 +509,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final Double value) {
+                                 @Nullable final Double value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
@@ -478,8 +522,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final String value) {
+                                 @Nullable final String value) {
         final String[] split = DOT_PATTERN.split(key);
         synchronized (LOCK) {
             this.ensureIntermediateNodes(key)
@@ -489,8 +535,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final List<?> value) {
+                                 @Nullable final List<?> value) {
         final String[] split = DOT_PATTERN.split(key);
         final ObjectMapper objectMapper = this.mapperSupplier.get();
         final JsonNode jsonNode = objectMapper.valueToTree(value);
@@ -502,8 +550,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @Contract(mutates = "this")
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
-                                 final Set<?> value) {
+                                 @Nullable final Set<?> value) {
         final String[] split = DOT_PATTERN.split(key);
         final ObjectMapper objectMapper = this.mapperSupplier.get();
         final JsonNode jsonNode = objectMapper.valueToTree(value);
@@ -515,8 +565,10 @@ final class ExtJacksonLiteSource extends LiteSource {
     }
 
     @Override
+    @NotNull
+    @Contract(mutates = "this")
     public LiteKonfiguration putCustom(@NotNull final String key,
-                                       final Object value) {
+                                       @Nullable final Object value) {
         final String[] split = DOT_PATTERN.split(key);
         final ObjectMapper objectMapper = this.mapperSupplier.get();
         final JsonNode jsonNode = objectMapper.valueToTree(value);
@@ -524,6 +576,30 @@ final class ExtJacksonLiteSource extends LiteSource {
             this.ensureIntermediateNodes(key)
                 .set(split[split.length - 1], jsonNode);
         }
+        return this;
+    }
+
+    @Override
+    @NotNull
+    @Contract(mutates = "this")
+    public LiteKonfiguration delete(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+        if (key.isEmpty())
+            throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
+
+        if (key.contains(".")) {
+            final String field = key.substring(key.lastIndexOf('.') + 1);
+            synchronized (LOCK) {
+                this.ensureIntermediateNodesOrNull(key)
+                    .ifPresent(node -> node.remove(field));
+            }
+        }
+        else {
+            synchronized (LOCK) {
+                this.root.remove(key);
+            }
+        }
+
         return this;
     }
 

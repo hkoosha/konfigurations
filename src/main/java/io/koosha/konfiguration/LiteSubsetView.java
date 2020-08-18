@@ -4,6 +4,7 @@ import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Objects;
@@ -21,9 +22,15 @@ import java.util.Set;
 @ThreadSafe
 public final class LiteSubsetView implements LiteKonfiguration {
 
+    @NotNull
     private final String name;
+
+    @NotNull
     private final LiteKonfiguration wrapped;
+
+    @NotNull
     private final String baseKey;
+
     private final boolean isReadonly;
 
     public LiteSubsetView(@NotNull final String name,
@@ -59,16 +66,21 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
+    @Contract(pure = true,
+              value = "->fail")
     public String serialize() {
         throw new KfgException(this.name, "serialize not supported on subset view.");
     }
 
+    @Contract(pure = true)
     @Override
     public boolean isReadonly() {
         return this.isReadonly;
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration toReadonly() {
         return this.isReadonly()
             ? this
@@ -76,6 +88,8 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
+    @Contract(pure = true)
     public LiteKonfiguration toWritableCopy() {
         return new LiteSubsetView(this.name, this.wrapped.toWritableCopy(), this.baseKey, false);
     }
@@ -86,14 +100,15 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
 
-    @Contract(pure = true)
     @Override
+    @Nullable
     public Boolean bool(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.bool(key(key));
     }
 
     @Override
+    @Nullable
     public Boolean bool(@NotNull final String key,
                         final Boolean def) {
         Objects.requireNonNull(key, "key");
@@ -101,6 +116,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final Boolean value) {
         Objects.requireNonNull(key, "key");
@@ -109,14 +125,15 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
     @Override
+    @Nullable
     public Byte byte_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.byte_(key(key));
     }
 
     @Override
+    @Nullable
     public Byte byte_(@NotNull final String key,
                       final Byte def) {
         Objects.requireNonNull(key, "key");
@@ -124,6 +141,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final Byte value) {
         Objects.requireNonNull(key, "key");
@@ -132,13 +150,14 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
+    @Nullable
     @Override
     public Character char_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.char_(key(key));
     }
 
+    @Nullable
     @Override
     public Character char_(@NotNull final String key,
                            final Character def) {
@@ -146,13 +165,14 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return wrapped.char_(key(key), def);
     }
 
-    @Contract(pure = true)
+    @Nullable
     @Override
     public Short short_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.short_(key(key));
     }
 
+    @Nullable
     @Override
     public Short short_(@NotNull final String key, final Short def) {
         Objects.requireNonNull(key, "key");
@@ -160,6 +180,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final Short value) {
         Objects.requireNonNull(key, "key");
@@ -168,14 +189,15 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
     @Override
+    @Nullable
     public Integer int_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.int_(key(key));
     }
 
     @Override
+    @Nullable
     public Integer int_(@NotNull final String key,
                         final Integer def) {
         Objects.requireNonNull(key, "key");
@@ -183,6 +205,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final Integer value) {
         Objects.requireNonNull(key, "key");
@@ -191,14 +214,14 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
-    @NotNull
+    @Nullable
     @Override
     public Long long_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.long_(key(key));
     }
 
+    @Nullable
     @Override
     public Long long_(@NotNull final String key,
                       final Long def) {
@@ -207,6 +230,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final Long value) {
         Objects.requireNonNull(key, "key");
@@ -215,14 +239,14 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
-    @NotNull
+    @Nullable
     @Override
     public Float float_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.float_(key(key));
     }
 
+    @Nullable
     @Override
     public Float float_(@NotNull final String key,
                         final Float def) {
@@ -231,6 +255,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final Float value) {
         Objects.requireNonNull(key, "key");
@@ -239,14 +264,14 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
-    @NotNull
+    @Nullable
     @Override
     public Double double_(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.double_(key(key));
     }
 
+    @Nullable
     @Override
     public Double double_(@NotNull final String key,
                           final Double def) {
@@ -255,6 +280,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final Double value) {
         Objects.requireNonNull(key, "key");
@@ -263,14 +289,14 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
-    @NotNull
+    @Nullable
     @Override
     public String string(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
         return wrapped.string(key(key));
     }
 
+    @Nullable
     @Override
     public String string(@NotNull final String key,
                          final String def) {
@@ -279,6 +305,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final String value) {
         Objects.requireNonNull(key, "key");
@@ -287,8 +314,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
-    @NotNull
+    @Nullable
     @Override
     public <U> List<U> list(@NotNull final String key,
                             @NotNull final Kind<U> type) {
@@ -296,6 +322,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return wrapped.list(key(key), type);
     }
 
+    @Nullable
     @Override
     public <U> List<U> list(@NotNull final String key,
                             @NotNull final Kind<U> type,
@@ -304,6 +331,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return wrapped.list(key(key), type, def);
     }
 
+    @NotNull
     @Override
     public LiteKonfiguration put(@NotNull final String key,
                                  final List<?> value) {
@@ -313,8 +341,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
-    @NotNull
+    @Nullable
     @Override
     public <U> Set<U> set(@NotNull final String key,
                           @NotNull final Kind<U> type) {
@@ -322,6 +349,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return wrapped.set(key(key), type);
     }
 
+    @Nullable
     @Override
     public <U> Set<U> set(@NotNull final String key,
                           @NotNull final Kind<U> type,
@@ -331,6 +359,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
     }
 
     @Override
+    @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  final Set<?> value) {
         Objects.requireNonNull(key, "key");
@@ -339,8 +368,7 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return this;
     }
 
-    @Contract(pure = true)
-    @NotNull
+    @Nullable
     @Override
     public <U> U custom(@NotNull final String key,
                         @NotNull final Kind<U> type) {
@@ -348,17 +376,27 @@ public final class LiteSubsetView implements LiteKonfiguration {
         return wrapped.custom(key(key), type);
     }
 
+    @Nullable
     @Override
     public <U> U custom(@NotNull final String key,
                         @NotNull final Kind<U> type,
-                        final U def) {
+                        @Nullable final U def) {
         Objects.requireNonNull(key, "key");
         return wrapped.custom(key(key), type, def);
     }
 
+    @NotNull
     @Override
-    public LiteKonfiguration putCustom(@NotNull final String key,
-                                       final Object value) {
+    public LiteKonfiguration delete(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+        this.ensureWritable();
+        this.wrapped.delete(key(key));
+        return this;
+    }
+
+    @Override
+    public @NotNull LiteKonfiguration putCustom(@NotNull final String key,
+                                                final Object value) {
         Objects.requireNonNull(key, "key");
         this.ensureWritable();
         this.wrapped.putCustom(key(key), value);

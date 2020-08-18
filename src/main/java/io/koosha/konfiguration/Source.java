@@ -325,6 +325,7 @@ public abstract class Source implements Konfiguration {
     // =========================================================================
 
     @Override
+    @NotNull
     public final Optional<KonfigurationManager> manager() {
         throw new KfgAssertionException(this.name(), null, null, null, "manager() should not be called on a Source.");
     }
