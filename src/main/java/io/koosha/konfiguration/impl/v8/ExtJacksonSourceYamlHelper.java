@@ -7,11 +7,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import io.koosha.konfiguration.KfgSourceException;
+import jdk.nashorn.internal.ir.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
 import static com.fasterxml.jackson.dataformat.yaml.YAMLGenerator.Feature.WRITE_DOC_START_MARKER;
 
+@Immutable
+@ThreadSafe
 final class ExtJacksonSourceYamlHelper {
 
     private ExtJacksonSourceYamlHelper() {

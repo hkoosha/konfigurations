@@ -77,28 +77,30 @@ final class ExtJacksonSource extends Source {
         if (key.isEmpty())
             throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
 
-        synchronized (LOCK) {
-            final JsonNode node = node_(key);
-            if (node.isMissingNode())
-                throw new KfgMissingKeyException(this.name(), key);
-            return node;
-        }
-    }
-
-    @NotNull
-    private JsonNode checkJsonType(final boolean condition,
-                                   @NotNull final Kind<?> required,
-                                   @NotNull final JsonNode node,
-                                   @NotNull final String key) {
-        if (!condition)
-            throw new KfgTypeException(this.name(), key, required, node);
-        if (node.isNull())
-            throw new KfgAssertionException(this.name(), key, required, null, null);
+        final JsonNode node = node_(key);
+        if (node.isMissingNode())
+            throw new KfgMissingKeyException(this.name(), key);
         return node;
     }
 
-    private boolean typeMatches(@NotNull final Kind<?> type,
-                                @NotNull final JsonNode node) {
+    @NotNull
+    static JsonNode checkJsonType(final boolean condition,
+                                  @NotNull final Kind<?> required,
+                                  @NotNull final JsonNode node,
+                                  @NotNull final String key,
+                                  @NotNull final String name) {
+        if (!condition)
+            throw new KfgTypeException(name, key, required, node);
+
+        if (node.isNull())
+            throw new KfgAssertionException(name, key, required, null, null);
+
+        return node;
+    }
+
+    @Contract(pure = true)
+    static boolean typeMatches(@NotNull final Kind<?> type,
+                               @NotNull final JsonNode node) {
 
         return type.isNull() && node.isNull()
             || type.isBool() && node.isBoolean()
@@ -172,10 +174,8 @@ final class ExtJacksonSource extends Source {
     protected Boolean bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(at.isBoolean(), Kind.BOOL, at, key).asBoolean();
-        }
+        final JsonNode at = node(key);
+        return checkJsonType(at.isBoolean(), Kind.BOOL, at, key, this.name()).asBoolean();
     }
 
     @Override
@@ -183,12 +183,10 @@ final class ExtJacksonSource extends Source {
     protected Character char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(at.isTextual() && at.textValue().length() == 1, Kind.STRING, at, key)
-                .textValue()
-                .charAt(0);
-        }
+        final JsonNode at = node(key);
+        return checkJsonType(at.isTextual() && at.textValue().length() == 1, Kind.STRING, at, key, this.name())
+            .textValue()
+            .charAt(0);
     }
 
     @Override
@@ -196,10 +194,8 @@ final class ExtJacksonSource extends Source {
     protected String string0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(at.isTextual(), Kind.STRING, at, key).asText();
-        }
+        final JsonNode at = this.node(key);
+        return checkJsonType(at.isTextual(), Kind.STRING, at, key, this.name()).asText();
     }
 
     @NotNull
@@ -207,12 +203,10 @@ final class ExtJacksonSource extends Source {
     protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(
-                at.isShort() || at.isInt() || at.isLong(),
-                Kind.LONG, at, key).longValue();
-        }
+        final JsonNode at = this.node(key);
+        return checkJsonType(
+            at.isShort() || at.isInt() || at.isLong(),
+            Kind.LONG, at, key, this.name()).longValue();
     }
 
     @NotNull
@@ -220,16 +214,14 @@ final class ExtJacksonSource extends Source {
     protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(
-                at.isFloat()
-                    || at.isDouble()
-                    || at.isShort()
-                    || at.isInt()
-                    || at.isLong(),
-                Kind.DOUBLE, at, key).doubleValue();
-        }
+        final JsonNode at = this.node(key);
+        return checkJsonType(
+            at.isFloat()
+                || at.isDouble()
+                || at.isShort()
+                || at.isInt()
+                || at.isLong(),
+            Kind.DOUBLE, at, key, this.name()).doubleValue();
     }
 
     @NotNull
@@ -245,16 +237,17 @@ final class ExtJacksonSource extends Source {
         final CollectionType javaType = tf.constructCollectionType(List.class, ct);
 
         final List<?> asList;
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            checkJsonType(at.isArray(), type, at, key);
-            try {
-                asList = reader.readValue(at.traverse(), javaType);
-            }
-            catch (final IOException e) {
-                throw new KfgTypeException(this.name(), key, type, at, "type mismatch", e);
-            }
+
+        final JsonNode at = this.node(key);
+        checkJsonType(at.isArray(), type, at, key, this.name());
+
+        try {
+            asList = reader.readValue(at.traverse(), javaType);
         }
+        catch (final IOException e) {
+            throw new KfgTypeException(this.name(), key, type, at, "type mismatch", e);
+        }
+
         return Collections.unmodifiableList(asList);
     }
 
@@ -279,40 +272,36 @@ final class ExtJacksonSource extends Source {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
-        synchronized (LOCK) {
-            final ObjectMapper reader = this.mapperSupplier.get();
+        final ObjectMapper reader = this.mapperSupplier.get();
+        Object ret;
+
+        try {
             final JsonNode node = this.node(key);
             final JsonParser traverse = node.traverse();
-
-            Object ret;
-            try {
-                ret = reader.readValue(traverse, new TypeReference<Object>() {
-                    @Override
-                    public Type getType() {
-                        return type.type();
-                    }
-                });
-            }
-            catch (final IOException e) {
-                throw new KfgTypeException(this.name(), key, type, null, "jackson error", e);
-            }
-
-            if (ret instanceof List)
-                return Collections.unmodifiableList(((List<?>) ret));
-            else if (ret instanceof Set)
-                return Collections.unmodifiableSet(((Set<?>) ret));
-            else
-                return ret;
+            ret = reader.readValue(traverse, new TypeReference<Object>() {
+                @Override
+                public Type getType() {
+                    return type.type();
+                }
+            });
         }
+        catch (final IOException e) {
+            throw new KfgTypeException(this.name(), key, type, null, "jackson error", e);
+        }
+
+        if (ret instanceof List)
+            return Collections.unmodifiableList(((List<?>) ret));
+        else if (ret instanceof Set)
+            return Collections.unmodifiableSet(((Set<?>) ret));
+        else
+            return ret;
     }
 
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            return node(key).isNull();
-        }
+        return node(key).isNull();
     }
 
     @Override
@@ -320,24 +309,21 @@ final class ExtJacksonSource extends Source {
                        @Nullable final Kind<?> type) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            if (this.node_(key).isMissingNode())
-                return false;
-            if (type == null)
-                return true;
+        if (this.node_(key).isMissingNode())
+            return false;
 
-            final JsonNode node = this.node(key);
+        if (type == null)
+            return true;
 
-            if (this.typeMatches(type, node))
-                return true;
+        if (typeMatches(type, this.node(key)))
+            return true;
 
-            try {
-                this.custom0(key, type);
-                return true;
-            }
-            catch (Throwable t) {
-                return false;
-            }
+        try {
+            this.custom0(key, type);
+            return true;
+        }
+        catch (Throwable t) {
+            return false;
         }
     }
 

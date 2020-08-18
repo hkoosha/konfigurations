@@ -5,9 +5,13 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.koosha.konfiguration.KfgSourceException;
+import jdk.nashorn.internal.ir.annotations.Immutable;
+import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 
+@Immutable
+@ThreadSafe
 final class ExtJacksonSourceJsonHelper {
 
     ExtJacksonSourceJsonHelper() {
@@ -36,6 +40,5 @@ final class ExtJacksonSourceJsonHelper {
                     "the class path, can not find the class: " + klass, e);
         }
     }
-
 
 }
