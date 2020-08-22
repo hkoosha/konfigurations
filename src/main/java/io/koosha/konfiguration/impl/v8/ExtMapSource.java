@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -19,6 +20,11 @@ import java.util.function.Supplier;
 
 import static java.util.Objects.requireNonNull;
 
+/**
+ * {@link #check(Kind, String)} is not very strong, regarding collection types
+ * but it is ok, as {@link #has(String, Kind)} is strong enough and is called
+ * before hand.
+ */
 @ThreadSafe
 @ApiStatus.Internal
 final class ExtMapSource extends Source {
@@ -44,15 +50,18 @@ final class ExtMapSource extends Source {
     private <T> T check(@NotNull final Kind<?> required,
                         @NotNull final String key) {
         final Object value = node(key);
+
         if (!required.klass().isAssignableFrom(value.getClass()))
             throw new KfgTypeException(this.name(), key, required, value);
+
         @SuppressWarnings("unchecked")
         final T t = (T) value;
+
         return t;
     }
 
-    public ExtMapSource(@NotNull final String name,
-                        @NotNull final Supplier<Map<String, ?>> mapSupplier) {
+    ExtMapSource(@NotNull final String name,
+                 @NotNull final Supplier<Map<String, ?>> mapSupplier) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(mapSupplier, "mapSupplier");
 
@@ -135,8 +144,23 @@ final class ExtMapSource extends Source {
                           @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
-        final Set<?> asSet = check(type, key);
-        return Collections.unmodifiableSet(asSet);
+        try {
+            final Set<?> asSet = check(type, key);
+            return Collections.unmodifiableSet(asSet);
+        }
+        catch (final KfgTypeException notASet) {
+            final List<?> asList;
+            try {
+                asList = this.list0(key, type);
+            }
+            catch (final KfgTypeException ignore) {
+                throw notASet;
+            }
+            final Set<?> asSet = new LinkedHashSet<>(asList);
+            if (asSet.size() != asList.size())
+                throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
+            return Collections.unmodifiableSet(asSet);
+        }
     }
 
     @Override
@@ -159,9 +183,12 @@ final class ExtMapSource extends Source {
                        @NotNull final Kind<?> type) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
+
         return this.root.containsKey(key) &&
             this.root.get(key) != null &&
-            type.klass().isAssignableFrom(this.root.get(key).getClass());
+            type.klass().isAssignableFrom(this.root.get(key).getClass()) &&
+            (!type.isCollection() || !type.getCollectionContainedKind().isParametrized()) &&
+            (!type.isMap() || (type.getMapKeyKind().isParametrized() || type.getMapValueKind().isParametrized()));
     }
 
     @Override

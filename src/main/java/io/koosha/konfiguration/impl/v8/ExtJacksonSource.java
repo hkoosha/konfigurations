@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -259,7 +259,7 @@ final class ExtJacksonSource extends Source {
         Objects.requireNonNull(type, "type");
 
         final List<?> asList = this.list0(key, type);
-        final Set<?> asSet = new HashSet<>(asList);
+        final Set<?> asSet = new LinkedHashSet<>(asList);
         if (asSet.size() != asList.size())
             throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
         return Collections.unmodifiableSet(asSet);

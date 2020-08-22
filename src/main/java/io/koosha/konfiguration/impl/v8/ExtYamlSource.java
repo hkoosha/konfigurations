@@ -28,7 +28,7 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -467,7 +467,7 @@ final class ExtYamlSource extends Source {
         Objects.requireNonNull(type, "type");
 
         final List<?> asList = this.list0(key, type);
-        final HashSet<?> asSet = new HashSet<>(asList);
+        final Set<?> asSet = new LinkedHashSet<>(asList);
         if (asSet.size() != asList.size())
             throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
         return Collections.unmodifiableSet(asSet);

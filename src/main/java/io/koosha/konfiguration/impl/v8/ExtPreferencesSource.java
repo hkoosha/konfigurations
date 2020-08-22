@@ -14,12 +14,17 @@ import org.jetbrains.annotations.NotNull;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.NodeChangeListener;
 import java.util.prefs.Preferences;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Reads konfig from a {@link Preferences} source.
@@ -39,6 +44,8 @@ import java.util.prefs.Preferences;
 @ThreadSafe
 final class ExtPreferencesSource extends Source {
 
+    private final Pattern LIST_SPLITTER = Pattern.compile(",");
+
     private final Preferences source;
     private final int lastHash;
 
@@ -47,8 +54,8 @@ final class ExtPreferencesSource extends Source {
 
     private final Object LOCK = new Object();
 
-    public ExtPreferencesSource(@NotNull final String name,
-                                @NotNull final Preferences preferences) {
+    ExtPreferencesSource(@NotNull final String name,
+                         @NotNull final Preferences preferences) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(preferences, "preferences");
 
@@ -114,21 +121,56 @@ final class ExtPreferencesSource extends Source {
     @NotNull
     protected List<?> list0(@NotNull final String key,
                             @NotNull final Kind<?> type) {
-        throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
+        final String value = this.source.get(key, "");
+        if (value.isEmpty())
+            return Collections.emptyList();
+
+        final String[] split = LIST_SPLITTER.split(value);
+        if (type.isString())
+            return Collections.unmodifiableList(Arrays.asList(split));
+
+        final Stream<String> stream = Stream.of(split);
+
+        final Stream<?> values;
+        if (type.isLong())
+            values = stream.map(Long::parseLong);
+        else if (type.isInt())
+            values = stream.map(Integer::parseInt);
+        else if (type.isByte())
+            values = stream.map(Byte::parseByte);
+        else if (type.isChar())
+            values = stream
+                .peek(it -> {
+                    if (it.length() > 1)
+                        throw new KfgTypeException(this.name, key, null, it, "expecting character");
+                })
+                .map(it -> it.charAt(0));
+        else
+            throw new KfgTypeException(this.name, key, type, null, "unsupported list type");
+
+        return Collections.unmodifiableList(values.collect(Collectors.toList()));
     }
 
     @Override
     @NotNull
     protected Set<?> set0(@NotNull final String key,
                           @NotNull final Kind<?> type) {
-        throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
+        final List<?> asList = this.list0(key, type);
+        final Set<?> asSet = new LinkedHashSet<>(asList);
+        if (asSet.size() != asList.size())
+            throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
+        return Collections.unmodifiableSet(asSet);
     }
 
     @Override
     @NotNull
     protected Object custom0(@NotNull final String key,
                              @NotNull final Kind<?> type) {
-        throw new KfgAssertionException(this.name, key, type, null, "operation not supported on this source");
+        throw new KfgAssertionException(this.name, key, type, null,
+            "operation not supported on this source");
     }
 
     @Override
@@ -147,15 +189,15 @@ final class ExtPreferencesSource extends Source {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
-            try {
-                synchronized (LOCK) {
-                    if (!source.nodeExists(sane(key)))
-                        return false;
-                }
+        try {
+            synchronized (LOCK) {
+                if (!source.nodeExists(sane(key)))
+                    return false;
             }
-            catch (Throwable e) {
-                throw new KfgSourceException(this.name(), key, null, null, "error checking existence of key", e);
-            }
+        }
+        catch (Throwable e) {
+            throw new KfgSourceException(this.name(), key, null, null, "error checking existence of key", e);
+        }
 
         try {
             if (type.isChar()) {
@@ -185,10 +227,19 @@ final class ExtPreferencesSource extends Source {
                 this.numberDouble0(key);
                 return true;
             }
+            if (type.isList()) {
+                this.list0(key, type.getCollectionContainedKind());
+                return true;
+            }
+            if (type.isSet()) {
+                this.set(key, type.getCollectionContainedKind());
+                return true;
+            }
         }
         catch (final KfgTypeException k) {
             return false;
         }
+
         return false;
     }
 

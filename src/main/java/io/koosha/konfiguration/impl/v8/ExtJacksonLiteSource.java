@@ -26,7 +26,7 @@ import java.io.StringWriter;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -153,9 +153,9 @@ final class ExtJacksonLiteSource extends LiteSource {
      * @throws KfgSourceException   if the provided json string can not be parsed by jackson.
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
-    public ExtJacksonLiteSource(@NotNull final String name,
-                                @NotNull final String json,
-                                @NotNull final Supplier<ObjectMapper> objectMapper) {
+    ExtJacksonLiteSource(@NotNull final String name,
+                         @NotNull final String json,
+                         @NotNull final Supplier<ObjectMapper> objectMapper) {
         requireNonNull(name, "name");
         requireNonNull(json, "json");
         requireNonNull(objectMapper, "objectMapper");
@@ -324,7 +324,7 @@ final class ExtJacksonLiteSource extends LiteSource {
                 || at.isInt()
                 || at.isLong(),
             Kind.DOUBLE, at, key, this.name())
-            .doubleValue();
+                               .doubleValue();
     }
 
     @NotNull
@@ -361,7 +361,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         requireNonNull(type, "type");
 
         final List<?> asList = this.list0(key, type);
-        final Set<?> asSet = new HashSet<>(asList);
+        final Set<?> asSet = new LinkedHashSet<>(asList);
         if (asSet.size() != asList.size())
             throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
         return Collections.unmodifiableSet(asSet);
