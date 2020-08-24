@@ -102,13 +102,17 @@ public abstract class Kind<TYPE> implements Serializable {
         if (!this.isCollection() || !this.isParametrized())
             throw new KfgIllegalStateException(
                 null, this.key, null, null, "is not a collection or collection type is not known");
+
         return this.parametrized().getActualTypeArguments()[0];
     }
 
+    @SuppressWarnings("rawtypes")
     @Contract(pure = true)
     public final Kind<?> getCollectionContainedKind() {
-        // TODO
-        throw new UnsupportedOperationException();
+        final Type type = this.getCollectionContainedType();
+
+        return new Kind(type) {
+        };
     }
 
 
