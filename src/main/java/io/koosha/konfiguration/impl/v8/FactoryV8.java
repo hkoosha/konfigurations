@@ -1,6 +1,7 @@
 package io.koosha.konfiguration.impl.v8;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationFactory;
 import net.jcip.annotations.Immutable;
@@ -319,6 +320,47 @@ public final class FactoryV8 implements KonfigurationFactory {
 
         final Konfiguration k = new ExtYamlSource(name, yaml, objectMapper);
         return kombine(name, k);
+    }
+
+
+    @Override
+    @NotNull
+    public Konfiguration gsonJson(@NotNull final String name,
+                                  @NotNull final Supplier<String> json) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(json, "json");
+        return gsonJson(name, json, ExtGsonSourceHelper::mapper);
+    }
+
+    @Override
+    @NotNull
+    public Konfiguration gsonJson(@NotNull final String name,
+                                  @NotNull final String json) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(json, "json");
+        return gsonJson(name, () -> json, ExtGsonSourceHelper::mapper);
+    }
+
+    @Override
+    @NotNull
+    public Konfiguration gsonJson(@NotNull final String name,
+                                  @NotNull final String json,
+                                  @NotNull final Supplier<Gson> objectMapper) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(json, "json");
+        Objects.requireNonNull(objectMapper, "objectMapper");
+        return gsonJson(name, () -> json, objectMapper);
+    }
+
+    @Override
+    @NotNull
+    public Konfiguration gsonJson(@NotNull final String name,
+                                  @NotNull final Supplier<String> json,
+                                  @NotNull final Supplier<Gson> objectMapper) {
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(json, "json");
+        Objects.requireNonNull(objectMapper, "objectMapper");
+        return new ExtGsonJsonSource(name, json, objectMapper);
     }
 
 }

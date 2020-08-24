@@ -35,6 +35,7 @@ final class ExtJacksonSourceYamlHelper {
         return mapper;
     }
 
+    @Contract(pure = true)
     static void ensureLibraryJarIsOnPath() {
         final String klass = "com.fasterxml.jackson.dataformat.yaml.YAMLFactory";
         try {

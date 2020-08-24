@@ -207,6 +207,7 @@ final class ExtMapSource extends Source {
         return newHash != lastHash;
     }
 
+    @Contract(pure = true)
     @Override
     @NotNull
     public Source updatedCopy() {

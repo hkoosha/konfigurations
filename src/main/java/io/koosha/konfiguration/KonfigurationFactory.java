@@ -1,6 +1,7 @@
 package io.koosha.konfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import io.koosha.konfiguration.impl.v8.FactoryV8;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Contract;
@@ -134,11 +135,15 @@ public interface KonfigurationFactory {
     Konfiguration map(@NotNull String name,
                       @NotNull Map<String, ?> storage);
 
+    // =========================================================================
+
     @NotNull
     @Contract("_, _ -> new")
     Konfiguration preferences(@NotNull String name,
                               @NotNull Preferences storage);
 
+    // =========================================================================
+
     /**
      * Creates a {@link Konfiguration} with the given json provider and a
      * default object mapper provider.
@@ -354,6 +359,7 @@ public interface KonfigurationFactory {
                               @NotNull Supplier<String> json,
                               @NotNull Supplier<ObjectMapper> objectMapper);
 
+    // =========================================================================
 
     /**
      * Creates a {@link Konfiguration} with the given yaml string as source.
@@ -375,7 +381,8 @@ public interface KonfigurationFactory {
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
     @NotNull
-    @Contract("_, _ -> new")
+    @Contract(pure = true,
+              value = "_, _ -> new")
     Konfiguration snakeYaml(@NotNull String name,
                             @NotNull String yaml);
 
@@ -404,7 +411,8 @@ public interface KonfigurationFactory {
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
     @NotNull
-    @Contract("_, _, _ -> new")
+    @Contract(pure = true,
+              value = "_, _, _ -> new")
     Konfiguration snakeYaml(@NotNull String name,
                             @NotNull String yaml,
                             @NotNull Supplier<Yaml> objectMapper);
@@ -431,7 +439,8 @@ public interface KonfigurationFactory {
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
     @NotNull
-    @Contract("_, _ -> new")
+    @Contract(pure = true,
+              value = "_, _ -> new")
     Konfiguration snakeYaml(@NotNull String name,
                             @NotNull Supplier<String> yaml);
 
@@ -461,9 +470,107 @@ public interface KonfigurationFactory {
      * @throws KfgSourceException   if the the root element returned by jackson is null.
      */
     @NotNull
-    @Contract("_, _, _ -> new")
+    @Contract(pure = true,
+              value = "_, _, _ -> new")
     Konfiguration snakeYaml(@NotNull String name,
                             @NotNull Supplier<String> yaml,
                             @NotNull Supplier<Yaml> objectMapper);
+
+    // =========================================================================
+
+    /**
+     * Creates a {@link Konfiguration} with the given json provider and a
+     * default object mapper provider.
+     *
+     * @param name name of created konfiguration.
+     * @param json backing store provider. Must always return a
+     *             non-null valid json string.
+     * @return a konfig source.
+     * @throws NullPointerException if any of its arguments are null.
+     * @throws KfgSourceException   if gson library is not in the classpath. it specifically looks
+     *                              for the class: "com.google.gson.Gson"
+     * @throws KfgSourceException   if the storage (json string) returned by json string is null.
+     * @throws KfgSourceException   if the provided json string can not be parsed by gson.
+     * @throws KfgSourceException   if the the root element returned by gson is null.
+     */
+    @NotNull
+    @Contract(pure = true,
+              value = "_, _ -> new")
+    Konfiguration gsonJson(@NotNull String name,
+                           @NotNull Supplier<String> json);
+
+    /**
+     * Creates a {@link Konfiguration} with the given json string as source.
+     *
+     * <b>Important: the source will NEVER update. It's a const source.</b>
+     *
+     * @param name name of created konfiguration.
+     * @param json backing store.
+     * @return a konfig source.
+     * @throws NullPointerException if any of its arguments are null.
+     * @throws KfgSourceException   if gson library is not in the classpath. it specifically looks
+     *                              for the class: "com.google.gson.Gson"
+     * @throws KfgSourceException   if the storage (json string) returned by json string is null.
+     * @throws KfgSourceException   if the provided json string can not be parsed by gson.
+     * @throws KfgSourceException   if the the root element returned by gson is null.
+     */
+    @NotNull
+    @Contract(pure = true,
+              value = "_, _ -> new")
+    Konfiguration gsonJson(@NotNull String name,
+                           @NotNull String json);
+
+    /**
+     * Creates a {@link Konfiguration} with the given json string and object
+     * mapper provider.
+     *
+     * <b>Important: the source will NEVER update. It's a const source.</b>
+     *
+     * @param name         name of created konfiguration.
+     * @param json         backing store.
+     * @param objectMapper A {@link Gson} provider. Must always return
+     *                     a valid non-null Gson, and if required, it
+     *                     must be able to deserialize custom types, so that
+     *                     {@link Konfiguration#custom(String, Kind)} works as well.
+     * @return a konfig source.
+     * @throws NullPointerException if any of its arguments are null.
+     * @throws KfgSourceException   if gson library is not in the classpath. it specifically looks
+     *                              for the class: "com.google.gson.Gson"
+     * @throws KfgSourceException   if the storage (json string) returned by json string is null.
+     * @throws KfgSourceException   if the provided json string can not be parsed by gson.
+     * @throws KfgSourceException   if the the root element returned by gson is null.
+     */
+    @NotNull
+    @Contract(pure = true,
+              value = "_, _, _ -> new")
+    Konfiguration gsonJson(@NotNull String name,
+                           @NotNull String json,
+                           @NotNull Supplier<Gson> objectMapper);
+
+    /**
+     * Creates a {@link Konfiguration} with the given json provider and object
+     * mapper provider.
+     *
+     * @param name         name of created konfiguration.
+     * @param json         backing store provider. Must always return a
+     *                     non-null valid json string.
+     * @param objectMapper A {@link ObjectMapper} provider. Must always return
+     *                     a valid non-null ObjectMapper, and if required, it
+     *                     ust be able to deserialize custom types, so that
+     *                     {@link Konfiguration#custom(String, Kind)} works as well.
+     * @return a konfig source.
+     * @throws NullPointerException if any of its arguments are null.
+     * @throws KfgSourceException   if gson library is not in the classpath. it specifically looks
+     *                              for the class: "com.google.gson.Gson"
+     * @throws KfgSourceException   if the storage (json string) returned by json string is null.
+     * @throws KfgSourceException   if the provided json string can not be parsed by gson.
+     * @throws KfgSourceException   if the the root element returned by gson is null.
+     */
+    @NotNull
+    @Contract(pure = true,
+              value = "_, _, _ -> new")
+    Konfiguration gsonJson(@NotNull String name,
+                           @NotNull Supplier<String> json,
+                           @NotNull Supplier<Gson> objectMapper);
 
 }

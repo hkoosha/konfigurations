@@ -1,25 +1,27 @@
-/*
-package io.koosha.konfiguration.ext;
 
-import com.fasterxml.jackson.databind.JsonNode;
+package io.koosha.konfiguration.impl.v8;
+
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
 import io.koosha.konfiguration.KfgMissingKeyException;
+import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
-import io.koosha.konfiguration.KfgTypeNullException;
 import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
+import net.jcip.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -34,13 +36,6 @@ import static java.util.Objects.requireNonNull;
 public final class ExtGsonJsonSource extends Source {
 
     private static final String DOT_PATTERN = Pattern.quote(".");
-    private static final Gson GSON = new Gson();
-
-    @Contract(pure = true)
-    @NotNull
-    private static Gson defaultJacksonObjectMapper() {
-        return GSON;
-    }
 
     private final Supplier<Gson> mapperSupplier;
     private final Supplier<String> json;
@@ -51,93 +46,52 @@ public final class ExtGsonJsonSource extends Source {
     @NotNull
     private final String name;
 
-    private JsonObject node_(@NotNull final String key) {
+    @Nullable
+    private JsonElement node_(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
+
+        if (key.isEmpty())
+            throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
+
+        final String[] split = key.split(DOT_PATTERN);
+
+        JsonElement node = this.root;
         synchronized (LOCK) {
-            Objects.requireNonNull(key, "key");
-
-            if (key.isEmpty())
-                throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
-
-            JsonObject node = this.root;
-            for (final String sub : key.split(DOT_PATTERN)) {
-                if (node.isMissingNode())
-                    return node;
-                // XXX null.
-                node = root.get(sub).getAsJsonObject();
+            for (final String sub : split) {
+                if (!(node instanceof JsonObject))
+                    return null;
+                if (!((JsonObject) node).has(sub))
+                    return null;
+                node = ((JsonObject) node).get(sub);
             }
-            return node;
         }
-    }
-
-    @NotNull
-    private JsonObject node(@NotNull final String key) {
-        synchronized (LOCK) {
-            Objects.requireNonNull(key, "key");
-
-            if (key.isEmpty())
-                throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
-
-            final JsonObject node = node_(key);
-            if (node.isMissingNode())
-                throw new KfgMissingKeyException(this.name(), key);
-            return node;
-        }
-    }
-
-    @NotNull
-    private JsonObject checkJsonType(final boolean condition,
-                                     @NotNull final Kind<?> required,
-                                     @NotNull final JsonObject node,
-                                     @NotNull final String key) {
-        if (!condition)
-            throw new KfgTypeException(this.name(), key, required, node);
-        if (node.isJsonNull())
-            throw new KfgTypeNullException(this.name(), key, required);
         return node;
     }
 
-    private boolean typeMatches(@NotNull final Kind<?> type,
-                                @NotNull final JsonNode node) {
+    @NotNull
+    private JsonElement node(@NotNull final String key) {
+        Objects.requireNonNull(key, "key");
 
-        return type.isNull() && node.isNull()
-            || type.isBool() && node.isBoolean()
-            || type.isChar() && node.isTextual() && node.asText().length() == 1
-            || type.isString() && node.isTextual()
-            || type.isByte() && node.isShort() && node.asInt() <= Byte.MAX_VALUE && Byte.MIN_VALUE <= node.asInt()
-            || type.isShort() && node.isShort()
-            || type.isInt() && node.isInt()
-            || type.isLong() && node.isLong()
-            || type.isFloat() && node.isFloat()
-            || type.isDouble() && node.isDouble()
-            || type.isList() && node.isArray()
-            || type.isSet() && node.isArray();
+        if (key.isEmpty())
+            throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
+
+        final JsonElement node = node_(key);
+        if (node == null)
+            throw new KfgMissingKeyException(this.name(), key);
+        return node;
     }
 
 
-    public ExtGsonJsonSource(@NotNull final String name,
-                             @NotNull final Supplier<String> jsonSupplier) {
-        this(name, jsonSupplier, ExtGsonJsonSource::defaultJacksonObjectMapper);
-    }
-
-    public ExtGsonJsonSource(@NotNull final String name,
-                             @NotNull final Supplier<String> jsonSupplier,
-                             @NotNull final Supplier<Gson> objectMapper) {
+    ExtGsonJsonSource(@NotNull final String name,
+                      @NotNull final Supplier<String> jsonSupplier,
+                      @NotNull final Supplier<Gson> objectMapper) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(jsonSupplier, "jsonSupplier");
         Objects.requireNonNull(objectMapper, "objectMapper");
 
-        this.name = name;
-        // Check early, so we're not fooled with a dummy object reader.
-        try {
-            Class.forName("com.google.gson");
-        }
-        catch (final ClassNotFoundException e) {
-            throw new KfgJacksonError(this.name(),
-                "gson library is required to be present in " +
-                    "the class path, can not find the class: " +
-                    "com.google.gson", e);
-        }
+        ExtGsonSourceHelper.ensureLibraryJarIsOnPath();
 
+        this.name = name;
         this.json = jsonSupplier;
         this.mapperSupplier = objectMapper;
         this.lastJson = this.json.get();
@@ -150,7 +104,7 @@ public final class ExtGsonJsonSource extends Source {
             update = this.mapperSupplier.get().fromJson(this.lastJson, JsonObject.class);
         }
         catch (final JsonSyntaxException e) {
-            throw new KfgJacksonError(this.name(), "error parsing json string", e);
+            throw new KfgSourceException(this.name(), "error parsing json string", e);
         }
         requireNonNull(update, "root element is null");
 
@@ -169,10 +123,10 @@ public final class ExtGsonJsonSource extends Source {
     protected Boolean bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonObject at = node(key);
-            return checkJsonType(at.isJsonPrimitive(), Kind.BOOL, at, key).asBoolean();
-        }
+        final JsonElement at = node(key);
+
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.BOOL, at), this.name(), Kind.BOOL, at, key)
+                                  .getAsBoolean();
     }
 
     @Override
@@ -180,12 +134,11 @@ public final class ExtGsonJsonSource extends Source {
     protected Character char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(at.isTextual() && at.textValue().length() == 1, Kind.STRING, at, key)
-                .textValue()
-                .charAt(0);
-        }
+        final JsonElement at = node(key);
+
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.CHAR, at), this.name(), Kind.CHAR, at, key)
+                                  .getAsString()
+                                  .charAt(0);
     }
 
     @Override
@@ -193,10 +146,10 @@ public final class ExtGsonJsonSource extends Source {
     protected String string0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(at.isTextual(), Kind.STRING, at, key).asText();
-        }
+        final JsonElement at = node(key);
+
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.STRING, at), this.name(), Kind.STRING, at, key)
+                                  .getAsString();
     }
 
     @NotNull
@@ -204,12 +157,9 @@ public final class ExtGsonJsonSource extends Source {
     protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(
-                at.isShort() || at.isInt() || at.isLong(),
-                Kind.LONG, at, key).longValue();
-        }
+        final JsonElement at = node(key);
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.LONG, at), this.name(), Kind.LONG, at, key)
+                                  .getAsLong();
     }
 
     @NotNull
@@ -217,16 +167,16 @@ public final class ExtGsonJsonSource extends Source {
     protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            return checkJsonType(
-                at.isFloat()
-                    || at.isDouble()
-                    || at.isShort()
-                    || at.isInt()
-                    || at.isLong(),
-                Kind.DOUBLE, at, key).doubleValue();
-        }
+        final JsonElement at = node(key);
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.DOUBLE, at), this.name(), Kind.DOUBLE, at, key)
+                                  .getAsDouble();
+    }
+
+    @NotNull
+    @Override
+    protected Set<?> set0(@NotNull final String key,
+                          @NotNull final Kind<?> type) {
+        return listToSet(key, type);
     }
 
     @NotNull
@@ -236,37 +186,24 @@ public final class ExtGsonJsonSource extends Source {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
-        final ObjectMapper reader = this.mapperSupplier.get();
-        final TypeFactory tf = reader.getTypeFactory();
-        final JavaType ct = tf.constructSimpleType(type.klass(), new JavaType[0]);
-        final CollectionType javaType = tf.constructCollectionType(List.class, ct);
+        final Gson reader = this.mapperSupplier.get();
 
-        final List<?> asList;
-        synchronized (LOCK) {
-            final JsonNode at = node(key);
-            checkJsonType(at.isArray(), type, at, key);
+        final JsonElement at = node(key);
+        ExtGsonSourceHelper.checkJsonType(at.isJsonArray(), this.name(), type, at, key);
+        final JsonArray asJsonArray = at.getAsJsonArray();
+
+        final Type typeToken = TypeToken.get(type.getCollectionContainedKind().type()).getType();
+
+        final List<?> asList = new ArrayList<>(asJsonArray.size());
+        for (final JsonElement jsonElement : asJsonArray)
             try {
-                asList = reader.readValue(at.traverse(), javaType);
+                asList.add(reader.fromJson(jsonElement, typeToken));
             }
-            catch (final IOException e) {
-                throw new KfgTypeException(this.name(), key, type, at, "type mismatch", e);
+            catch (final JsonSyntaxException e) {
+                throw new KfgTypeException(this.name(), key, type, null, "gson error", e);
             }
-        }
+
         return Collections.unmodifiableList(asList);
-    }
-
-    @NotNull
-    @Override
-    protected Set<?> set0(@NotNull final String key,
-                          @NotNull final Kind<?> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-
-        final List<?> asList = this.list0(key, type);
-        final Set<?> asSet = new HashSet<>(asList);
-        if (asSet.size() != asList.size())
-            throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
-        return Collections.unmodifiableSet(asSet);
     }
 
     @Override
@@ -276,40 +213,32 @@ public final class ExtGsonJsonSource extends Source {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
-        synchronized (LOCK) {
-            final ObjectMapper reader = this.mapperSupplier.get();
-            final JsonNode node = this.node(key);
-            final JsonParser traverse = node.traverse();
+        final Gson reader = this.mapperSupplier.get();
+        final JsonElement node = this.node(key);
 
-            Object ret;
-            try {
-                ret = reader.readValue(traverse, new TypeReference<Object>() {
-                    @Override
-                    public Type getType() {
-                        return type.type();
-                    }
-                });
-            }
-            catch (final IOException e) {
-                throw new KfgTypeException(this.name(), key, type, null, "jackson error", e);
-            }
+        final Type typeToken = TypeToken.get(type.type()).getType();
 
-            if (ret instanceof List)
-                return Collections.unmodifiableList(((List<?>) ret));
-            else if (ret instanceof Set)
-                return Collections.unmodifiableSet(((Set<?>) ret));
-            else
-                return ret;
+        Object ret;
+        try {
+            ret = reader.fromJson(node, typeToken);
         }
+        catch (final JsonSyntaxException e) {
+            throw new KfgTypeException(this.name(), key, type, null, "gson error", e);
+        }
+
+        if (ret instanceof List)
+            return Collections.unmodifiableList(((List<?>) ret));
+        else if (ret instanceof Set)
+            return Collections.unmodifiableSet(((Set<?>) ret));
+        else
+            return ret;
     }
 
     @Override
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            return node(key).isNull();
-        }
+        return node(key).isJsonNull();
     }
 
     @Override
@@ -317,24 +246,22 @@ public final class ExtGsonJsonSource extends Source {
                        @Nullable final Kind<?> type) {
         Objects.requireNonNull(key, "key");
 
-        synchronized (LOCK) {
-            if (this.node_(key).isMissingNode())
-                return false;
-            if (type == null)
-                return true;
+        if (this.node_(key) == null)
+            return false;
+        if (type == null)
+            return true;
 
-            final JsonNode node = this.node(key);
+        final JsonElement node = this.node(key);
 
-            if (this.typeMatches(type, node))
-                return true;
+        if (ExtGsonSourceHelper.typeMatches(type, node))
+            return true;
 
-            try {
-                this.custom0(key, type);
-                return true;
-            }
-            catch (Throwable t) {
-                return false;
-            }
+        try {
+            this.custom0(key, type);
+            return true;
+        }
+        catch (final Throwable t) {
+            return false;
         }
     }
 
@@ -345,8 +272,7 @@ public final class ExtGsonJsonSource extends Source {
         return newJson != null && !Objects.equals(newJson, lastJson);
     }
 
-    @Contract(pure = true,
-              value = "-> new")
+    @Contract(pure = true)
     @Override
     @NotNull
     public Source updatedCopy() {
@@ -356,4 +282,3 @@ public final class ExtGsonJsonSource extends Source {
     }
 
 }
-*/

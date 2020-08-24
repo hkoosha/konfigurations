@@ -115,8 +115,8 @@ public class DummyVTest {
 
     @Test
     public void testNull_() throws Exception {
-        assertNull(DummyV.null_(Kind._VOID).v());
-        assertNull(DummyV.null_(Kind._VOID).v(null));
+        assertNull(DummyV.null_(Kind.VOID).v());
+        assertNull(DummyV.null_(Kind.VOID).v(null));
     }
 
 }

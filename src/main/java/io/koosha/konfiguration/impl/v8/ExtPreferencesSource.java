@@ -15,7 +15,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -66,6 +65,7 @@ final class ExtPreferencesSource extends Source {
 
     @Override
     @NotNull
+    @Contract(pure = true)
     protected Object bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -76,6 +76,7 @@ final class ExtPreferencesSource extends Source {
 
     @Override
     @NotNull
+    @Contract(pure = true)
     protected Object char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -89,6 +90,7 @@ final class ExtPreferencesSource extends Source {
 
     @Override
     @NotNull
+    @Contract(pure = true)
     protected Object string0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -99,6 +101,7 @@ final class ExtPreferencesSource extends Source {
 
     @Override
     @NotNull
+    @Contract(pure = true)
     protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -109,6 +112,7 @@ final class ExtPreferencesSource extends Source {
 
     @Override
     @NotNull
+    @Contract(pure = true)
     protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -119,6 +123,8 @@ final class ExtPreferencesSource extends Source {
 
     @Override
     @NotNull
+    @Contract(pure = true,
+              value = "_,_->new")
     protected List<?> list0(@NotNull final String key,
                             @NotNull final Kind<?> type) {
         final String value = this.source.get(key, "");
@@ -153,20 +159,16 @@ final class ExtPreferencesSource extends Source {
 
     @Override
     @NotNull
+    @Contract(pure = true)
     protected Set<?> set0(@NotNull final String key,
                           @NotNull final Kind<?> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-
-        final List<?> asList = this.list0(key, type);
-        final Set<?> asSet = new LinkedHashSet<>(asList);
-        if (asSet.size() != asList.size())
-            throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
-        return Collections.unmodifiableSet(asSet);
+        return listToSet(key, type);
     }
 
     @Override
     @NotNull
+    @Contract(pure = true,
+              value = "_,_->fail")
     protected Object custom0(@NotNull final String key,
                              @NotNull final Kind<?> type) {
         throw new KfgAssertionException(this.name, key, type, null,
@@ -174,6 +176,7 @@ final class ExtPreferencesSource extends Source {
     }
 
     @Override
+    @Contract(pure = true)
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -183,6 +186,8 @@ final class ExtPreferencesSource extends Source {
         }
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Contract(pure = true)
     @Override
     public boolean has(@NotNull final String key,
                        @NotNull final Kind<?> type) {
@@ -243,6 +248,7 @@ final class ExtPreferencesSource extends Source {
         return false;
     }
 
+    @Contract(pure = true)
     private String sane(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
@@ -259,6 +265,7 @@ final class ExtPreferencesSource extends Source {
         return key.replace('.', '/');
     }
 
+    @Contract(pure = true)
     private int hashOf() {
         final ByteArrayOutputStream buffer = new ByteArrayOutputStream();
         try {
@@ -267,13 +274,15 @@ final class ExtPreferencesSource extends Source {
             }
         }
         catch (final IOException | BackingStoreException e) {
-            throw new KfgSourceException(this.name(), "could not calculate hash of the java.util.prefs.Preferences source", e);
+            throw new KfgSourceException(this.name(),
+                "could not calculate hash of the java.util.prefs.Preferences source", e);
         }
         return Arrays.hashCode(buffer.toByteArray());
     }
 
     @NotNull
     @Override
+    @Contract(pure = true)
     public String name() {
         return this.name;
     }
@@ -286,6 +295,8 @@ final class ExtPreferencesSource extends Source {
 
     @NotNull
     @Override
+    @Contract(pure = true,
+              value = "->this")
     public Source updatedCopy() {
         return this;
     }

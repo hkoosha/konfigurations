@@ -4,20 +4,28 @@ import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Objects;
 
-final class ParameterizedTypeImpl implements ParameterizedType {
+final class ParameterizedTypeImpl implements ParameterizedType, Serializable {
 
+    private static final long serialVersionUID = 1;
+
+    @NotNull
     private final Type[] actualTypeArguments;
+
+    @NotNull
     private final Type rawType;
+
+    @Nullable
     private final Type ownerType;
 
     ParameterizedTypeImpl(@NotNull final Type[] actualTypeArguments,
                           @NotNull final Type rawType,
-                          final Type ownerType) {
+                          @Nullable final Type ownerType) {
         Objects.requireNonNull(actualTypeArguments);
         Objects.requireNonNull(rawType);
         this.actualTypeArguments = actualTypeArguments;

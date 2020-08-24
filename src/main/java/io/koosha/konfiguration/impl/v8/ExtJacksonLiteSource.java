@@ -233,7 +233,7 @@ final class ExtJacksonLiteSource extends LiteSource {
 
             final JsonNode node = this.node(key);
 
-            if (ExtJacksonSource.typeMatches(type, node))
+            if (ExtJacksonSourceJsonHelper.typeMatches(type, node))
                 return true;
 
             try {
@@ -257,8 +257,8 @@ final class ExtJacksonLiteSource extends LiteSource {
             at = node(key);
         }
 
-        return ExtJacksonSource.checkJsonType(at.isBoolean(), Kind.BOOL, at, key, this.name())
-                               .asBoolean();
+        return ExtJacksonSourceJsonHelper.checkJsonType(at.isBoolean(), Kind.BOOL, at, key, this.name())
+                                         .asBoolean();
     }
 
     @Override
@@ -271,10 +271,10 @@ final class ExtJacksonLiteSource extends LiteSource {
             at = node(key);
         }
 
-        return ExtJacksonSource.checkJsonType(
+        return ExtJacksonSourceJsonHelper.checkJsonType(
             at.isTextual() && at.textValue().length() == 1, Kind.STRING, at, key, this.name())
-                               .textValue()
-                               .charAt(0);
+                                         .textValue()
+                                         .charAt(0);
     }
 
     @Override
@@ -287,8 +287,8 @@ final class ExtJacksonLiteSource extends LiteSource {
             at = node(key);
         }
 
-        return ExtJacksonSource.checkJsonType(at.isTextual(), Kind.STRING, at, key, this.name())
-                               .asText();
+        return ExtJacksonSourceJsonHelper.checkJsonType(at.isTextual(), Kind.STRING, at, key, this.name())
+                                         .asText();
     }
 
     @NotNull
@@ -301,10 +301,10 @@ final class ExtJacksonLiteSource extends LiteSource {
             at = node(key);
         }
 
-        return ExtJacksonSource.checkJsonType(
+        return ExtJacksonSourceJsonHelper.checkJsonType(
             at.isShort() || at.isInt() || at.isLong(),
             Kind.LONG, at, key, this.name())
-                               .longValue();
+                                         .longValue();
     }
 
     @NotNull
@@ -317,14 +317,14 @@ final class ExtJacksonLiteSource extends LiteSource {
             at = node(key);
         }
 
-        return ExtJacksonSource.checkJsonType(
+        return ExtJacksonSourceJsonHelper.checkJsonType(
             at.isFloat()
                 || at.isDouble()
                 || at.isShort()
                 || at.isInt()
                 || at.isLong(),
             Kind.DOUBLE, at, key, this.name())
-                               .doubleValue();
+                                         .doubleValue();
     }
 
     @NotNull
@@ -342,7 +342,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final List<?> asList;
         synchronized (LOCK) {
             final JsonNode at = this.node(key);
-            ExtJacksonSource.checkJsonType(at.isArray(), type, at, key, this.name());
+            ExtJacksonSourceJsonHelper.checkJsonType(at.isArray(), type, at, key, this.name());
             try {
                 asList = reader.readValue(at.traverse(), javaType);
             }

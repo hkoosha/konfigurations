@@ -2,7 +2,6 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgSourceException;
-import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.Immutable;
@@ -28,7 +27,6 @@ import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -463,14 +461,7 @@ final class ExtYamlSource extends Source {
     @NotNull
     protected Set<?> set0(@NotNull final String key,
                           @NotNull final Kind<?> type) {
-        Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(type, "type");
-
-        final List<?> asList = this.list0(key, type);
-        final Set<?> asSet = new LinkedHashSet<>(asList);
-        if (asSet.size() != asList.size())
-            throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
-        return Collections.unmodifiableSet(asSet);
+        return listToSet(key, type);
     }
 
     @Override
@@ -525,8 +516,7 @@ final class ExtYamlSource extends Source {
     }
 
     @Override
-    @Contract(pure = true,
-              value = "-> new")
+    @Contract(pure = true)
     @NotNull
     public Source updatedCopy() {
         return this.hasUpdate()

@@ -13,6 +13,7 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 @SuppressWarnings("unused")
@@ -36,7 +37,7 @@ public abstract class Kind<TYPE> implements Serializable {
     }
 
     private Kind(@NotNull final Type t) {
-        this(null, t);
+        this(null, Objects.requireNonNull(t, "t"));
     }
 
     protected Kind() {
@@ -54,9 +55,9 @@ public abstract class Kind<TYPE> implements Serializable {
     }
 
     @Contract(pure = true)
-    @Nullable
-    public final String key() {
-        return this.key;
+    @NotNull
+    public final Optional<String> key() {
+        return Optional.ofNullable(this.key);
     }
 
     @Contract(pure = true)
@@ -106,6 +107,7 @@ public abstract class Kind<TYPE> implements Serializable {
 
     @Contract(pure = true)
     public final Kind<?> getCollectionContainedKind() {
+        // TODO
         throw new UnsupportedOperationException();
     }
 
@@ -129,12 +131,14 @@ public abstract class Kind<TYPE> implements Serializable {
     @Contract(pure = true)
     @NotNull
     public final Kind<?> getMapKeyKind() {
+        // TODO
         throw new UnsupportedOperationException();
     }
 
     @Contract(pure = true)
     @NotNull
     public final Kind<?> getMapValueKind() {
+        // TODO
         throw new UnsupportedOperationException();
     }
 
@@ -288,6 +292,7 @@ public abstract class Kind<TYPE> implements Serializable {
               pure = true)
     public static <U> Kind<U> of(@NotNull Class<U> klass) {
         Objects.requireNonNull(klass, "klass");
+
         if (klass == boolean.class)
             klass = (Class<U>) Boolean.class;
         else if (klass == byte.class)
@@ -306,6 +311,7 @@ public abstract class Kind<TYPE> implements Serializable {
             klass = (Class<U>) Double.class;
         else if (klass == void.class)
             klass = (Class<U>) Void.class;
+
         return new Kind<U>(klass) {
         };
     }
@@ -375,6 +381,6 @@ public abstract class Kind<TYPE> implements Serializable {
     public static final Kind<Float> FLOAT = of(Float.class);
     public static final Kind<Double> DOUBLE = of(Double.class);
     public static final Kind<String> STRING = of(String.class);
-    public static final Kind<?> _VOID = of(Void.class);
+    public static final Kind<?> VOID = of(Void.class);
 
 }

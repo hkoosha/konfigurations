@@ -175,27 +175,29 @@ final class Kombiner implements Konfiguration {
     @Nullable
     Object issueValue(@NotNull final Kind<?> key) {
         Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(key.key(), "key's text key");
+
+        final String strKey = key.key().orElseThrow(
+            () -> new KfgIllegalStateException(this.name, "missing key"));
 
         final Optional<Source> find = this
             .sources
             .sources()
             .stream()
-            .filter(source -> source.has(key.key(), key))
+            .filter(source -> source.has(strKey, key))
             .findFirst();
 
         if (!find.isPresent())
-            throw new KfgMissingKeyException(this.name(), key.key(), key);
+            throw new KfgMissingKeyException(this.name(), strKey, key);
 
-        this.issuedKeys.add(key.withKey(key.key()));
-        final Object value = find.get().custom(key.key(), key).v();
+        this.issuedKeys.add(key.withKey(strKey));
+        final Object value = find.get().custom(strKey, key).v();
         this.cache.put(key, value);
         return value;
     }
 
     boolean hasInCache(@NotNull final Kind<?> key) {
         Objects.requireNonNull(key, "key");
-        Objects.requireNonNull(key.key(), "key's text key");
+        key.key().orElseThrow(() -> new KfgIllegalStateException(this.name(), "missing key"));
         return this.cache.containsKey(key);
     }
 

@@ -3,6 +3,7 @@ package io.koosha.konfiguration.impl.v8;
 import io.koosha.konfiguration.Handle;
 import io.koosha.konfiguration.KeyObserver;
 import io.koosha.konfiguration.KfgAssertionException;
+import io.koosha.konfiguration.KfgIllegalStateException;
 import io.koosha.konfiguration.KonfigurationManager;
 import io.koosha.konfiguration.Source;
 import io.koosha.konfiguration.type.Kind;
@@ -20,8 +21,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-
-import static java.util.Objects.requireNonNull;
 
 @NotThreadSafe
 @ApiStatus.Internal
@@ -59,10 +58,10 @@ final class KombinerManager implements KonfigurationManager {
             newCache.putAll(this.origin.cacheCopy());
 
             this.origin.issuedKeys.forEach(q -> {
-                final String key = requireNonNull(
-                    q.key(), "key passed through kombiner is null: " + q);
+                final String key = q.key().orElseThrow(() ->
+                    new KfgIllegalStateException(origin.name(), "key passed through kombiner is not set"));
 
-                final Optional<?> oldValue = this.origin.getCachedValue(q.key(), q);
+                final Optional<?> oldValue = this.origin.getCachedValue(key, q);
 
                 final Optional<Source> newValue = newSources
                     .values()
@@ -70,7 +69,7 @@ final class KombinerManager implements KonfigurationManager {
                     .filter(it -> it.has(key, q))
                     .findFirst();
 
-                final Object newValueGet = newValue.map(source -> source.custom(q.key(), q).v())
+                final Object newValueGet = newValue.map(source -> source.custom(key, q).v())
                                                    .orElse(null);
 
                 //noinspection ConstantConditions
@@ -85,10 +84,12 @@ final class KombinerManager implements KonfigurationManager {
             toBeNotifiedListeners.computeIfAbsent(KeyObserver.LISTEN_TO_ALL, q_ -> new ArrayList<>())
                                  .addAll(this.origin.observers.getKeyListeners(KeyObserver.LISTEN_TO_ALL));
 
-            for (final Kind<?> kind : updatedKeys)
-                //noinspection ConstantConditions
-                toBeNotifiedListeners.computeIfAbsent(kind.key(), q_ -> new ArrayList<>())
-                                     .addAll(this.origin.observers.getKeyListeners(kind.key()));
+            for (final Kind<?> kind : updatedKeys) {
+                final String strKey = kind.key().orElseThrow(
+                    () -> new KfgIllegalStateException(origin.name(), ""));
+                toBeNotifiedListeners.computeIfAbsent(strKey, q_ -> new ArrayList<>())
+                                     .addAll(this.origin.observers.getKeyListeners(strKey));
+            }
 
             return false;
         });

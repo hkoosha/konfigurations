@@ -6,18 +6,17 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 /**
  * Special version of {@link Konfiguration}, intended to go into a Kombiner.
  */
 public abstract class Source implements Konfiguration {
-
-    protected static final String DOT_PATTERN = Pattern.quote(".");
 
     @Override
     @NotNull
@@ -326,8 +325,10 @@ public abstract class Source implements Konfiguration {
 
     @Override
     @NotNull
+    @Contract(value = "->fail")
     public final Optional<KonfigurationManager> manager() {
-        throw new KfgAssertionException(this.name(), null, null, null, "manager() should not be called on a Source.");
+        throw new KfgAssertionException(this.name(), null, null, null,
+            "manager() should not be called on a Source.");
     }
 
 
@@ -355,6 +356,20 @@ public abstract class Source implements Konfiguration {
     @NotNull
     protected abstract Set<?> set0(@NotNull final String key,
                                    @NotNull Kind<?> type);
+
+    @NotNull
+    protected final Set<?> listToSet(@NotNull final String key,
+                                     @NotNull final Kind<?> type) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
+        final List<?> asList = this.list0(key, type);
+        final Set<?> asSet = new HashSet<>(asList);
+        if (asSet.size() != asList.size())
+            throw new KfgTypeException(this.name(), key, type.asSet(), asList, "is a list, not a set");
+        return Collections.unmodifiableSet(asSet);
+    }
+
 
     @NotNull
     protected abstract Object custom0(@NotNull String key,
@@ -472,6 +487,7 @@ public abstract class Source implements Konfiguration {
      * @throws KfgTypeException if the requested type does not match the type
      *                          of value in the given in.
      */
+    @Contract(pure = true)
     private void checkCollectionType(@NotNull final String key,
                                      @NotNull final Kind<?> neededType,
                                      @NotNull final Object value) {
@@ -480,7 +496,8 @@ public abstract class Source implements Konfiguration {
         Objects.requireNonNull(value, "value");
 
         if (!(value instanceof Collection))
-            throw new KfgIllegalStateException(this.name(), key, neededType.asList(), value, "expecting a collection");
+            throw new KfgIllegalStateException(this.name(), key, neededType.asList(), value,
+                "expecting a collection");
 
         for (final Object o : (Collection<?>) value)
             if (o != null && !neededType.klass().isAssignableFrom(o.getClass()))
@@ -498,6 +515,7 @@ public abstract class Source implements Konfiguration {
      */
     @SuppressWarnings("unchecked")
     @NotNull
+    @Contract(pure = true)
     private <U> K<U> k(@NotNull final String key,
                        @Nullable final Kind<U> type,
                        @Nullable final Object value) {
@@ -536,6 +554,7 @@ public abstract class Source implements Konfiguration {
                 + getClass().getName() + ", observer=" + observer);
     }
 
+    @Contract("_, _ -> fail")
     @Override
     @NotNull
     public final Handle registerSoft(@NotNull final KeyObserver observer,
@@ -558,6 +577,7 @@ public abstract class Source implements Konfiguration {
                 + ", key=" + key);
     }
 
+    @Contract("_, _ -> fail")
     @Override
     public final void deregister(@NotNull final Handle observer,
                                  @NotNull final String key) {
@@ -568,6 +588,7 @@ public abstract class Source implements Konfiguration {
                 + ", key=" + key);
     }
 
+    @Contract("_ -> fail")
     @Override
     public final void deregister(@NotNull final Handle observer) {
         throw new KfgAssertionException(
@@ -576,6 +597,7 @@ public abstract class Source implements Konfiguration {
                 + getClass().getName() + ", observer=" + observer);
     }
 
+    @Contract(pure = true)
     @NotNull
     public abstract Source updatedCopy();
 
