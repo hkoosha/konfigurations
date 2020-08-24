@@ -24,16 +24,16 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
-public class ExtJacksonSourceTest {
+public class ExtGsonJsonSourceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExtJacksonSourceTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExtGsonJsonSourceTest.class);
 
     static String SAMPLE_0;
     static String SAMPLE_1;
 
     private String json;
 
-    private ExtJacksonSource k;
+    private ExtGsonJsonSource k;
 
     @BeforeClass
     public void init() throws Exception {
@@ -55,17 +55,17 @@ public class ExtJacksonSourceTest {
     @BeforeMethod
     public void setup() throws Exception {
         this.json = SAMPLE_0;
-        this.k = new ExtJacksonSource("testJacksonSource",
+        this.k = new ExtGsonJsonSource("testGsonSource",
             () -> json,
-            ExtJacksonSourceJsonHelper::mapper);
+            ExtGsonSourceHelper::mapper);
     }
 
     private void update() {
         this.json = SAMPLE_1;
-        this.k = (ExtJacksonSource) this.k.updatedCopy();
+        this.k = (ExtGsonJsonSource) this.k.updatedCopy();
     }
 
-    private ExtJacksonSource k() {
+    private ExtGsonJsonSource k() {
         return this.k;
     }
 

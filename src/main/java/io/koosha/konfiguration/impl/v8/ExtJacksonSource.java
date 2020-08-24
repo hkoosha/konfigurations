@@ -256,7 +256,7 @@ final class ExtJacksonSource extends Source {
             });
         }
         catch (final IOException e) {
-            throw new KfgTypeException(this.name(), key, type, null, "jackson error", e);
+            throw new KfgSourceException(this.name(), key, type, null, "jackson error", e);
         }
 
         if (ret instanceof List)
@@ -305,13 +305,12 @@ final class ExtJacksonSource extends Source {
         return newJson != null && !Objects.equals(newJson, lastJson);
     }
 
-    @Contract(pure = true)
+    @Contract(pure = true,
+              value = "->new")
     @Override
     @NotNull
     public Source updatedCopy() {
-        return this.hasUpdate()
-            ? new ExtJacksonSource(this.name(), this.jsonSupplier, this.mapperSupplier)
-            : this;
+        return new ExtJacksonSource(this.name(), this.jsonSupplier, this.mapperSupplier);
     }
 
 }

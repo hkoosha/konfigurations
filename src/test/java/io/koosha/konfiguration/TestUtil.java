@@ -1,10 +1,12 @@
 package io.koosha.konfiguration;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Contract;
 
 import java.beans.ConstructorProperties;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public final class TestUtil {
 
@@ -22,14 +24,14 @@ public final class TestUtil {
      * @param <V>  value type.
      * @return created map.
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings("unchecked")
     @ApiStatus.Internal
+    @Contract(pure = true)
     public static <K, V> Map<K, V> mapOf(final K k, final V v, Object... rest) {
-        final Map map = new HashMap<>();
+        final Map<K, V> map = new HashMap<>();
         map.put(k, v);
-        for (int i = 0; i < rest.length; i += 2) {
-            map.put(rest[i], rest[i + 1]);
-        }
+        for (int i = 0; i < rest.length; i += 2)
+            map.put((K) rest[i], (V) rest[i + 1]);
         return map;
     }
 
@@ -58,6 +60,25 @@ public final class TestUtil {
             this(str, again, olf, i);
         }
 
+        @Override
+        public String toString() {
+            return "DummyCustom2[str=" + this.str + ", i=" + this.i + "]";
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.str, this.i);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if (!(obj instanceof DummyCustom2))
+                return false;
+            return Objects.equals(this.i, ((DummyCustom2) obj).i)
+                && Objects.equals(this.str, ((DummyCustom2) obj).str);
+        }
     }
 
     /**
@@ -81,6 +102,26 @@ public final class TestUtil {
 
         public String concat() {
             return this.str + " ::: " + this.i;
+        }
+
+        @Override
+        public String toString() {
+            return "DummyCustom[str=" + this.str + ", i=" + this.i + "]";
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(this.str, this.i);
+        }
+
+        @Override
+        public boolean equals(final Object obj) {
+            if (this == obj)
+                return true;
+            if (!(obj instanceof DummyCustom))
+                return false;
+            return Objects.equals(this.i, ((DummyCustom) obj).i)
+                && Objects.equals(this.str, ((DummyCustom) obj).str);
         }
 
     }

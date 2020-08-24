@@ -24,9 +24,9 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
-public class ExtJacksonSourceTest {
+public class ExtJacksonYamlSourceTest {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ExtJacksonSourceTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExtJacksonYamlSourceTest.class);
 
     static String SAMPLE_0;
     static String SAMPLE_1;
@@ -40,12 +40,12 @@ public class ExtJacksonSourceTest {
         //noinspection ConstantConditions
         final URI uri0 = this.getClass()
                              .getClassLoader()
-                             .getResource("sample0.json")
+                             .getResource("sample0.yaml")
                              .toURI();
         //noinspection ConstantConditions
         final URI uri1 = this.getClass()
                              .getClassLoader()
-                             .getResource("sample1.json")
+                             .getResource("sample1.yaml")
                              .toURI();
 
         SAMPLE_0 = new String(Files.readAllBytes(Paths.get(uri0)), StandardCharsets.UTF_8);
@@ -57,7 +57,7 @@ public class ExtJacksonSourceTest {
         this.json = SAMPLE_0;
         this.k = new ExtJacksonSource("testJacksonSource",
             () -> json,
-            ExtJacksonSourceJsonHelper::mapper);
+            ExtJacksonSourceYamlHelper::mapper);
     }
 
     private void update() {

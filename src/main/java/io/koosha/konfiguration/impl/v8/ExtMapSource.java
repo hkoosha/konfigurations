@@ -207,13 +207,12 @@ final class ExtMapSource extends Source {
         return newHash != lastHash;
     }
 
-    @Contract(pure = true)
+    @Contract(pure = true,
+              value = "->new")
     @Override
     @NotNull
     public Source updatedCopy() {
-        return this.hasUpdate()
-            ? new ExtMapSource(name(), map)
-            : this;
+        return new ExtMapSource(name(), map);
     }
 
 }

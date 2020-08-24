@@ -28,6 +28,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
+import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.checkJsonType;
+import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.typeMatches;
 import static java.util.Objects.requireNonNull;
 
 @Immutable
@@ -125,8 +127,8 @@ public final class ExtGsonJsonSource extends Source {
 
         final JsonElement at = node(key);
 
-        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.BOOL, at), this.name(), Kind.BOOL, at, key)
-                                  .getAsBoolean();
+        return checkJsonType(typeMatches(Kind.BOOL, at), this.name(), Kind.BOOL, at, key)
+            .getAsBoolean();
     }
 
     @Override
@@ -136,9 +138,9 @@ public final class ExtGsonJsonSource extends Source {
 
         final JsonElement at = node(key);
 
-        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.CHAR, at), this.name(), Kind.CHAR, at, key)
-                                  .getAsString()
-                                  .charAt(0);
+        return checkJsonType(typeMatches(Kind.CHAR, at), this.name(), Kind.CHAR, at, key)
+            .getAsString()
+            .charAt(0);
     }
 
     @Override
@@ -148,8 +150,8 @@ public final class ExtGsonJsonSource extends Source {
 
         final JsonElement at = node(key);
 
-        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.STRING, at), this.name(), Kind.STRING, at, key)
-                                  .getAsString();
+        return checkJsonType(typeMatches(Kind.STRING, at), this.name(), Kind.STRING, at, key)
+            .getAsString();
     }
 
     @NotNull
@@ -158,8 +160,8 @@ public final class ExtGsonJsonSource extends Source {
         Objects.requireNonNull(key, "key");
 
         final JsonElement at = node(key);
-        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.LONG, at), this.name(), Kind.LONG, at, key)
-                                  .getAsLong();
+        return checkJsonType(typeMatches(Kind.LONG, at), this.name(), Kind.LONG, at, key)
+            .getAsLong();
     }
 
     @NotNull
@@ -168,8 +170,8 @@ public final class ExtGsonJsonSource extends Source {
         Objects.requireNonNull(key, "key");
 
         final JsonElement at = node(key);
-        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.DOUBLE, at), this.name(), Kind.DOUBLE, at, key)
-                                  .getAsDouble();
+        return checkJsonType(typeMatches(Kind.DOUBLE, at), this.name(), Kind.DOUBLE, at, key)
+            .getAsDouble();
     }
 
     @NotNull
@@ -189,10 +191,10 @@ public final class ExtGsonJsonSource extends Source {
         final Gson reader = this.mapperSupplier.get();
 
         final JsonElement at = node(key);
-        ExtGsonSourceHelper.checkJsonType(at.isJsonArray(), this.name(), type, at, key);
+        checkJsonType(at.isJsonArray(), this.name(), type, at, key);
         final JsonArray asJsonArray = at.getAsJsonArray();
 
-        final Type typeToken = TypeToken.get(type.getCollectionContainedKind().type()).getType();
+        final Type typeToken = TypeToken.get(type.type()).getType();
 
         final List<?> asList = new ArrayList<>(asJsonArray.size());
         for (final JsonElement jsonElement : asJsonArray)
@@ -200,7 +202,7 @@ public final class ExtGsonJsonSource extends Source {
                 asList.add(reader.fromJson(jsonElement, typeToken));
             }
             catch (final JsonSyntaxException e) {
-                throw new KfgTypeException(this.name(), key, type, null, "gson error", e);
+                throw new KfgSourceException(this.name(), key, type, null, "gson error", e);
             }
 
         return Collections.unmodifiableList(asList);
@@ -227,9 +229,9 @@ public final class ExtGsonJsonSource extends Source {
         }
 
         if (ret instanceof List)
-            return Collections.unmodifiableList(((List<?>) ret));
+            return Collections.unmodifiableList((List<?>) ret);
         else if (ret instanceof Set)
-            return Collections.unmodifiableSet(((Set<?>) ret));
+            return Collections.unmodifiableSet((Set<?>) ret);
         else
             return ret;
     }
@@ -253,7 +255,7 @@ public final class ExtGsonJsonSource extends Source {
 
         final JsonElement node = this.node(key);
 
-        if (ExtGsonSourceHelper.typeMatches(type, node))
+        if (typeMatches(type, node))
             return true;
 
         try {
@@ -272,13 +274,12 @@ public final class ExtGsonJsonSource extends Source {
         return newJson != null && !Objects.equals(newJson, lastJson);
     }
 
-    @Contract(pure = true)
+    @Contract(pure = true,
+              value = "->new")
     @Override
     @NotNull
     public Source updatedCopy() {
-        return this.hasUpdate()
-            ? new ExtGsonJsonSource(this.name(), this.json, this.mapperSupplier)
-            : this;
+        return new ExtGsonJsonSource(this.name(), this.json, this.mapperSupplier);
     }
 
 }

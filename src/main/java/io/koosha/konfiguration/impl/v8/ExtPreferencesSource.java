@@ -69,8 +69,10 @@ final class ExtPreferencesSource extends Source {
     protected Object bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
+        final String sane = sane(key);
+
         synchronized (LOCK) {
-            return this.source.getBoolean(sane(key), false);
+            return this.source.getBoolean(sane, false);
         }
     }
 
@@ -80,12 +82,16 @@ final class ExtPreferencesSource extends Source {
     protected Object char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
+        final String sane = sane(key);
+
+        final String s;
         synchronized (LOCK) {
-            final String s = ((String) this.string0(sane(key)));
-            if (s.length() != 1)
-                throw new KfgTypeException(this.name(), key, Kind.CHAR, s);
-            return ((String) this.string0(sane(key))).charAt(0);
+            s = ((String) this.string0(sane));
         }
+        if (s.length() != 1)
+            throw new KfgTypeException(this.name(), key, Kind.CHAR, s);
+
+        return s.charAt(0);
     }
 
     @Override
@@ -94,8 +100,10 @@ final class ExtPreferencesSource extends Source {
     protected Object string0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
+        final String sane = sane(key);
+
         synchronized (LOCK) {
-            return this.source.get(sane(key), null);
+            return this.source.get(sane, null);
         }
     }
 
@@ -105,8 +113,10 @@ final class ExtPreferencesSource extends Source {
     protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
+        final String sane = sane(key);
+
         synchronized (LOCK) {
-            return this.source.getLong(sane(key), 0);
+            return this.source.getLong(sane, 0);
         }
     }
 
@@ -116,8 +126,10 @@ final class ExtPreferencesSource extends Source {
     protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
+        final String sane = sane(key);
+
         synchronized (LOCK) {
-            return this.source.getDouble(sane(key), 0);
+            return this.source.getDouble(sane, 0);
         }
     }
 
@@ -180,9 +192,11 @@ final class ExtPreferencesSource extends Source {
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
+        final String sane = sane(key);
+
         synchronized (LOCK) {
-            return this.source.get(sane(key), null) == null
-                && this.source.get(sane(key), "") == null;
+            return this.source.get(sane, null) == null
+                && this.source.get(sane, "") == null;
         }
     }
 
@@ -194,9 +208,11 @@ final class ExtPreferencesSource extends Source {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(type, "type");
 
+        final String sane = sane(key);
+
         try {
             synchronized (LOCK) {
-                if (!source.nodeExists(sane(key)))
+                if (!source.nodeExists(sane))
                     return false;
             }
         }
@@ -252,9 +268,11 @@ final class ExtPreferencesSource extends Source {
     private String sane(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
+        final String newKey = key.replace('.', '/');
+
         try {
             synchronized (LOCK) {
-                if (!this.source.nodeExists(key))
+                if (!this.source.nodeExists(newKey))
                     throw new KfgIllegalStateException(this.name(), "missing key=" + key);
             }
         }
@@ -262,7 +280,7 @@ final class ExtPreferencesSource extends Source {
             throw new KfgIllegalStateException(this.name(), "backing store error for key=" + key, e);
         }
 
-        return key.replace('.', '/');
+        return newKey;
     }
 
     @Contract(pure = true)
@@ -298,7 +316,7 @@ final class ExtPreferencesSource extends Source {
     @Contract(pure = true,
               value = "->this")
     public Source updatedCopy() {
-        return this;
+        return new ExtPreferencesSource(this.name(), this.source);
     }
 
 }

@@ -14,7 +14,6 @@ import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.LiteKonfiguration;
 import io.koosha.konfiguration.LiteSource;
-import io.koosha.konfiguration.LiteSubsetView;
 import io.koosha.konfiguration.type.Kind;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
@@ -24,9 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.lang.reflect.Type;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -47,7 +44,6 @@ import static java.util.Objects.requireNonNull;
 final class ExtJacksonLiteSource extends LiteSource {
 
     private static final Pattern DOT_PATTERN = Pattern.compile("\\.");
-    private static final String DOT_PATTERN_QUOTED = Pattern.quote(".");
 
     private final Supplier<ObjectMapper> mapperSupplier;
     private final ObjectNode root;
@@ -63,7 +59,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         if (key.isEmpty())
             throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
 
-        final String[] split = key.split(DOT_PATTERN_QUOTED);
+        final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
             JsonNode node = this.root;
@@ -91,47 +87,43 @@ final class ExtJacksonLiteSource extends LiteSource {
 
     @NotNull
     @Contract(mutates = "this")
-    private ObjectNode ensureIntermediateNodes(@NotNull final String[] key) {
+    private ObjectNode ensureIntermediateNodes(@NotNull final String[] key,
+                                               @NotNull final String keyJoined) {
         ObjectNode from = this.root;
 
-        synchronized (LOCK) {
-            for (int i = 0; i < key.length - 1; i++) {
-                JsonNode next = from.findPath(key[i]);
-                if (next.isMissingNode()) {
-                    from.set(key[i], from.objectNode());
-                    next = from.findPath(key[i]);
-                }
-                else if (!next.isObject()) {
-                    throw new KfgTypeException(
-                        this.name, Arrays.toString(key), null, null,
-                        "expected all objects in path, found=" + next + " at=" + key[i]);
-                }
-                from = (ObjectNode) next;
+        for (int i = 0; i < key.length - 1; i++) {
+            JsonNode next = from.findPath(key[i]);
+            if (next.isMissingNode()) {
+                from.set(key[i], from.objectNode());
+                next = from.findPath(key[i]);
             }
+            else if (!next.isObject()) {
+                throw new KfgTypeException(
+                    this.name, keyJoined, null, null,
+                    "expected all objects in path, found=" + next + " at=" + key[i]);
+            }
+            from = (ObjectNode) next;
         }
 
         return from;
     }
 
-    private Optional<ObjectNode> ensureIntermediateNodesOrNull(@NotNull final String key) {
-        requireNonNull(key, "key");
-        if (key.isEmpty())
-            throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
+    @Contract(pure = true)
+    private Optional<ObjectNode> ensureIntermediateNodesOrNull(@NotNull final String[] key,
+                                                               @NotNull final String keyJoined) {
+        ObjectNode from = this.root;
 
-        final String[] split = DOT_PATTERN.split(key);
-        synchronized (LOCK) {
-            ObjectNode from = this.root;
-            for (int i = 0; i < split.length - 1; i++) {
-                JsonNode next = from.findPath(split[i]);
-                if (next.isMissingNode())
-                    return Optional.empty();
-                else if (!next.isObject())
-                    throw new KfgTypeException(this.name, key, null, null, "expected all objects in path, found=" + next + " at=" + split[i]);
-                from = (ObjectNode) next;
-            }
-
-            return Optional.of(from);
+        for (int i = 0; i < key.length - 1; i++) {
+            JsonNode next = from.findPath(key[i]);
+            if (next.isMissingNode())
+                return Optional.empty();
+            else if (!next.isObject())
+                throw new KfgTypeException(this.name, keyJoined, null, null,
+                    "expected all objects in path, found=" + next + " at=" + key[i]);
+            from = (ObjectNode) next;
         }
+
+        return Optional.of(from);
     }
 
 
@@ -206,12 +198,6 @@ final class ExtJacksonLiteSource extends LiteSource {
     @Override
     public boolean isReadonly() {
         return false;
-    }
-
-    @Override
-    @NotNull
-    public LiteKonfiguration toReadonly() {
-        return new LiteSubsetView(this.name(), this, "", true);
     }
 
     @Override
@@ -357,14 +343,7 @@ final class ExtJacksonLiteSource extends LiteSource {
     @Override
     protected Set<?> set0(@NotNull final String key,
                           @NotNull final Kind<?> type) {
-        requireNonNull(key, "key");
-        requireNonNull(type, "type");
-
-        final List<?> asList = this.list0(key, type);
-        final Set<?> asSet = new LinkedHashSet<>(asList);
-        if (asSet.size() != asList.size())
-            throw new KfgTypeException(this.name, key, type.asSet(), asList, "is a list, not a set");
-        return Collections.unmodifiableSet(asSet);
+        return listToSet(key, type);
     }
 
     @Override
@@ -421,7 +400,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .put(split[split.length - 1], value);
         }
 
@@ -438,7 +417,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .put(split[split.length - 1], value == null ? null : value.shortValue());
         }
 
@@ -455,7 +434,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .put(split[split.length - 1], value);
         }
 
@@ -472,7 +451,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .put(split[split.length - 1], value);
         }
 
@@ -489,7 +468,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .put(split[split.length - 1], value);
         }
 
@@ -506,7 +485,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .put(split[split.length - 1], value);
         }
 
@@ -523,7 +502,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .put(split[split.length - 1], value);
         }
 
@@ -540,7 +519,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final String[] split = DOT_PATTERN.split(key);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .put(split[split.length - 1], value);
         }
 
@@ -559,7 +538,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final JsonNode jsonNode = objectMapper.valueToTree(value);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .set(split[split.length - 1], jsonNode);
         }
 
@@ -578,7 +557,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final JsonNode jsonNode = objectMapper.valueToTree(value);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .set(split[split.length - 1], jsonNode);
         }
 
@@ -597,7 +576,7 @@ final class ExtJacksonLiteSource extends LiteSource {
         final JsonNode jsonNode = objectMapper.valueToTree(value);
 
         synchronized (LOCK) {
-            this.ensureIntermediateNodes(split)
+            this.ensureIntermediateNodes(split, key)
                 .set(split[split.length - 1], jsonNode);
         }
 
@@ -614,8 +593,9 @@ final class ExtJacksonLiteSource extends LiteSource {
 
         if (key.contains(".")) {
             final String field = key.substring(key.lastIndexOf('.') + 1);
+            final String[] split = DOT_PATTERN.split(key);
             synchronized (LOCK) {
-                this.ensureIntermediateNodesOrNull(key)
+                this.ensureIntermediateNodesOrNull(split, key)
                     .ifPresent(node -> node.remove(field));
             }
         }

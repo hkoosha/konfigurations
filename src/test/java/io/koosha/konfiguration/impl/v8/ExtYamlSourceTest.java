@@ -173,7 +173,9 @@ public class ExtYamlSourceTest {
     public void testCustomValue() {
         final String yamlString = "bang:\n  str : hello\n  i: 99";
 
-        final ExtYamlSource y = new ExtYamlSource("testYamlSource", () -> yamlString,
+        final ExtYamlSource y = new ExtYamlSource(
+            "testYamlSource",
+            () -> yamlString,
             ExtYamlSource.defaultYamlSupplier::get);
 
         final TestUtil.DummyCustom bang = y.custom(
@@ -197,7 +199,9 @@ public class ExtYamlSourceTest {
         };
 
         final ExtYamlSource y = new ExtYamlSource(
-            "testYamlSource", yamlString, ExtYamlSource.defaultYamlSupplier::get);
+            "testYamlSource",
+            yamlString,
+            ExtYamlSource.defaultYamlSupplier::get);
 
         final TestUtil.DummyCustom2 bang = y.custom(
             "bang", Kind.of(TestUtil.DummyCustom2.class)).vn();

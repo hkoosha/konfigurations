@@ -6,6 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -356,6 +358,19 @@ public abstract class LiteSource implements LiteKonfiguration {
         return this.has(key, type.withKey(key)) ? set(key, type) : def;
     }
 
+    @NotNull
+    protected final Set<?> listToSet(@NotNull final String key,
+                                     @NotNull final Kind<?> type) {
+        Objects.requireNonNull(key, "key");
+        Objects.requireNonNull(type, "type");
+
+        final List<?> asList = this.list0(key, type);
+        final Set<?> asSet = new HashSet<>(asList);
+        if (asSet.size() != asList.size())
+            throw new KfgTypeException(this.name(), key, type.asSet(), asList, "is a list, not a set");
+        return Collections.unmodifiableSet(asSet);
+    }
+
     @Nullable
     @SuppressWarnings("unchecked")
     @Override
@@ -564,6 +579,14 @@ public abstract class LiteSource implements LiteKonfiguration {
             this.name().split("::")[0] + "::" + key,
             this,
             key, this.isReadonly());
+    }
+
+    @Override
+    @NotNull
+    @Contract(pure = true,
+              value = "->new")
+    public final LiteKonfiguration toReadonly() {
+        return new LiteSubsetView(this.name(), this, "", true);
     }
 
 }
