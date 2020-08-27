@@ -124,7 +124,7 @@ public final class ExtGsonJsonSource extends Source {
     protected Boolean bool0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        final JsonElement at = node(key);
+        final JsonElement at = this.node(key);
 
         return checkJsonType(typeMatches(Kind.BOOL, at), this.name(), Kind.BOOL, at, key)
             .getAsBoolean();
@@ -135,7 +135,7 @@ public final class ExtGsonJsonSource extends Source {
     protected Character char0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        final JsonElement at = node(key);
+        final JsonElement at = this.node(key);
 
         return checkJsonType(typeMatches(Kind.CHAR, at), this.name(), Kind.CHAR, at, key)
             .getAsString()
@@ -147,7 +147,7 @@ public final class ExtGsonJsonSource extends Source {
     protected String string0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        final JsonElement at = node(key);
+        final JsonElement at = this.node(key);
 
         return checkJsonType(typeMatches(Kind.STRING, at), this.name(), Kind.STRING, at, key)
             .getAsString();
@@ -158,7 +158,7 @@ public final class ExtGsonJsonSource extends Source {
     protected Number number0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        final JsonElement at = node(key);
+        final JsonElement at = this.node(key);
         return checkJsonType(typeMatches(Kind.LONG, at), this.name(), Kind.LONG, at, key)
             .getAsLong();
     }
@@ -168,7 +168,7 @@ public final class ExtGsonJsonSource extends Source {
     protected Number numberDouble0(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        final JsonElement at = node(key);
+        final JsonElement at = this.node(key);
         return checkJsonType(typeMatches(Kind.DOUBLE, at), this.name(), Kind.DOUBLE, at, key)
             .getAsDouble();
     }
@@ -189,7 +189,7 @@ public final class ExtGsonJsonSource extends Source {
 
         final Gson reader = this.mapperSupplier.get();
 
-        final JsonElement at = node(key);
+        final JsonElement at = this.node(key);
         checkJsonType(at.isJsonArray(), this.name(), type, at, key);
         final JsonArray asJsonArray = at.getAsJsonArray();
 
@@ -239,7 +239,7 @@ public final class ExtGsonJsonSource extends Source {
     protected boolean isNull(@NotNull final String key) {
         Objects.requireNonNull(key, "key");
 
-        return node(key).isJsonNull();
+        return this.node(key).isJsonNull();
     }
 
     @Override
@@ -249,6 +249,7 @@ public final class ExtGsonJsonSource extends Source {
 
         if (this.node_(key) == null)
             return false;
+
         if (type == null)
             return true;
 
