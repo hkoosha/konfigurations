@@ -19,15 +19,15 @@ final class ExtGsonSourceHelper {
     }
 
     static void ensureLibraryJarIsOnPath() {
-        final String klass = "com.google.gson.Gson";
-        try {
-            Class.forName(klass);
-        }
-        catch (final ClassNotFoundException e) {
-            throw new KfgSourceException(null,
-                "gson library is required to be present in " +
-                    "the class path, can not find the class: " + klass, e);
-        }
+        // final String klass = "com.google.gson.Gson";
+        // try {
+        //     Class.forName(klass);
+        // }
+        // catch (final ClassNotFoundException e) {
+        //     throw new KfgSourceException(null,
+        //         "gson library is required to be present in " +
+        //             "the class path, can not find the class: " + klass, e);
+        // }
     }
 
     @NotNull
