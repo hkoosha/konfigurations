@@ -13,8 +13,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-import static java.lang.String.format;
-
 @ThreadSafe
 @ApiStatus.Internal
 final class KombinerK<U> implements K<U> {
@@ -109,10 +107,10 @@ final class KombinerK<U> implements K<U> {
     @Override
     public String toString() {
         try {
-            return format("K(%s=%s)", this.key, this.v());
+            return String.format("K(%s=%s)", this.key, this.v());
         }
         catch (final Exception e) {
-            return format("K(error::%s)", this.key);
+            return String.format("K(error::%s)", this.key);
         }
     }
 

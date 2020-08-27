@@ -14,6 +14,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,8 +23,6 @@ import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.singleton;
-import static java.util.Collections.unmodifiableMap;
 
 @ThreadSafe
 @Immutable
@@ -90,7 +89,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                                  @NotNull final Konfiguration source) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(source, "source");
-        return kombine(name, singleton(source));
+        return kombine(name, Collections.singleton(source));
     }
 
     @Override
@@ -148,7 +147,7 @@ public final class FactoryV8 implements KonfigurationFactory {
                              @NotNull final Map<String, ?> storage) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(storage, "storage");
-        final Map<String, ?> copy = unmodifiableMap(new HashMap<>(storage));
+        final Map<String, ?> copy = Collections.unmodifiableMap(new HashMap<>(storage));
         return map(name, () -> copy);
     }
 

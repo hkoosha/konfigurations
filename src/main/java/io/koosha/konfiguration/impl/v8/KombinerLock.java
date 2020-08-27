@@ -8,12 +8,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Supplier;
-
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @ThreadSafe
 @ApiStatus.Internal
@@ -47,7 +46,7 @@ final class KombinerLock {
             lock.lock();
         else
             try {
-                if (!lock.tryLock(this.lockWaitTimeMillis, MILLISECONDS))
+                if (!lock.tryLock(this.lockWaitTimeMillis, TimeUnit.MILLISECONDS))
                     throw new KfgConcurrencyException(this.name, "could not acquire lock");
             }
             catch (final InterruptedException e) {

@@ -38,8 +38,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.asList;
-import static java.util.Objects.requireNonNull;
-import static java.util.stream.Collectors.toList;
 
 /**
  * Reads konfig from a yaml source (supplied as string).
@@ -103,7 +101,7 @@ final class ExtYamlSource extends Source {
                             return false;
                     return true;
                 })
-                .collect(toList());
+                .collect(Collectors.toList());
             if (constructors.isEmpty())
                 throw new KfgSourceException(null, "no constructor with ConstructorProperties is liable for:" + cArgsByName);
             if (constructors.size() > 1)
@@ -219,7 +217,7 @@ final class ExtYamlSource extends Source {
                             t.typeIs(String.class))
                             t.value = new String(t.byteArray());
                     })
-                    .collect(toList());
+                    .collect(Collectors.toList());
 
                 final Map<String, ParamNode> byName = consArgs
                     .stream()
@@ -228,7 +226,7 @@ final class ExtYamlSource extends Source {
                 final List<String> names = consArgs
                     .stream()
                     .map(t -> t.name)
-                    .collect(toList());
+                    .collect(Collectors.toList());
 
                 final Class<?>[] types = consArgs
                     .stream()
@@ -267,7 +265,7 @@ final class ExtYamlSource extends Source {
                         c0 = null;
                     }
 
-                requireNonNull(c0, "no constructor found for: " + node);
+                Objects.requireNonNull(c0, "no constructor found for: " + node);
 
                 final String[] annotatedNames =
                     c0.getAnnotation(ConstructorProperties.class).value();
@@ -392,11 +390,11 @@ final class ExtYamlSource extends Source {
         }
 
         final String newYaml = this.yaml.get();
-        requireNonNull(newYaml, "supplied storage is null");
+        Objects.requireNonNull(newYaml, "supplied storage is null");
         this.lastYaml = newYaml;
 
         final Yaml newMapper = mapper.get();
-        requireNonNull(newMapper, "supplied mapper is null");
+        Objects.requireNonNull(newMapper, "supplied mapper is null");
         this.root = Collections.unmodifiableMap(newMapper.load(newYaml));
     }
 

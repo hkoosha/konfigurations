@@ -3,8 +3,6 @@ package io.koosha.konfiguration;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Nullable;
 
-import static java.lang.String.format;
-
 public class KfgMissingKeyException extends KfgException {
 
     public KfgMissingKeyException(@Nullable final String source,
@@ -26,7 +24,7 @@ public class KfgMissingKeyException extends KfgException {
 
     @Override
     public String toString() {
-        return format("%s(key=%s, neededType=%s)",
+        return String.format("%s(key=%s, neededType=%s)",
             this.getClass().getName(),
             this.key(),
             this.neededType());

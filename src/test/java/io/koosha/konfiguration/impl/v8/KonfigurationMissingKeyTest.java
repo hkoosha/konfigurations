@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static java.util.Collections.singletonMap;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 public class KonfigurationMissingKeyTest {
 
@@ -24,12 +26,25 @@ public class KonfigurationMissingKeyTest {
     @BeforeMethod
     public void setup() {
         this.returnFour = true;
-        this.k = KonfigurationFactory.getInstance().map("map", sup);
+        this.k = KonfigurationFactory.getInstance()
+                                     .map("map", sup);
     }
 
     @Test
     public void testMissingKeyNotRaisedUntilValueIsNotCalled() {
         k.string("i.do.not.exist");
+    }
+
+    @Test
+    public void testMissingKeyNotRaisedWhenDefaultIsProvidedWithNull() {
+        final String v = k.string("i.do.not.exist").v(null);
+        assertNull(v);
+    }
+
+    @Test
+    public void testMissingKeyNotRaisedWhenDefaultIsProvidedWithNonNull() {
+        final String v = k.string("i.do.not.exist").v("haha");
+        assertEquals(v, "haha");
     }
 
     @Test(expectedExceptions = KfgMissingKeyException.class)

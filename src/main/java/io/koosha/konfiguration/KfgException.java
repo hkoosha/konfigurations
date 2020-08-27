@@ -5,8 +5,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-import static java.lang.String.format;
-
 @SuppressWarnings("unused")
 public class KfgException extends RuntimeException {
 
@@ -100,7 +98,7 @@ public class KfgException extends RuntimeException {
 
     @Override
     public String toString() {
-        return format("%s(key=%s, neededType=%s, actualValue=%s, message=%s)",
+        return String.format("%s(key=%s, neededType=%s, actualValue=%s, message=%s)",
             this.getClass().getName(),
             this.key(),
             this.neededType(),
@@ -150,7 +148,7 @@ public class KfgException extends RuntimeException {
     static String msgOf(final Throwable t) {
         return t == null
             ? "[null exception]->[null exception]"
-            : format("[throwable::%s]->[%s]", t.getClass().getName(), t.getMessage());
+            : String.format("[throwable::%s]->[%s]", t.getClass().getName(), t.getMessage());
     }
 
     static String toStringOf(final Object value) {
@@ -170,7 +168,7 @@ public class KfgException extends RuntimeException {
             representationV = "[" + "Objects.toString(value)" + "]->" + msgOf(t);
         }
 
-        return format("[%s]:[%s]", representationC, representationV);
+        return String.format("[%s]:[%s]", representationC, representationV);
     }
 
 }

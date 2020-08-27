@@ -11,10 +11,6 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
-import java.net.URI;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.List;
 
@@ -37,27 +33,18 @@ public class ExtGsonJsonSourceTest {
 
     @BeforeClass
     public void init() throws Exception {
-        //noinspection ConstantConditions
-        final URI uri0 = this.getClass()
-                             .getClassLoader()
-                             .getResource("sample0.json")
-                             .toURI();
-        //noinspection ConstantConditions
-        final URI uri1 = this.getClass()
-                             .getClassLoader()
-                             .getResource("sample1.json")
-                             .toURI();
-
-        SAMPLE_0 = new String(Files.readAllBytes(Paths.get(uri0)), StandardCharsets.UTF_8);
-        SAMPLE_1 = new String(Files.readAllBytes(Paths.get(uri1)), StandardCharsets.UTF_8);
+        SAMPLE_0 = TestUtil.readResource("sample0.json");
+        SAMPLE_1 = TestUtil.readResource("sample1.json");
     }
 
     @BeforeMethod
     public void setup() throws Exception {
         this.json = SAMPLE_0;
-        this.k = new ExtGsonJsonSource("testGsonSource",
-            () -> json,
-            ExtGsonSourceHelper::mapper);
+        this.k = new ExtGsonJsonSource(
+            "testGsonSource",
+            () -> this.json,
+            ExtGsonSourceHelper::mapper
+        );
     }
 
     private void update() {
@@ -124,7 +111,7 @@ public class ExtGsonJsonSourceTest {
 
         this.update();
 
-        List<Integer> after = this.k().list("aIntList", Kind.INT).v();
+        final List<Integer> after = this.k().list("aIntList", Kind.INT).v();
         assertEquals(after, asList(2, 2));
     }
 

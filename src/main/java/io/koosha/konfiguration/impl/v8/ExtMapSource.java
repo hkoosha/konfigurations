@@ -18,8 +18,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * {@link #check(Kind, String)} is not very strong, regarding collection types
  * but it is ok, as {@link #has(String, Kind)} is strong enough and is called
@@ -69,7 +67,7 @@ final class ExtMapSource extends Source {
         this.map = mapSupplier;
         this.root = new HashMap<>(mapSupplier.get());
         this.lastHash = this.root.hashCode();
-        requireNonNull(this.map.get(), "supplied map is null");
+        Objects.requireNonNull(this.map.get(), "supplied map is null");
     }
 
     @Override

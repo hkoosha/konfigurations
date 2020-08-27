@@ -32,7 +32,6 @@ import java.util.regex.Pattern;
 
 import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.checkJsonType;
 import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.typeMatches;
-import static java.util.Objects.requireNonNull;
 
 @ThreadSafe
 final class ExtGsonJsonLiteSource extends LiteSource {
@@ -137,7 +136,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
         this.json = json;
         this.mapperSupplier = objectMapper;
 
-        requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
+        Objects.requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
 
         final JsonObject update;
         try {
@@ -146,7 +145,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
         catch (final JsonSyntaxException e) {
             throw new KfgSourceException(this.name(), "error parsing json string", e);
         }
-        requireNonNull(update, "root element is null");
+        Objects.requireNonNull(update, "root element is null");
 
         this.root = update;
     }
@@ -284,7 +283,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
     @Override
     @NotNull
     public LiteKonfiguration delete(final @NotNull String key) {
-        requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
         if (key.isEmpty())
             throw new KfgMissingKeyException(this.name(), key, "empty konfig key");
 
@@ -352,7 +351,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
     @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  @Nullable final Boolean value) {
-        requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
 
         final String[] split = DOT_PATTERN.split(key);
 
@@ -418,7 +417,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
 
     private LiteKonfiguration putNumber(@NotNull final String key,
                                         @Nullable final Number value) {
-        requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
 
         final String[] split = DOT_PATTERN.split(key);
 
@@ -438,7 +437,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
     @NotNull
     public LiteKonfiguration put(@NotNull final String key,
                                  @Nullable final String value) {
-        requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
 
         final String[] split = DOT_PATTERN.split(key);
 
@@ -472,7 +471,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
 
     private LiteKonfiguration putCollection(@NotNull final String key,
                                             @Nullable final Collection<?> value) {
-        requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
 
         final String[] split = DOT_PATTERN.split(key);
         final Gson objectMapper = this.mapperSupplier.get();
@@ -494,7 +493,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
     @Contract(mutates = "this")
     public LiteKonfiguration putCustom(@NotNull final String key,
                                        @Nullable final Object value) {
-        requireNonNull(key, "key");
+        Objects.requireNonNull(key, "key");
 
         final String[] split = DOT_PATTERN.split(key);
         final Gson objectMapper = this.mapperSupplier.get();

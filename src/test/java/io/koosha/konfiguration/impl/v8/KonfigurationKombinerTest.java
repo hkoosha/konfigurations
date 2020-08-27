@@ -14,6 +14,7 @@ import java.util.function.Supplier;
 import static java.util.Collections.singletonMap;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
+import static org.testng.Assert.assertNull;
 import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
@@ -71,7 +72,15 @@ public final class KonfigurationKombinerTest {
 
     @Test
     public void testDefaultValue() {
-        assertEquals(k.long_("some bla bla bla").v(9876L), (Long) 9876L);
+        final Long actual = 9876L;
+        final Long v = k.long_("some bla bla bla").v(actual);
+        assertEquals(v, actual);
+    }
+
+    @Test
+    public void testDefaultValueNull() {
+        final Long v = k.long_("some bla bla bla").v(null);
+        assertNull(v);
     }
 
 }

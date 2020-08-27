@@ -28,8 +28,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import static java.util.Objects.requireNonNull;
-
 /**
  * Reads konfig from a json/yaml source (supplied as string).
  *
@@ -106,17 +104,17 @@ final class ExtJacksonSource extends Source {
     ExtJacksonSource(@NotNull final String name,
                      @NotNull final Supplier<String> jsonSupplier,
                      @NotNull final Supplier<ObjectMapper> objectMapper) {
-        requireNonNull(name, "name");
-        requireNonNull(jsonSupplier, "jsonSupplier");
-        requireNonNull(objectMapper, "objectMapper");
-        requireNonNull(objectMapper.get(), "supplied mapper is null");
+        Objects.requireNonNull(name, "name");
+        Objects.requireNonNull(jsonSupplier, "jsonSupplier");
+        Objects.requireNonNull(objectMapper, "objectMapper");
+        Objects.requireNonNull(objectMapper.get(), "supplied mapper is null");
 
         this.name = name;
         this.jsonSupplier = jsonSupplier;
         this.mapperSupplier = objectMapper;
 
         this.lastJson = this.jsonSupplier.get();
-        requireNonNull(this.lastJson, "supplied json is null");
+        Objects.requireNonNull(this.lastJson, "supplied json is null");
 
         final JsonNode update;
         try {
@@ -125,7 +123,7 @@ final class ExtJacksonSource extends Source {
         catch (final IOException e) {
             throw new KfgSourceException(this.name(), "error parsing json string", e);
         }
-        requireNonNull(update, "root element is null");
+        Objects.requireNonNull(update, "root element is null");
 
         this.root = update;
     }

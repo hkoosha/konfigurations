@@ -30,7 +30,6 @@ import java.util.regex.Pattern;
 
 import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.checkJsonType;
 import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.typeMatches;
-import static java.util.Objects.requireNonNull;
 
 @Immutable
 @ThreadSafe
@@ -98,8 +97,8 @@ public final class ExtGsonJsonSource extends Source {
         this.mapperSupplier = objectMapper;
         this.lastJson = this.json.get();
 
-        requireNonNull(this.lastJson, "supplied json is null");
-        requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
+        Objects.requireNonNull(this.lastJson, "supplied json is null");
+        Objects.requireNonNull(this.mapperSupplier.get(), "supplied mapper is null");
 
         final JsonObject update;
         try {
@@ -108,7 +107,7 @@ public final class ExtGsonJsonSource extends Source {
         catch (final JsonSyntaxException e) {
             throw new KfgSourceException(this.name(), "error parsing json string", e);
         }
-        requireNonNull(update, "root element is null");
+        Objects.requireNonNull(update, "root element is null");
 
         this.root = update;
     }

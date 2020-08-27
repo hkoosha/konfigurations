@@ -5,10 +5,11 @@ import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationFactory;
 import io.koosha.konfiguration.TestUtil;
 import io.koosha.konfiguration.type.Kind;
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
 import java.util.Collections;
+
+import static org.testng.Assert.assertSame;
 
 @SuppressWarnings("WeakerAccess")
 public class KonfigurationKombinerCustomValueTest {
@@ -25,7 +26,7 @@ public class KonfigurationKombinerCustomValueTest {
     @Test
     public void testCustomValue() {
         K<TestUtil.DummyCustom> custom = k.custom(key, Kind.of(TestUtil.DummyCustom.class));
-        Assert.assertSame(custom.v(), value);
+        assertSame(custom.v(), value);
     }
 
 }

@@ -14,8 +14,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.Set;
-
-import static java.util.stream.Collectors.toList;
+import java.util.stream.Collectors;
 
 @NotThreadSafe
 @ApiStatus.Internal
@@ -79,7 +78,7 @@ final class KombinerObservers {
             .map(Observer::listener)
             .filter(Objects::nonNull)
             .map(it -> (Runnable) () -> it.accept(key))
-            .collect(toList());
+            .collect(Collectors.toList());
     }
 
     @NotThreadSafe

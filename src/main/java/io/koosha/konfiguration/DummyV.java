@@ -13,8 +13,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static java.lang.String.format;
-
 /**
  * Dummy konfig value, holding a constant konfig value with no source.
  *
@@ -132,7 +130,7 @@ public final class DummyV<U> implements K<U> {
             vStr = "";
             keyStr = "!" + key;
         }
-        return format("K[exists=%b,%s=%s]", this.exists, keyStr, vStr);
+        return String.format("K[exists=%b,%s=%s]", this.exists, keyStr, vStr);
     }
 
     // ________________________________________________ PREDEFINED CONST VALUES

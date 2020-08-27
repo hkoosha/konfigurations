@@ -4,6 +4,14 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Contract;
 
 import java.beans.ConstructorProperties;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -12,6 +20,33 @@ public final class TestUtil {
 
     private TestUtil() {
 
+    }
+
+    public static String readResource(final String name) {
+        final URL resource = TestUtil.class.getClassLoader()
+                                           .getResource(name);
+        if (resource == null)
+            throw new RuntimeException("resource not found: " + name);
+
+        final URI uri0;
+        try {
+            uri0 = resource.toURI();
+        }
+        catch (final URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        final Path path = Paths.get(uri0);
+
+        final byte[] bytes;
+        try {
+            bytes = Files.readAllBytes(path);
+        }
+        catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return new String(bytes, StandardCharsets.UTF_8);
     }
 
     /**

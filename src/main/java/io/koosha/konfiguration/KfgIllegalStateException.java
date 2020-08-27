@@ -4,8 +4,6 @@ import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static io.koosha.konfiguration.KfgException.toStringOf;
-
 public class KfgIllegalStateException extends IllegalStateException {
 
     @Nullable
@@ -41,7 +39,7 @@ public class KfgIllegalStateException extends IllegalStateException {
         this.source = source;
         this.key = key;
         this.neededType = neededType;
-        this.actualValue = toStringOf(actualValue);
+        this.actualValue = KfgException.toStringOf(actualValue);
     }
 
     public KfgIllegalStateException(@Nullable final String source,
@@ -54,7 +52,7 @@ public class KfgIllegalStateException extends IllegalStateException {
         this.source = source;
         this.key = key;
         this.neededType = neededType;
-        this.actualValue = toStringOf(actualValue);
+        this.actualValue = KfgException.toStringOf(actualValue);
     }
 
     public KfgIllegalStateException(@NotNull final String source,
@@ -64,7 +62,7 @@ public class KfgIllegalStateException extends IllegalStateException {
         this.source = source;
         this.key = key;
         this.neededType = neededType;
-        this.actualValue = toStringOf(actualValue);
+        this.actualValue = KfgException.toStringOf(actualValue);
     }
 
     @Nullable
