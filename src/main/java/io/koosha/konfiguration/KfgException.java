@@ -22,7 +22,7 @@ public class KfgException extends RuntimeException {
 
     public KfgException(@Nullable final String source,
                         @Nullable final Throwable cause) {
-        super(cause);
+        super("source: " + source, cause);
         this.source = source;
         this.key = null;
         this.neededType = null;
@@ -89,6 +89,7 @@ public class KfgException extends RuntimeException {
                         @Nullable final String key,
                         @Nullable final Kind<?> neededType,
                         @Nullable final Object actualValue) {
+        super("source: " + source + " key:" + key + " neededType: " + neededType + " actualType: " + actualValue);
         this.source = source;
         this.key = key;
         this.neededType = neededType;

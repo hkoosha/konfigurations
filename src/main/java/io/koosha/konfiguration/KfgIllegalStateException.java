@@ -1,7 +1,6 @@
 package io.koosha.konfiguration;
 
 import io.koosha.konfiguration.type.Kind;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class KfgIllegalStateException extends IllegalStateException {
@@ -26,7 +25,11 @@ public class KfgIllegalStateException extends IllegalStateException {
     public KfgIllegalStateException(@Nullable final String source,
                                     final String message,
                                     final Throwable t) {
-        this(source, null, null, null, message, t);
+        super(message, t);
+        this.source = source;
+        this.key = null;
+        this.neededType = null;
+        this.actualValue = KfgException.toStringOf(null);
     }
 
 
@@ -36,29 +39,6 @@ public class KfgIllegalStateException extends IllegalStateException {
                                     @Nullable final Object actualValue,
                                     final String message) {
         super(message);
-        this.source = source;
-        this.key = key;
-        this.neededType = neededType;
-        this.actualValue = KfgException.toStringOf(actualValue);
-    }
-
-    public KfgIllegalStateException(@Nullable final String source,
-                                    @Nullable final String key,
-                                    @Nullable final Kind<?> neededType,
-                                    @Nullable final Object actualValue,
-                                    final String message,
-                                    final Throwable cause) {
-        super(message, cause);
-        this.source = source;
-        this.key = key;
-        this.neededType = neededType;
-        this.actualValue = KfgException.toStringOf(actualValue);
-    }
-
-    public KfgIllegalStateException(@NotNull final String source,
-                                    @Nullable final String key,
-                                    @Nullable final Kind<?> neededType,
-                                    @Nullable final Object actualValue) {
         this.source = source;
         this.key = key;
         this.neededType = neededType;

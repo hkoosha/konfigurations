@@ -52,7 +52,7 @@ observer will be notified once for each updated key in each update.
 reference is kept to listeners (GC works as expected).
 
 ```java
-KonfigurationFactory f    = KonfigurationFactory.getInstanceV8();
+KonfigurationFactory f    = KonfigurationFactory.getInstance();
 
 // Create as many sources as necessary
 Konfiguration        json = f.jacksonJson ("myJsonSource", "some_valid_json...");
