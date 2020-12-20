@@ -11,7 +11,6 @@ import org.yaml.snakeyaml.Yaml;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.prefs.Preferences;
 
@@ -21,7 +20,6 @@ public interface KonfigurationFactory {
     String VERSION = "8.0.0";
 
     long LOCK_WAIT_MILLIS__DEFAULT = 300;
-    AtomicBoolean UNSAFE_YAML = new AtomicBoolean(true);
 
 
     @Contract(pure = true)

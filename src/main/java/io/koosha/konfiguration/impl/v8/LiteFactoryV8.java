@@ -27,7 +27,6 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
                                          @NotNull final String json) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
-        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
 
         return jacksonJson(name, json, ExtJacksonSourceJsonHelper::mapper);
     }
@@ -40,7 +39,6 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
 
         return new ExtJacksonLiteSource(name, json, objectMapper);
     }
@@ -51,7 +49,6 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
                                          @NotNull final String yaml) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
-        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
 
         return jacksonYaml(name, yaml, ExtJacksonSourceYamlHelper::mapper);
     }
@@ -64,7 +61,6 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
 
         return new ExtJacksonLiteSource(name, yaml, objectMapper);
     }
@@ -75,7 +71,6 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
                                       @NotNull final String json) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
-        ExtGsonSourceHelper.ensureLibraryJarIsOnPath();
 
         return gsonJson(name, json, ExtGsonSourceHelper::mapper);
     }
@@ -87,7 +82,6 @@ public class LiteFactoryV8 implements LiteKonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        ExtGsonSourceHelper.ensureLibraryJarIsOnPath();
 
         return new ExtGsonJsonLiteSource(name, json, objectMapper);
     }

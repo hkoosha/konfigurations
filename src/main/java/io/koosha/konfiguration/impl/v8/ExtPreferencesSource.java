@@ -2,6 +2,7 @@ package io.koosha.konfiguration.impl.v8;
 
 import io.koosha.konfiguration.KfgAssertionException;
 import io.koosha.konfiguration.KfgIllegalStateException;
+import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.Source;
@@ -273,7 +274,7 @@ final class ExtPreferencesSource extends Source {
         try {
             synchronized (LOCK) {
                 if (!this.source.nodeExists(newKey))
-                    throw new KfgIllegalStateException(this.name(), "missing key=" + key);
+                    throw new KfgMissingKeyException(this.name(), key);
             }
         }
         catch (final BackingStoreException e) {

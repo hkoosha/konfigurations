@@ -1,4 +1,0 @@
-When updating sources, it's best to wait an amount of time before notifying 
-observers. 
-raise condition?
-

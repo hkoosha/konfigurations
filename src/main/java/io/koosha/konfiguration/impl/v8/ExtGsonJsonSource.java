@@ -90,8 +90,6 @@ public final class ExtGsonJsonSource extends Source {
         Objects.requireNonNull(jsonSupplier, "jsonSupplier");
         Objects.requireNonNull(objectMapper, "objectMapper");
 
-        ExtGsonSourceHelper.ensureLibraryJarIsOnPath();
-
         this.name = name;
         this.json = jsonSupplier;
         this.mapperSupplier = objectMapper;

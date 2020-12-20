@@ -33,18 +33,6 @@ final class ExtJacksonSourceJsonHelper {
         return mapper;
     }
 
-    static void ensureLibraryJarIsOnPath() {
-        // final String klass = "com.fasterxml.jackson.databind.ObjectMapper";
-        // try {
-        //     Class.forName(klass);
-        // }
-        // catch (final ClassNotFoundException e) {
-        //     throw new KfgSourceException(null,
-        //         "jackson yaml library is required to be present in " +
-        //             "the class path, can not find the class: " + klass, e);
-        // }
-    }
-
     @Contract(pure = true)
     static boolean typeMatches(@NotNull final Kind<?> type,
                                @NotNull final JsonNode node) {

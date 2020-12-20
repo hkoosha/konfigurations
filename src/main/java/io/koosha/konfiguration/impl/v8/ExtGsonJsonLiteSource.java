@@ -130,8 +130,6 @@ final class ExtGsonJsonLiteSource extends LiteSource {
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
 
-        ExtGsonSourceHelper.ensureLibraryJarIsOnPath();
-
         this.name = name;
         this.json = json;
         this.mapperSupplier = objectMapper;

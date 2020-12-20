@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
-import io.koosha.konfiguration.KfgSourceException;
 import jdk.nashorn.internal.ir.annotations.Immutable;
 import net.jcip.annotations.ThreadSafe;
 import org.jetbrains.annotations.Contract;
@@ -32,19 +31,6 @@ final class ExtJacksonSourceYamlHelper {
         mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
         mapper.findAndRegisterModules();
         return mapper;
-    }
-
-    @Contract(pure = true)
-    static void ensureLibraryJarIsOnPath() {
-        // final String klass = "com.fasterxml.jackson.dataformat.yaml.YAMLFactory";
-        // try {
-        //     Class.forName(klass);
-        // }
-        // catch (final ClassNotFoundException e) {
-        //     throw new KfgSourceException(null,
-        //         "jackson yaml library is required to be present in " +
-        //             "the class path, can not find the class: " + klass, e);
-        // }
     }
 
 }

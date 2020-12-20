@@ -378,17 +378,6 @@ final class ExtYamlSource extends Source {
         this.yaml = yamlSupplier;
         this.mapper = mapper;
 
-        // Check early, so we 're not fooled with a dummy object reader.
-        try {
-            Class.forName("org.yaml.snakeyaml.Yaml");
-        }
-        catch (final ClassNotFoundException e) {
-            throw new KfgSourceException(this.name(),
-                "org.yaml.snakeyaml library is required to be" +
-                    " present in the class path, can not find the" +
-                    "class: org.yaml.snakeyaml.Yaml", e);
-        }
-
         final String newYaml = this.yaml.get();
         Objects.requireNonNull(newYaml, "supplied storage is null");
         this.lastYaml = newYaml;

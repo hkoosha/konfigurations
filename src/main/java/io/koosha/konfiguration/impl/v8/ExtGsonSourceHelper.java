@@ -3,7 +3,6 @@ package io.koosha.konfiguration.impl.v8;
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
-import io.koosha.konfiguration.KfgSourceException;
 import io.koosha.konfiguration.KfgTypeException;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Contract;
@@ -16,18 +15,6 @@ final class ExtGsonSourceHelper {
 
     private ExtGsonSourceHelper() {
         throw new UnsupportedOperationException();
-    }
-
-    static void ensureLibraryJarIsOnPath() {
-        // final String klass = "com.google.gson.Gson";
-        // try {
-        //     Class.forName(klass);
-        // }
-        // catch (final ClassNotFoundException e) {
-        //     throw new KfgSourceException(null,
-        //         "gson library is required to be present in " +
-        //             "the class path, can not find the class: " + klass, e);
-        // }
     }
 
     @NotNull

@@ -173,7 +173,6 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final Supplier<String> json) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
-        ExtJacksonSourceJsonHelper.ensureLibraryJarIsOnPath();
 
         return jacksonJson(name, json, ExtJacksonSourceJsonHelper::mapper);
     }
@@ -185,7 +184,6 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final String json) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
-        ExtJacksonSourceJsonHelper.ensureLibraryJarIsOnPath();
 
         return jacksonJson(name, () -> json);
     }
@@ -199,7 +197,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        ExtJacksonSourceJsonHelper.ensureLibraryJarIsOnPath();
 
         return jacksonJson(name, () -> json, objectMapper);
     }
@@ -213,7 +210,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(json, "json");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        ExtJacksonSourceJsonHelper.ensureLibraryJarIsOnPath();
 
         final Konfiguration k = new ExtJacksonSource(name, json, objectMapper);
         return kombine(name, k);
@@ -227,7 +223,6 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final Supplier<String> yaml) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
-        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
 
         return jacksonYaml(name, yaml, ExtJacksonSourceYamlHelper::mapper);
     }
@@ -239,7 +234,6 @@ public final class FactoryV8 implements KonfigurationFactory {
                                      @NotNull final String yaml) {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
-        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
 
         return jacksonYaml(name, () -> yaml);
     }
@@ -253,7 +247,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
 
         return jacksonYaml(name, () -> yaml, objectMapper);
     }
@@ -267,7 +260,6 @@ public final class FactoryV8 implements KonfigurationFactory {
         Objects.requireNonNull(name, "name");
         Objects.requireNonNull(yaml, "yaml");
         Objects.requireNonNull(objectMapper, "objectMapper");
-        ExtJacksonSourceYamlHelper.ensureLibraryJarIsOnPath();
 
         final Konfiguration k = new ExtJacksonSource(name, yaml, objectMapper);
         return kombine(name, k);

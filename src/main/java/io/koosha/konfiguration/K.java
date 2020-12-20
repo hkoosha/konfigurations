@@ -134,7 +134,6 @@ public interface K<U> {
      *                                original konfiguration source.
      * @see #v(Object)
      */
-    @Nullable
     U v();
 
     /**
@@ -158,7 +157,6 @@ public interface K<U> {
      * of this konfiguration has been removed from the original source.
      * @see #v()
      */
-    @Nullable
     default U v(@Nullable final U defaultValue) {
         // this.exits() is not atomic.
         try {
@@ -169,7 +167,6 @@ public interface K<U> {
         }
     }
 
-    @Nullable
     default U vn(@NotNull final U defaultValue) {
         Objects.requireNonNull(defaultValue,
             "defaultValue for vn() can not be null, you may use the v() variant instead");
