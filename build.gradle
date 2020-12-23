@@ -9,28 +9,12 @@ plugins {
 
 def isCiServer = System.getenv().containsKey("IS_CI_ENV")
 
-project.ext {
-    my_group = 'io.koosha.konfigurations'
-    my_artifact = 'konfigurations'
-    my_version = '9.0.0'
-    my_name = 'Konfigurations'
-    my_real_name = 'Koosha Hosseiny'
-    my_email = 'i@koosha.io'
-    my_description = 'Simple, small and extendable configuration management library with live updates.'
-    my_url = 'https://github.com/hkoosha/konfigurations'
-    my_url_issues = 'https://github.com/hkoosha/konfigurations/issues'
-    my_git = 'scm:git:git://github.com/hkoosha/konfigurations.git'
-    my_git_conn = 'scm:git:git@github.com:hkoosha/konfigurations.git'
-    my_org = 'io.koosha'
-    my_org_url = 'https://koosha.io'
-}
-
 tasks.withType(JavaCompile) {
     options.fork = true
 }
 
-group ext.my_group
-version ext.my_version
+group 'io.koosha.konfigurations'
+version '9.0.0'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -97,89 +81,60 @@ task javadocJar(type: Jar, dependsOn: javadoc) {
     from javadoc.destinationDir
 }
 
-task allJar(type: Jar, dependsOn: [sourcesJar, javadocJar, jar]) {
-    classifier = 'everything'
-    from sourceSets.main.allSource
-    from javadoc.destinationDir
-    archiveBaseName = 'allJar'
-    from configurations.archives.artifacts.files.collect {
-        zipTree(it)
-    }
-}
-
 artifacts {
     archives sourcesJar
     archives javadocJar
-    // archives allJar
 }
 
-signing {
-    required {
-      !version.toString().endsWith('-SNAPSHOT') && 
-        tasks.withType(PublishToMavenRepository).find {
-         gradle.taskGraph.hasTask it
-      }
+bintray {
+    // user = isCiServer ? '' : myBintrayUser
+    // key = isCiServer ? '' : myBintrayAPIKey
+    user = ''
+    key = ''
+    pkg {
+        repo = 'konfigurations'
+        name = 'konfigurations'
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://github.com/hkoosha/konfigurations'
     }
-    sign configurations.archives
-    sign publishing.publications
+}
+
+def pomConfig = {
+    licenses {
+        license {
+            name 'The Apache Software License, Version 2.0'
+            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+            distribution 'repo'
+        }
+    }
+    developers {
+        developer {
+            id 'hkoosha'
+            name 'Koosha Hosseiny'
+            email 'i@koosha.io'
+        }
+    }
+    
+    scm {
+       url 'https://github.com/hkoosha/konfigurations'
+    }
 }
 
 publishing {
     publications {
-        sonata(MavenPublication) {
-            pom {
-                description = project.ext.my_description
-                name = project.ext.my_name
-                url = project.ext.my_url
-                organization {
-                    name = project.ext.my_org
-                    url = project.ext.my_org_url
-                }
-                issueManagement {
-                    system = 'GitHub'
-                    url = project.ext.my_url_issues
-                }
-                licenses {
-                    license {
-                        name = 'Apache License'
-                        url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-                    }
-                }
-                scm {
-                    connection = project.ext.my_git
-                    developerConnection = project.ext.my_git_conn
-                    url = project.ext.my_url
-                }
-                developers {
-                    developer {
-                        url = project.ext.my_org_url
-                        name = project.ext.my_real_name
-                        email = project.ext.my_email
-                    }
-                }
-            }
-            groupId project.ext.my_group
-            artifactId project.ext.my_artifact
-            version project.ext.my_version
+        MyPublication(MavenPublication) {
             from components.java
-            artifact sourcesJar {
-                classifier 'sources'
-            }
-            artifact javadocJar {
-                classifier 'javadoc'
-            }
-            repositories {
-                maven {
-                    url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
-                    if(!isCiServer) {
-                      credentials {
-                          // username sonatypeUsername
-                          // password sonatypePassword
-                          username ''
-                          password ''
-                      }
-                    }
-                }
+            artifact sourcesJar
+            artifact javadocJar
+            groupId 'io.koosha.konfigurations'
+            artifactId 'konfigurations'
+            version '9.0.0'
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('description', 'Simple, small and extendable zero dependency configuration management library with live updates')
+                root.appendNode('name', 'Konfigurations')
+                root.appendNode('url', 'https://github.com/hkoosha/konfigurations')
+                root.children().last() + pomConfig
             }
         }
     }
