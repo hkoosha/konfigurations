@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -27,9 +27,9 @@ import static java.util.Arrays.asList;
 @ThreadSafe
 @Immutable
 @ApiStatus.Internal
-public final class FactoryV8 implements KonfigurationFactory {
+public final class Factory implements KonfigurationFactory {
 
-    private static final String VERSION = "io.koosha.konfiguration:8.0.0";
+    private static final String VERSION = "io.koosha.konfiguration:9.0.0";
 
     private static final boolean DEFAULT_FAIR_LOCK = false;
     private static final Long DEFAULT_LOCK_WAIT_TIME_MILLIS = null;
@@ -37,8 +37,8 @@ public final class FactoryV8 implements KonfigurationFactory {
 
     @Contract(pure = true)
     @NotNull
-    public static KonfigurationFactory getInstanceV8() {
-        return getInstanceV8(
+    public static KonfigurationFactory getFactoryInstance() {
+        return getFactoryInstance(
             DEFAULT_LOCK_WAIT_TIME_MILLIS,
             DEFAULT_FAIR_LOCK,
             DEFAULT_UPDATABLE);
@@ -46,17 +46,17 @@ public final class FactoryV8 implements KonfigurationFactory {
 
     @Contract(pure = true)
     @NotNull
-    public static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
-                                                     final boolean fairLock) {
-        return getInstanceV8(lockWaitTime, fairLock, DEFAULT_UPDATABLE);
+    public static KonfigurationFactory getFactoryInstance(@Nullable final Long lockWaitTime,
+                                                          final boolean fairLock) {
+        return getFactoryInstance(lockWaitTime, fairLock, DEFAULT_UPDATABLE);
     }
 
     @Contract(pure = true)
     @NotNull
-    public static KonfigurationFactory getInstanceV8(@Nullable final Long lockWaitTime,
-                                                     final boolean fairLock,
-                                                     final boolean updatable) {
-        return new FactoryV8(lockWaitTime, fairLock, updatable);
+    public static KonfigurationFactory getFactoryInstance(@Nullable final Long lockWaitTime,
+                                                          final boolean fairLock,
+                                                          final boolean updatable) {
+        return new Factory(lockWaitTime, fairLock, updatable);
     }
 
     @Nullable
@@ -64,9 +64,9 @@ public final class FactoryV8 implements KonfigurationFactory {
     private final boolean fairLock;
     private final boolean updatable;
 
-    private FactoryV8(@Nullable final Long lockWaitTime,
-                      final boolean fairLock,
-                      final boolean updatable) {
+    private Factory(@Nullable final Long lockWaitTime,
+                    final boolean fairLock,
+                    final boolean updatable) {
         this.lockWaitTime = lockWaitTime;
         this.fairLock = fairLock;
         this.updatable = updatable;

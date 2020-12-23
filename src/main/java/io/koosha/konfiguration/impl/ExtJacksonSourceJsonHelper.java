@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;

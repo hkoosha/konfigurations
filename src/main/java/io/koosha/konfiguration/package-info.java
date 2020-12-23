@@ -9,7 +9,7 @@
  *
  * <h1>Extending</h1>
  * For extending the konfiguration library / connecting new sources, look at
- * the * {@link io.koosha.konfiguration.impl.v8.FactoryV8} <em>BUT DO NOT USE
+ * the * {@link io.koosha.konfiguration.impl.Factory} <em>BUT DO NOT USE
  * THAT CLASS</em> or any class * in that package directly, they are internal
  * implementation and subject to change even in minor releases.
  * <p>
@@ -17,7 +17,7 @@
  * {@code io.koosha.konfiguration.impl.v0.ExtJacksonJsonSource} or any of
  * {@code io.koosha.konfiguration.impl.v0.Ext*} classes as an example, and
  * later wrap them in a {@link io.koosha.konfiguration.Konfiguration} just as
- * {@link io.koosha.konfiguration.impl.v8.FactoryV8#jacksonJson(java.lang.String, java.lang.String)}
+ * {@link io.koosha.konfiguration.impl.Factory#jacksonJson(java.lang.String, java.lang.String)}
  * does.
  */
 package io.koosha.konfiguration;

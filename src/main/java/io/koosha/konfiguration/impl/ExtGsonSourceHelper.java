@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;

@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
@@ -12,13 +12,13 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 @ApiStatus.Internal
-public class LiteFactoryV8 implements LiteKonfigurationFactory {
+public class LiteFactory implements LiteKonfigurationFactory {
 
     @NotNull
     @Contract(pure = true,
               value = "->new")
-    public static LiteKonfigurationFactory getInstanceV8() {
-        return new LiteFactoryV8();
+    public static LiteKonfigurationFactory getFactoryInstance() {
+        return new LiteFactory();
     }
 
     @Override

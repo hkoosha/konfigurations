@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import io.koosha.konfiguration.Handle;
 import io.koosha.konfiguration.Source;

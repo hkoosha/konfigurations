@@ -2,7 +2,7 @@ package io.koosha.konfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import io.koosha.konfiguration.impl.v8.LiteFactoryV8;
+import io.koosha.konfiguration.impl.LiteFactory;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +14,7 @@ public interface LiteKonfigurationFactory {
     @Contract(pure = true)
     @NotNull
     static LiteKonfigurationFactory getInstance() {
-        return LiteFactoryV8.getInstanceV8();
+        return LiteFactory.getFactoryInstance();
     }
 
     /**

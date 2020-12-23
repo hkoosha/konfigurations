@@ -1,5 +1,5 @@
 
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -28,8 +28,8 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
 
-import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.checkJsonType;
-import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.typeMatches;
+import static io.koosha.konfiguration.impl.ExtGsonSourceHelper.checkJsonType;
+import static io.koosha.konfiguration.impl.ExtGsonSourceHelper.typeMatches;
 
 @Immutable
 @ThreadSafe

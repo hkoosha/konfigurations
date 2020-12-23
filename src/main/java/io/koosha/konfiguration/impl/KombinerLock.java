@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import io.koosha.konfiguration.KfgConcurrencyException;
 import io.koosha.konfiguration.KfgIllegalStateException;

@@ -1,4 +1,4 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
@@ -29,9 +29,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.regex.Pattern;
-
-import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.checkJsonType;
-import static io.koosha.konfiguration.impl.v8.ExtGsonSourceHelper.typeMatches;
 
 @ThreadSafe
 final class ExtGsonJsonLiteSource extends LiteSource {
@@ -162,8 +159,8 @@ final class ExtGsonJsonLiteSource extends LiteSource {
 
         final JsonElement at = node(key);
 
-        return checkJsonType(typeMatches(Kind.BOOL, at), this.name(), Kind.BOOL, at, key)
-            .getAsBoolean();
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.BOOL, at), this.name(), Kind.BOOL, at, key)
+                                  .getAsBoolean();
     }
 
     @Override
@@ -173,9 +170,9 @@ final class ExtGsonJsonLiteSource extends LiteSource {
 
         final JsonElement at = node(key);
 
-        return checkJsonType(typeMatches(Kind.CHAR, at), this.name(), Kind.CHAR, at, key)
-            .getAsString()
-            .charAt(0);
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.CHAR, at), this.name(), Kind.CHAR, at, key)
+                                  .getAsString()
+                                  .charAt(0);
     }
 
     @Override
@@ -185,8 +182,8 @@ final class ExtGsonJsonLiteSource extends LiteSource {
 
         final JsonElement at = node(key);
 
-        return checkJsonType(typeMatches(Kind.STRING, at), this.name(), Kind.STRING, at, key)
-            .getAsString();
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.STRING, at), this.name(), Kind.STRING, at, key)
+                                  .getAsString();
     }
 
     @NotNull
@@ -195,8 +192,8 @@ final class ExtGsonJsonLiteSource extends LiteSource {
         Objects.requireNonNull(key, "key");
 
         final JsonElement at = node(key);
-        return checkJsonType(typeMatches(Kind.LONG, at), this.name(), Kind.LONG, at, key)
-            .getAsLong();
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.LONG, at), this.name(), Kind.LONG, at, key)
+                                  .getAsLong();
     }
 
     @NotNull
@@ -205,8 +202,8 @@ final class ExtGsonJsonLiteSource extends LiteSource {
         Objects.requireNonNull(key, "key");
 
         final JsonElement at = node(key);
-        return checkJsonType(typeMatches(Kind.DOUBLE, at), this.name(), Kind.DOUBLE, at, key)
-            .getAsDouble();
+        return ExtGsonSourceHelper.checkJsonType(ExtGsonSourceHelper.typeMatches(Kind.DOUBLE, at), this.name(), Kind.DOUBLE, at, key)
+                                  .getAsDouble();
     }
 
     @NotNull
@@ -226,7 +223,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
         final Gson reader = this.mapperSupplier.get();
 
         final JsonElement at = node(key);
-        checkJsonType(at.isJsonArray(), this.name(), type, at, key);
+        ExtGsonSourceHelper.checkJsonType(at.isJsonArray(), this.name(), type, at, key);
         final JsonArray asJsonArray = at.getAsJsonArray();
 
         final Type typeToken = TypeToken.get(type.type()).getType();
@@ -314,7 +311,7 @@ final class ExtGsonJsonLiteSource extends LiteSource {
 
         final JsonElement node = this.node(key);
 
-        if (typeMatches(type, node))
+        if (ExtGsonSourceHelper.typeMatches(type, node))
             return true;
 
         try {

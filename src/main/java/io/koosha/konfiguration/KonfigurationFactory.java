@@ -2,7 +2,7 @@ package io.koosha.konfiguration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
-import io.koosha.konfiguration.impl.v8.FactoryV8;
+import io.koosha.konfiguration.impl.Factory;
 import io.koosha.konfiguration.type.Kind;
 import org.jetbrains.annotations.Contract;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +17,7 @@ import java.util.prefs.Preferences;
 @SuppressWarnings("unused")
 public interface KonfigurationFactory {
 
-    String VERSION = "8.0.0";
+    String VERSION = "9.0.0";
 
     long LOCK_WAIT_MILLIS__DEFAULT = 300;
 
@@ -25,14 +25,14 @@ public interface KonfigurationFactory {
     @Contract(pure = true)
     @NotNull
     static KonfigurationFactory getInstance() {
-        return FactoryV8.getInstanceV8();
+        return Factory.getFactoryInstance();
     }
 
     @Contract(pure = true)
     @NotNull
     static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
                                             final boolean fairLock) {
-        return FactoryV8.getInstanceV8(lockWaitTime, fairLock);
+        return Factory.getFactoryInstance(lockWaitTime, fairLock);
     }
 
     @Contract(pure = true)
@@ -40,7 +40,7 @@ public interface KonfigurationFactory {
     static KonfigurationFactory getInstance(@Nullable final Long lockWaitTime,
                                             final boolean fairLock,
                                             final boolean updatable) {
-        return FactoryV8.getInstanceV8(lockWaitTime, fairLock, updatable);
+        return Factory.getFactoryInstance(lockWaitTime, fairLock, updatable);
     }
 
 

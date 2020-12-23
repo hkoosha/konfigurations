@@ -1,105 +1,79 @@
-package io.koosha.konfiguration.impl.v8;
+package io.koosha.konfiguration.impl;
 
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
-import io.koosha.konfiguration.KonfigurationFactory;
+import io.koosha.konfiguration.TestUtil;
+import io.koosha.konfiguration.type.Kind;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.io.File;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Scanner;
+import java.util.function.Supplier;
 
-import static java.util.Arrays.asList;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-@SuppressWarnings({"RedundantThrows", "WeakerAccess"})
-public class ExtMapSourceTest {
+@SuppressWarnings("RedundantThrows")
+public class ExtYamlSourceTest {
 
-    protected Map<String, Object> map;
-    protected Map<String, Object> map0;
-    protected Map<String, Object> map1;
+    static String SAMPLE_0;
+    static String SAMPLE_1;
 
-    private Konfiguration k;
+    private String yaml;
+
+    private ExtYamlSource k;
 
     @BeforeClass
-    public void classSetup() throws Exception {
-        this.map0 = new HashMap<>();
-
-        this.map0.put("aInt", 12);
-        this.map0.put("aBool", true);
-        this.map0.put("aIntList", asList(1, 0, 2));
-        this.map0.put("aStringList", asList("a", "B", "c"));
-        this.map0.put("aLong", Long.MAX_VALUE);
-        this.map0.put("aDouble", 3.14D);
-        this.map0.put("aString", "hello world");
-
-        HashMap<Object, Object> m0 = new HashMap<>();
-        m0.put("a", 99);
-        m0.put("c", 22);
-        this.map0.put("aMap", m0);
-
-        HashSet<Integer> s0 = new HashSet<>(asList(1, 2));
-        this.map0.put("aSet", s0);
-        this.map0 = Collections.unmodifiableMap(this.map0);
-
-        // --------------
-
-        this.map1 = new HashMap<>();
-
-        this.map1.put("aInt", 99);
-        this.map1.put("aBool", false);
-        this.map1.put("aIntList", asList(2, 2));
-        this.map1.put("aStringList", asList("a", "c"));
-        this.map1.put("aLong", Long.MIN_VALUE);
-        this.map1.put("aDouble", 4.14D);
-        this.map1.put("aString", "goodbye world");
-
-        HashMap<Object, Object> m1 = new HashMap<>();
-        m1.put("a", "b");
-        m1.put("c", "e");
-        this.map1.put("aMap", m1);
-
-        HashSet<Integer> s1 = new HashSet<>(asList(1, 2, 3));
-        this.map1.put("aSet", s1);
-
-        this.map1 = Collections.unmodifiableMap(this.map1);
+    public void init() throws Exception {
+        //noinspection ConstantConditions
+        final URI uri0 = ExtYamlSource.class.getClassLoader()
+                                            .getResource("sample0.yaml")
+                                            .toURI();
+        //noinspection ConstantConditions
+        final URI uri1 = ExtYamlSource.class.getClassLoader()
+                                            .getResource("sample1.yaml")
+                                            .toURI();
+        SAMPLE_0 = new String(Files.readAllBytes(Paths.get(uri0)));
+        SAMPLE_1 = new String(Files.readAllBytes(Paths.get(uri1)));
     }
 
     @BeforeMethod
     public void setup() throws Exception {
-        this.map = this.map0;
-        this.k = KonfigurationFactory.getInstance().map("map", () -> map);
-    }
-
-    private void update() {
-        this.map = this.map1;
-        //noinspection OptionalGetWithoutIsPresent
-        this.k.manager().get().updateNow();
+        this.yaml = SAMPLE_0;
+        this.k = new ExtYamlSource("yamlSourceTest", () -> this.yaml,
+            ExtYamlSource.defaultYamlSupplier::get);
     }
 
     private Konfiguration k() {
         return this.k;
     }
 
+    private void update() {
+        this.yaml = SAMPLE_1;
+        this.k = ((ExtYamlSource) this.k.updatedCopy());
+    }
+
     @Test
     public void testNotUpdatable() throws Exception {
-        //noinspection OptionalGetWithoutIsPresent
-        assertFalse(this.k().manager().get().hasUpdate());
+        assertFalse(this.k.hasUpdate());
     }
 
     @Test
     public void testUpdatable() throws Exception {
-        map = map1;
-        //noinspection OptionalGetWithoutIsPresent
-        assertTrue(this.k().manager().get().hasUpdate());
+        this.yaml = SAMPLE_1;
+        assertTrue(this.k.hasUpdate());
     }
 
+
     // =========================================================================
+
 
     @Test
     public void testBool() throws Exception {
@@ -166,11 +140,6 @@ public class ExtMapSourceTest {
     }
 
     @Test(expectedExceptions = KfgMissingKeyException.class)
-    public void testBadDouble1() throws Exception {
-        this.k().double_("aLong").v();
-    }
-
-    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadDouble() throws Exception {
         this.k().double_("aString").v();
     }
@@ -193,18 +162,56 @@ public class ExtMapSourceTest {
 
 
     @Test(expectedExceptions = KfgMissingKeyException.class)
-    public void testBadString0() throws Exception {
-        this.k().string("aInt").v();
-    }
-
-    @Test(expectedExceptions = KfgMissingKeyException.class)
-    public void testBadString1() throws Exception {
-        this.k().string("aBool").v();
-    }
-
-    @Test(expectedExceptions = KfgMissingKeyException.class)
     public void testBadString2() throws Exception {
         this.k().string("aIntList").v();
+    }
+
+
+    // =========================================================================
+
+    @Test
+    public void testCustomValue() {
+        final String yamlString = "bang:\n  str : hello\n  i: 99";
+
+        final ExtYamlSource y = new ExtYamlSource(
+            "testYamlSource",
+            () -> yamlString,
+            ExtYamlSource.defaultYamlSupplier::get);
+
+        final TestUtil.DummyCustom bang = y.custom(
+            "bang", Kind.of(TestUtil.DummyCustom.class)).vn();
+
+        assertEquals(bang.i, 99);
+        assertEquals(bang.str, "hello");
+    }
+
+    @Test
+    public void testCustomValue2() {
+        final Supplier<String> yamlString = () -> {
+            try {
+                File file = new File(getClass().getResource("/sample2.yaml").getPath());
+                return new Scanner(file, StandardCharsets.UTF_8.name())
+                    .useDelimiter("\\Z").next();
+            }
+            catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        final ExtYamlSource y = new ExtYamlSource(
+            "testYamlSource",
+            yamlString,
+            ExtYamlSource.defaultYamlSupplier::get);
+
+        final TestUtil.DummyCustom2 bang = y.custom(
+            "bang", Kind.of(TestUtil.DummyCustom2.class)).vn();
+
+        assertEquals(bang.i, 99);
+        assertEquals(bang.str, "hello");
+        assertEquals(bang.olf, TestUtil.mapOf(
+            "manga", "panga", "foo", "bar", "baz", "quo"));
+        assertEquals(bang.again, "no");
+        assertEquals(bang.i, 99);
     }
 
 }
