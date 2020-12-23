@@ -30,14 +30,14 @@ public abstract class Kind<TYPE> implements Serializable {
     private final Type type;
 
     private Kind(@Nullable final String key,
-                 @Nullable final Type t) {
+                 @NotNull final Type t) {
         Objects.requireNonNull(t, "type");
         this.key = key;
         this.type = t;
     }
 
     private Kind(@NotNull final Type t) {
-        this(null, Objects.requireNonNull(t, "t"));
+        this(null, t);
     }
 
     protected Kind() {

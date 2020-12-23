@@ -16,7 +16,7 @@ public class KonfigurationKombinerCustomValueTest {
 
     final TestUtil.DummyCustom value = new TestUtil.DummyCustom();
 
-    final String key = "theKey";
+    static final String key = "theKey";
 
     private final Konfiguration k = KonfigurationFactory.getInstance().map(
         "meName",

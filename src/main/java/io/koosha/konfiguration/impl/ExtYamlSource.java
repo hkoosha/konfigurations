@@ -24,6 +24,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 import java.beans.ConstructorProperties;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -215,7 +216,7 @@ final class ExtYamlSource extends Source {
                         else if (t.value instanceof byte[] &&
                             Objects.equals(t.node.getTag(), Tag.BINARY) &&
                             t.typeIs(String.class))
-                            t.value = new String(t.byteArray());
+                            t.value = new String(t.byteArray(), StandardCharsets.UTF_8);
                     })
                     .collect(Collectors.toList());
 

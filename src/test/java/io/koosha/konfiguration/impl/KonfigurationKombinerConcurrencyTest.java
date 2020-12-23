@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationFactory;
 import io.koosha.konfiguration.KonfigurationManager;
@@ -9,6 +10,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
@@ -20,6 +22,8 @@ import static io.koosha.konfiguration.TestUtil.mapOf;
 import static java.util.Arrays.asList;
 
 @SuppressWarnings("WeakerAccess")
+@SuppressFBWarnings(value = "IS2_INCONSISTENT_SYNC",
+                    justification = "non-synchronized use is only in init method of test framework")
 public class KonfigurationKombinerConcurrencyTest {
 
     private Map<String, Object> MAP0;
@@ -46,8 +50,8 @@ public class KonfigurationKombinerConcurrencyTest {
         final URI uri1 = ExtJacksonSource.class.getClassLoader()
                                                .getResource("sample1.json")
                                                .toURI();
-        JSON0 = new String(Files.readAllBytes(Paths.get(uri0)));
-        JSON1 = new String(Files.readAllBytes(Paths.get(uri1)));
+        JSON0 = new String(Files.readAllBytes(Paths.get(uri0)), StandardCharsets.UTF_8);
+        JSON1 = new String(Files.readAllBytes(Paths.get(uri1)), StandardCharsets.UTF_8);
 
         this.MAP0 = mapOf("aInt", 12, "aBool", false, "aIntList", asList(1, 0, 2), "aLong", 88L);
         this.MAP1 = mapOf("aInt", 99, "bBool", false, "aIntList", asList(2, 2));

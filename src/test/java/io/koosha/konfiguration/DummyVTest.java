@@ -1,5 +1,6 @@
 package io.koosha.konfiguration;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.koosha.konfiguration.type.Kind;
 import org.testng.annotations.Test;
 
@@ -28,6 +29,7 @@ public class DummyVTest {
         assertSame(dummyV.key(), key);
     }
 
+    @SuppressFBWarnings("RC_REF_COMPARISON")
     @Test
     public void testV() throws Exception {
         long value = 99L;
@@ -35,6 +37,7 @@ public class DummyVTest {
         assertSame(dummyV.v(), value);
     }
 
+    @SuppressFBWarnings("RC_REF_COMPARISON")
     @Test
     public void testVWithDefaultValue() throws Exception {
         long value = 99L;

@@ -31,8 +31,6 @@ public class SourceTest {
     private static final String STRING_ABC = "stringAbc";
 
     private List<?> listValue = null;
-    private Set<?> setValue = null;
-    private Object customValue = null;
 
     class ExtSampleSource extends Source {
 
@@ -141,13 +139,13 @@ public class SourceTest {
         @Override
         @NotNull
         protected Set<?> set0(@NotNull String key, @NotNull Kind<?> type) {
-            return setValue;
+            throw new UnsupportedOperationException();
         }
 
         @Override
         @NotNull
         protected Object custom0(@NotNull String key, @NotNull Kind<?> type) {
-            return customValue;
+            throw new UnsupportedOperationException();
         }
 
     }
@@ -157,8 +155,6 @@ public class SourceTest {
     @BeforeMethod
     public void setup() {
         listValue = null;
-        setValue = null;
-        customValue = null;
         this.source = new ExtSampleSource();
     }
 

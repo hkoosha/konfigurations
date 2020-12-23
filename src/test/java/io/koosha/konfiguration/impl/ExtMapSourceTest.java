@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.KonfigurationFactory;
@@ -17,7 +18,8 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
-@SuppressWarnings({"RedundantThrows", "WeakerAccess"})
+@SuppressWarnings("RedundantThrows")
+@SuppressFBWarnings({"CNT_ROUGH_CONSTANT_VALUE", "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
 public class ExtMapSourceTest {
 
     protected Map<String, Object> map;

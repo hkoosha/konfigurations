@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.Konfiguration;
 import io.koosha.konfiguration.TestUtil;
@@ -21,6 +22,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
+@SuppressFBWarnings({"CNT_ROUGH_CONSTANT_VALUE", "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
 public class ExtYamlSourceTest {
 
     static String SAMPLE_0;
@@ -40,8 +42,8 @@ public class ExtYamlSourceTest {
         final URI uri1 = ExtYamlSource.class.getClassLoader()
                                             .getResource("sample1.yaml")
                                             .toURI();
-        SAMPLE_0 = new String(Files.readAllBytes(Paths.get(uri0)));
-        SAMPLE_1 = new String(Files.readAllBytes(Paths.get(uri1)));
+        SAMPLE_0 = new String(Files.readAllBytes(Paths.get(uri0)), StandardCharsets.UTF_8);
+        SAMPLE_1 = new String(Files.readAllBytes(Paths.get(uri1)), StandardCharsets.UTF_8);
     }
 
     @BeforeMethod

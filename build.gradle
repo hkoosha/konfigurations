@@ -1,7 +1,10 @@
-apply plugin: 'java'
-apply plugin: 'idea'
-apply plugin: 'maven-publish'
-apply plugin: 'signing'
+plugins {
+    id "com.github.spotbugs" version "4.6.0"
+    id 'java'
+    id 'idea'
+    id 'maven-publish'
+    id 'signing'
+}
 
 def isCiServer = System.getenv().containsKey("IS_CI_ENV")
 
@@ -33,7 +36,6 @@ targetCompatibility = 1.8
 
 repositories {
     mavenCentral()
-    mavenLocal()
 }
 
 test {
@@ -46,6 +48,18 @@ idea {
         inheritOutputDirs = true
         downloadJavadoc = true
         downloadSources = true
+    }
+}
+
+spotbugsMain {
+    reports {
+        html.enabled = true
+    }
+}
+
+spotbugsTest {
+    reports {
+        html.enabled = true
     }
 }
 
@@ -69,6 +83,7 @@ dependencies {
     testImplementation 'org.testng:testng:7.3.0'
     testImplementation 'org.slf4j:slf4j-api:1.7.30'
     testImplementation 'org.slf4j:slf4j-simple:1.7.30'
+    testCompileOnly 'com.google.code.findbugs:annotations:3.0.1'
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {

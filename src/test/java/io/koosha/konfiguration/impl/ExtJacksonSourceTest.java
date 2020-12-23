@@ -1,5 +1,6 @@
 package io.koosha.konfiguration.impl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.koosha.konfiguration.KfgMissingKeyException;
 import io.koosha.konfiguration.TestUtil;
 import io.koosha.konfiguration.type.Kind;
@@ -20,6 +21,7 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 @SuppressWarnings("RedundantThrows")
+@SuppressFBWarnings({"CNT_ROUGH_CONSTANT_VALUE", "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD"})
 public class ExtJacksonSourceTest {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExtJacksonSourceTest.class);
