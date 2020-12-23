@@ -173,10 +173,10 @@ publishing {
                     url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
                     if(!isCiServer) {
                       credentials {
-                          username sonatypeUsername
-                          password sonatypePassword
-                          // username ''
-                          // password ''
+                          // username sonatypeUsername
+                          // password sonatypePassword
+                          username ''
+                          password ''
                       }
                     }
                 }
@@ -185,7 +185,3 @@ publishing {
     }
 }
 
-bintray {
-    user = myBintrayUser
-    key = myBintrayAPIKey
-}
