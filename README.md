@@ -8,12 +8,12 @@ Simple, small and extendable zero dependency configuration management library wi
 <dependency>
     <groupId>io.koosha.konfigurations</groupId>
     <artifactId>konfigurations</artifactId>
-    <version>8.0.0</version>
+    <version>9.0.0</version>
 </dependency>
 ```
 
 ```groovy
-compile group: 'io.koosha.konfigurations', name: 'konfigurations', version: '8.0.0'
+compile group: 'io.koosha.konfigurations', name: 'konfigurations', version: '9.0.0'
 ```
 
 Development happens on the master branch. Releases are tagged. 

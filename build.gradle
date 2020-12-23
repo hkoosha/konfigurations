@@ -1,4 +1,5 @@
 plugins {
+    id "com.jfrog.bintray" version "1.8.5"
     id "com.github.spotbugs" version "4.6.0"
     id 'java'
     id 'idea'
@@ -172,14 +173,19 @@ publishing {
                     url "https://oss.sonatype.org/service/local/staging/deploy/maven2"
                     if(!isCiServer) {
                       credentials {
-                          // username sonatypeUsername
-                          // password sonatypePassword
-                          username ''
-                          password ''
+                          username sonatypeUsername
+                          password sonatypePassword
+                          // username ''
+                          // password ''
                       }
                     }
                 }
             }
         }
     }
+}
+
+bintray {
+    user = myBintrayUser
+    key = myBintrayAPIKey
 }
