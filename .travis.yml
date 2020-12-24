@@ -5,7 +5,7 @@ jdk:
   - openjdk8
 
 script:
-  - ./gradlew clean test 
+  - ./gradlew clean build test 
 
 env:
 - IS_CI_ENV=1

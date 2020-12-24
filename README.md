@@ -1,4 +1,4 @@
-## Java Configuration Library [![Build Status](https://travis-ci.org/hkoosha/konfigurations.svg?branch=master)](https://travis-ci.org/hkoosha/konfigurations)
+## Java Configuration Library [![Build Status](https://travis-ci.com/hkoosha/konfigurations.svg?branch=master)](https://travis-ci.com/hkoosha/konfigurations.svg?branch=master)
 
 Simple, small and extendable zero dependency configuration management library with live updates.
 
